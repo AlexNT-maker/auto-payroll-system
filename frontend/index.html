@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto payroll app</title>
+    <link rel="stylesheet" href="./src/style.css">
+  </head>
+  <body>
+    
+    <!--Navbar-->
+    <nav class="navbar">
+      <div class="logo">Payroll Manager</div>
+      <div class="nav-links">
+        <button id="nav-home" class="active">Καταχώρηση</button>
+        <button id="nav-employees">Εργαζόμενοι</button>
+        <button id="nav-boats">Σκάφη</button>
+        <button id="nav-expenses">Έξοδα</button>
+        <button id="nav-payments">Πληρωμές</button>
+      </div>
+    </nav>
+
+    <!--Home page-->
+    <main id="app">
+      <div id="page-home">
+        <h1>Ημερήσια Καταχώρηση</h1>
+        
+        <!--Calendar-->
+        <div class="date-selector">
+          <label for="date-picker">Ημερομηνία:</label>
+          <input type="date" id="date-picker">
+        </div>
+
+        <!--Daily form to fill about workers-->
+        <form id="attendance-form">
+          <table class="attendance-table">
+            <thead>
+              <tr>
+                <th>Εργαζόμενος</th>
+                <th>Παρουσία</th>
+                <th>Σκάφος</th>
+                <th>Υπερωρία</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-list">
+              </tbody>
+          </table>
+
+          <button type="submit" class="btn-submit">Αποθήκευση Ημέρας</button>
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
