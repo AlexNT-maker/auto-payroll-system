@@ -50,6 +50,65 @@
           <button type="submit" class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
         </form>
       </div>
+
+      <!--Page No.2 In this page the user can manage his workers-->
+      <div id="page-employees" class="animate-enter hidden">
+        <h1>Διαχείρηση εργαζομένων</h1>
+        <div style="margin-bottom: 2rem; text-align: right;">
+          <button id="btn-add-employee" style="margin-bottom: 5px;" class="btn-submit hover-lift click-shrink">
+            Προσθήκη εργαζόμενου
+          </button>
+        </div>
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th>Όνομα</th>
+              <th>Ημερομίσθιο</th>
+              <th>Υπερωρία</th>
+              <th>Τράπεζα/μέρα</th>
+              <th>Ενέργειες</th>
+            </tr>
+          </thead>
+          <tbody id="employees-list">
+
+            </tbody>
+        </table>
+      </div>
+
+      <!--Form for adding a new employee-->
+      <div id="modal-employee" class="modal-overlay hidden">
+        <div class="modal-content animate-enter">
+          <h2 id="modal-title">Νέος εργαζόμενος</h2>
+          <form id="employee-form">
+            <input type="hidden" id="emp-id"> 
+            <div class="form-group">
+              <label>Ονοματεπώνυμο:</label>
+              <input type="text" id="emp-name" required>
+            </div>
+
+            <div class="form-group">
+              <label>Ημερομίσθιο:</label>
+              <input type="number" id="emp-wage" required step="any">
+            </div>
+
+            <div class="form-group">
+              <label>Υπερωρία:</label>
+              <input type="number" id="emp-overtime" required step="any">
+            </div>
+
+            <div class="form-group">
+              <label>Τράπεζα(Ημερίσιο ποσό):</label>
+              <input type="number" id="emp-bank" required-step="any">
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn-submit hover-lift">Αποθήκευση</button>
+              <button type="button" id="btn-cancel hover-lift">Ακύρωση αλλαγών</button>
+            </div>
+          </form>
+
+        </div>
+      </div>
     </main>
 
     <script type="module" src="/src/main.ts"></script>
