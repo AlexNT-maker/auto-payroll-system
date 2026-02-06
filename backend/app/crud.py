@@ -21,6 +21,29 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate):
     db.refresh(db_employee)
     return db_employee
 
+# Update employee
+def update_employee(db: Session, employee_id: int, employee_data: schemas.EmployeeCreate):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    if not db_employee:
+        return None
+    
+    db_employee.name = employee_data.name
+    db_employee.daily_wage = employee_data.daily_wage
+    db_employee.overtime_rate = employee_data.overtime_rate
+    db_employee.bank_daily_amount = employee_data.bank_daily_amount
+
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
+
+# Delete employee
+def delete_employee(db: Session, employee_id: int):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    if db_employee:
+        db.delete(db_employee)
+        db.commit()
+        return db_employee
+
 # -- Boats --
 
 def get_boats(db: Session):

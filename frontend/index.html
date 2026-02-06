@@ -14,7 +14,7 @@
   <div class="nav-links">
     <button id="nav-home" class="active hover-lift click-shrink">Καταχώρηση</button>
     <button id="nav-employees" class="hover-lift click-shrink">Εργαζόμενοι</button>
-    <button id="nav-boats" class="hover-lift click-shrink">Σκάφη</button>
+    <button id="nav-boats" class="hover-lift click-shrink">Σκάφοι</button>
     <button id="nav-expenses" class="hover-lift click-shrink">Έξοδα</button>
     <button id="nav-payments" class="hover-lift click-shrink">Πληρωμές</button>
   </div>
@@ -47,7 +47,7 @@
               </tbody>
           </table>
 
-          <button type="submit" class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
+          <button type="submit"  class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
         </form>
       </div>
 
@@ -88,22 +88,22 @@
 
             <div class="form-group">
               <label>Ημερομίσθιο:</label>
-              <input type="number" id="emp-wage" required step="any">
+              <input type="number" id="emp-wage" required step="0.01">
             </div>
 
             <div class="form-group">
               <label>Υπερωρία:</label>
-              <input type="number" id="emp-overtime" required step="any">
+              <input type="number" id="emp-overtime" required step="0.01">
             </div>
 
             <div class="form-group">
               <label>Τράπεζα(Ημερίσιο ποσό):</label>
-              <input type="number" id="emp-bank" required-step="any">
+              <input type="number" id="emp-bank" required step="0.01">
             </div>
 
             <div class="modal-actions">
               <button type="submit" class="btn-submit hover-lift">Αποθήκευση</button>
-              <button type="button" id="btn-cancel hover-lift">Ακύρωση αλλαγών</button>
+              <button type="button" id="btn-cancel" class="btn-cancel">Ακύρωση</button>
             </div>
           </form>
 

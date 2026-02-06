@@ -50,6 +50,20 @@ def read_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
     employees = crud.get_employees(db)
     return employees
 
+@app.put("/employees/", response_model= schemas.Employee)
+def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
+    updated_employee = crud.update_employee(db, employee_id, employee)
+    if updated_employee is None:
+        raise HTTPException(status_code= 404, detail= "Ο εργαζόμενος δεν βρέθηκε")
+    return updated_employee
+
+@app.delete("/employees/{employee_id}")
+def delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    deleted_employee = crud.delete_employee(db, employee_id)
+    if deleted_employee is None:
+        raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
+    return {"message": "Επιτυχής διαγραφή", "name": deleted_employee.name}
+
 # 2. -- Boats --
 @app.post("/boats/", response_model= schemas.Boat)
 def create_boat(boat: schemas.BoatCreate, db: Session = Depends(get_db)):

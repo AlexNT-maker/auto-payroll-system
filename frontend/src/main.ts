@@ -174,8 +174,6 @@ function navigateTo(pageName: 'home' | 'employees'){
 navButtons.home.addEventListener('click',() => navigateTo('home'));
 navButtons.employees.addEventListener('click',() => navigateTo('employees'));
 
-fetchData();
-
 // 7. -- Employee management logic -- 
 
 // Modal and list items
@@ -232,3 +230,113 @@ function attachActionListeners() {
         });
     });
 }
+
+
+// -- 8. Modal functions --
+function openModal() {
+    modal.classList.remove('hidden');
+    employeeForm.reset(); 
+    inputId.value = '';   
+    document.getElementById('modal-title')!.textContent = "Νέος Εργαζόμενος";
+}
+
+function closeModal() {
+    modal.classList.add('hidden');
+}
+
+function openEditModal(id: number) {
+    const emp = employees.find(e => e.id === id);
+    if (!emp) return;
+    inputName.value = emp.name;
+    inputWage.value = emp.daily_wage.toString();
+    inputOvertime.value = emp.overtime_rate.toString();
+    inputBank.value = emp.bank_daily_amount.toString();
+    inputId.value = emp.id.toString();
+
+    document.getElementById('modal-title')!.textContent = "Επεξεργασία Εργαζόμενου";
+    modal.classList.remove('hidden');
+}
+
+
+// 9. -- Modal Event Listeners --
+
+btnAddEmployee.addEventListener('click', openModal);
+
+btnCancel.addEventListener('click', () => {
+  modal.classList.add('hidden');
+});
+
+
+
+
+// 10. -- Save employee logic --
+
+employeeForm.addEventListener('submit', async (e) =>{
+  e.preventDefault();
+
+  const formData = {
+    name: inputName.value,
+    daily_wage: parseFloat(inputWage.value),
+    overtime_rate: parseFloat(inputOvertime.value),
+    bank_daily_amount: parseFloat(inputBank.value)
+  };
+
+  const id = inputId.value;
+
+  try {
+    let response;
+
+    // --- PUT ---
+    if (id) {
+      response = await fetch(`http://127.0.0.1:8000/employees/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      
+    } else {
+      // --- POST ---
+      response = await fetch('http://127.0.0.1:8000/employees/', { // ΠΡΟΣΟΧΗ: Έβαλες σκέτο /employees στο δικό σου, θέλει /employees/
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+    }
+
+    if (response.ok) {
+      closeModal();
+      await fetchData(); 
+      alert(id ? "Τα στοιχεία ενημερώθηκαν!" : "Ο εργαζόμενος προστέθηκε!");
+    } else {
+      alert("Υπήρξε πρόβλημα κατά την αποθήκευση.");
+    }
+
+  } catch (error) {
+    console.error("Error saving employee:", error);
+    alert("Σφάλμα επικοινωνίας με τον server.");
+  }
+});
+
+
+// 11. -- Delete logic --
+async function deleteEmployee(id:number) {
+  try{
+    const response = await fetch(`http://127.0.0.1:8000/employees/${id}`, {
+      method: 'DELETE'
+  });
+
+  if(response.ok){
+  await fetchData();
+  alert("Ο εργαζόμενος διαγράφηκε επιτυχώς");
+} else{
+  const errorData = await response.json();
+  alert("Σφάλμα διαγραφής: " + (errorData.detail || "Άγνωστο σφάλμα"));
+}
+} catch (error) {
+  console.error("Delete error:", error);
+  alert("Δεν ήταν δυνατή η σύνδεση με τον server");
+}
+}
+
+
+fetchData();
