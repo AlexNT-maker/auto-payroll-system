@@ -150,14 +150,16 @@ form.addEventListener('submit', async (event: Event)=>{
 const pages={
   home: document.getElementById('page-home')!,
   employees: document.getElementById('page-employees')!,
+  boats: document.getElementById('page-boats')!,
 };
 
 const navButtons = {
   home: document.getElementById('nav-home')!,
   employees: document.getElementById('nav-employees')!,
+  boats: document.getElementById('nav-boats')!,
 };
 
-function navigateTo(pageName: 'home' | 'employees'){
+function navigateTo(pageName: 'home' | 'employees' | 'boats') {
   Object.values(pages).forEach(page => {
     if (page) page.classList.add('hidden');
   });
@@ -166,13 +168,13 @@ function navigateTo(pageName: 'home' | 'employees'){
   Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
   navButtons[pageName].classList.add('active');
 
-  if (pageName === 'employees') {
-    renderEmployeesList();
-  }
+  if (pageName === 'employees') renderEmployeesList();
+  if (pageName === 'boats') renderBoatsList() ;
 }
 
 navButtons.home.addEventListener('click',() => navigateTo('home'));
 navButtons.employees.addEventListener('click',() => navigateTo('employees'));
+navButtons.boats.addEventListener('click',() => navigateTo('boats'));
 
 // 7. -- Employee management logic -- 
 
@@ -296,7 +298,7 @@ employeeForm.addEventListener('submit', async (e) =>{
       
     } else {
       // --- POST ---
-      response = await fetch('http://127.0.0.1:8000/employees/', { // ΠΡΟΣΟΧΗ: Έβαλες σκέτο /employees στο δικό σου, θέλει /employees/
+      response = await fetch('http://127.0.0.1:8000/employees/', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -337,6 +339,208 @@ async function deleteEmployee(id:number) {
   alert("Δεν ήταν δυνατή η σύνδεση με τον server");
 }
 }
+
+
+// 12. --Boats create logic --
+// Selectors
+const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
+const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
+const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boat')!;
+const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
+const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
+const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
+const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
+const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
+const btnCloseAnalysis = document.querySelector<HTMLButtonElement>('#btn-close-analysis')!;
+const btnRunAnalysis = document.querySelector<HTMLButtonElement>('#btn-run-analysis')!;
+const inputStart = document.querySelector<HTMLInputElement>('#analysis-start')!;
+const inputEnd = document.querySelector<HTMLInputElement>('#analysis-end')!;
+const resultsDiv = document.querySelector<HTMLDivElement>('#analysis-results')!;
+const totalCostSpan = document.querySelector<HTMLSpanElement>('#total-cost')!;
+const analysisListBody = document.querySelector<HTMLTableSectionElement>('#analysis-list')!;
+const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-title')!;
+
+
+let currentAnalysisBoatId: number | null = null;
+
+function renderBoatsList(){
+  boatsListBody.innerHTML = '';
+  boats.forEach(boat => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+    <td>${boat.name}</td>
+    <td style="display: flex; align-items:center;">
+    <button class="action-btn hover-lift btn-analysis" data-id="${boat.id}" 
+                style="background-color: #3b82f6; color: white; margin-right: 0.5rem;">
+          Ανάλυση
+        </button>
+        <button class="action-btn btn-edit hover-lift" data-id="${boat.id}" data-type="boat">Επεξεργασία</button>
+        <button class="action-btn btn-delete hover-lift" data-id="${boat.id}" data-type="boat">Διαγραφή</button>
+      </td>
+      `;
+      boatsListBody.appendChild(row);
+  })
+   attachBoatListeners();
+}
+
+function attachBoatListeners() {
+    boatsListBody.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = parseInt((e.target as HTMLElement).dataset.id!);
+            openBoatModal(id);
+        });
+    });
+
+    boatsListBody.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = parseInt((e.target as HTMLElement).dataset.id!);
+            if(confirm("Είστε σίγουρος για τη διαγραφή;")) deleteBoat(id);
+        });
+    });
+
+    boatsListBody.querySelectorAll('.btn-analysis').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = parseInt((e.target as HTMLElement).dataset.id!);
+            openAnalysisModal(id);
+        });
+    });
+}
+
+function openAnalysisModal(boatId: number){
+  currentAnalysisBoatId = boatId;
+  const boat = boats.find(b => b.id === boatId);
+    analysisTitle.textContent = `Ανάλυση: ${boat ? boat.name : ''}`;
+
+    const now = new Date() ;
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() +1, 0) ;
+    inputStart.valueAsDate = firstDay; 
+    inputEnd.valueAsDate = lastDay;
+
+    resultsDiv.classList.add('hidden'); 
+    modalAnalysis.classList.remove('hidden');
+}
+
+btnRunAnalysis.addEventListener('click', async () => {
+    if (!currentAnalysisBoatId) return;
+    
+    const start = inputStart.value;
+    const end = inputEnd.value;
+
+    if (!start || !end) {
+        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        return;
+    }
+    
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/boats/${currentAnalysisBoatId}/analysis?start=${start}&end=${end}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            analysisTitle.textContent = `Ανάλυση: ${data.boat_name}`;
+            totalCostSpan.textContent = `${data.total_cost.toFixed(2)} €`;
+
+            analysisListBody.innerHTML = ''; 
+            
+            data.analysis_data.forEach((item: any) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.employee_name}</td>
+                    <td style="font-weight: bold;">${item.total_cost.toFixed(2)} €</td>
+                `;
+                analysisListBody.appendChild(row);
+            });
+
+            resultsDiv.classList.remove('hidden');
+
+        } else {
+            alert("Σφάλμα κατά τη λήψη δεδομένων.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Σφάλμα σύνδεσης.");
+    }
+});
+
+btnAddBoat.addEventListener('click', () => openBoatModal());
+btnCancelBoat.addEventListener('click', () => modalBoat.classList.add('hidden'));
+btnCloseAnalysis.addEventListener('click', () => {
+  modalAnalysis.classList.add('hidden');
+});
+
+
+boatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = inputBoatName.value;
+    const id = inputBoatId.value;
+    
+    try {
+        let response;
+        if (id) {
+            response = await fetch(`http://127.0.0.1:8000/boats/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name }) 
+            });
+        } else {
+            response = await fetch('http://127.0.0.1:8000/boats/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name })
+            });
+        }
+        if (response.ok) {
+            modalBoat.classList.add('hidden');
+            await fetchData(); 
+            renderBoatsList(); 
+            alert("Επιτυχία!");
+        } else {
+            alert("Σφάλμα αποθήκευσης");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Σφάλμα δικτύου");
+    }
+});
+
+
+function openBoatModal(id?: number) { 
+    modalBoat.classList.remove('hidden');
+    boatForm.reset();
+    
+    if (id) {
+        
+        const boat = boats.find(b => b.id === id);
+        if (boat) {
+            inputBoatName.value = boat.name;
+            inputBoatId.value = boat.id.toString();
+            document.getElementById('modal-boat-title')!.textContent = "Επεξεργασία Σκάφους";
+        }
+    } else {
+        inputBoatId.value = '';
+        document.getElementById('modal-boat-title')!.textContent = "Νέο Σκάφος";
+    }
+}
+
+// 13. -- Boats Delete Logic --
+async function deleteBoat(id: number) {
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/boats/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            await fetchData();
+            renderBoatsList();
+            alert("Το σκάφος διαγράφηκε");
+        } else {
+            alert("Αδυναμία διαγραφής");
+        }
+    } catch (err) {
+        console.error(err);
+    }
+  }
+
+
 
 
 fetchData();

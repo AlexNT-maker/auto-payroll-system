@@ -58,6 +58,62 @@ def create_boat(db: Session, boat: schemas.BoatCreate):
     db.refresh(db_boat)
     return db_boat
 
+# Update Boat
+def update_boat(db: Session, boat_id: int, boat_data: schemas.BoatCreate):
+    db_boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+    if not db_boat:
+        return None
+    db_boat.name = boat_data.name
+    db.commit()
+    db.refresh(db_boat)
+    return db_boat
+
+# Delete Boat
+def delete_boat(db: Session, boat_id: int):
+    db_boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+    if db_boat:
+        db.delete(db_boat)
+        db.commit()
+    return db_boat
+
+# Analysis Boat
+def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: date):
+    
+    boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+    if not boat:
+        return None
+    
+    records = db.query(models.Attendance).join(models.Employee).filter(
+        models.Attendance.boat_id == boat_id,
+        models.Attendance.date >= start_date,
+        models.Attendance.date <= end_date,
+        models.Attendance.present == True
+    ).all ()
+    analysis_data = []
+    total_sum = 0.0
+
+    for rec in records:
+        wage = rec.employee.daily_wage
+        ot_cost = rec.overtime_hours * rec.employee.overtime_rate
+        daily_total = wage + ot_cost + rec.extra_amount
+
+        total_sum += daily_total
+
+        analysis_data.append({
+            "date": rec.date,
+            "employee_name": rec.employee.name,
+            "daily_cost": wage,
+            "overtime_cost": ot_cost,
+            "total_cost": daily_total
+        })
+
+        return {
+            "boat_name": boat.name,
+            "total_cost": total_sum,
+            "analysis_data": analysis_data
+        }
+
+
 # -- Attendance --
 
 def create_attendance(db: Session, attendance: schemas.AttendanceCreate):

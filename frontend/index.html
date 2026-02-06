@@ -75,6 +75,28 @@
         </table>
       </div>
 
+<!--Page No.3 In this page we keep a track of the active boats and an analysis of the workers expenses on each boat-->
+      <div id="page-boats" class="animate-enter hidden">
+        <h1>Διαχείριση Σκαφών</h1>
+        
+        <div style="margin-bottom: 2rem; text-align: right;">
+          <button id="btn-add-boat" class="btn-submit hover-lift click-shrink">
+            Προσθήκη Σκάφους
+          </button>
+        </div>
+
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th>Όνομα Σκάφους</th>
+              <th>Ενέργειες</th>
+            </tr>
+          </thead>
+          <tbody id="boats-list">
+             </tbody>
+        </table>
+      </div>
+
       <!--Form for adding a new employee-->
       <div id="modal-employee" class="modal-overlay hidden">
         <div class="modal-content animate-enter">
@@ -107,6 +129,69 @@
             </div>
           </form>
 
+        </div>
+      </div>
+
+      <!--Form for adding a new boat-->
+
+      <div id="modal-boat" class="modal-overlay hidden">
+        <div class="modal-content animate-enter">
+          <h2 id="modal-boat-title">Νέο Σκάφος</h2>
+          
+          <form id="boat-form">
+            <input type="hidden" id="boat-id"> 
+
+            <div class="form-group">
+              <label>Όνομα Σκάφους:</label>
+              <input type="text" id="boat-name" required >
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn-submit hover-lift">Αποθήκευση</button>
+                <button type="button" id="btn-cancel-boat" class="btn-cancel hover-lift">Ακύρωση</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!--Modal for cost analysis and history about boats-->
+      <div id="modal-boat-analysis" class="modal-overlay hidden">
+        <div class="modal-content animate-enter" style="max-width: 600px;"> <h2 id="analysis-title">Ανάλυση Κόστους</h2>
+          
+          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end;">
+            <div style="flex: 1;">
+              <label style="font-weight: bold; font-size: 0.9rem;">Από:</label>
+              <input type="date" id="analysis-start" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <div style="flex: 1;">
+              <label style="font-weight: bold; font-size: 0.9rem;">Έως:</label>
+              <input type="date" id="analysis-end" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            <button id="btn-run-analysis" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 38px;">Προβολή</button>
+          </div>
+
+          <div id="analysis-results" class="hidden">
+            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">Σύνολο Κόστους: <span id="total-cost" style="color: var(--primary-color);">0.00 €</span></h3>
+              <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">(Μεροκάματα + Υπερωρίες)</p>
+            </div>
+
+            <table class="attendance-table" style="font-size: 0.9rem;">
+              <thead>
+                <tr>
+                  <th>Ημερομηνία</th>
+                  <th>Εργαζόμενος</th>
+                  <th>Κόστος</th>
+                </tr>
+              </thead>
+              <tbody id="analysis-list">
+                </tbody>
+            </table>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-close-analysis" class="btn-cancel hover-lift">Κλείσιμο</button>
+          </div>
         </div>
       </div>
     </main>

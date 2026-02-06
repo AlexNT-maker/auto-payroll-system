@@ -53,3 +53,16 @@ class Attendance(AttendanceBase):
 
     class Config:
         from_attributes = True
+
+# -- Schemas for analysis --
+class AnalysisItem(BaseModel):
+    date: date
+    employee_name: str
+    daily_cost: float
+    overtime_cost: float 
+    total_cost: float
+
+class BoatAnalysisResponse(BaseModel):
+    boat_name: str
+    total_cost: float
+    analysis_data: List[AnalysisItem]

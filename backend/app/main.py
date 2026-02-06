@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
+from datetime import date
 
 from . import crud, models, schemas
 from .database import SessionLocal, engine
@@ -50,7 +51,7 @@ def read_employees(skip: int = 0, limit: int = 100, db: Session = Depends(get_db
     employees = crud.get_employees(db)
     return employees
 
-@app.put("/employees/", response_model= schemas.Employee)
+@app.put("/employees/{employee_id}", response_model= schemas.Employee)
 def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Session = Depends(get_db)):
     updated_employee = crud.update_employee(db, employee_id, employee)
     if updated_employee is None:
@@ -73,6 +74,27 @@ def create_boat(boat: schemas.BoatCreate, db: Session = Depends(get_db)):
 def read_boats(skip: int = 0, limit: int = 100, db: Session =Depends (get_db)):
     boats = crud.get_boats(db)
     return boats
+
+@app.put("/boats/{boat_id}", response_model= schemas.Boat)
+def update_boat(boat_id: int, boat: schemas.BoatCreate, db: Session = Depends(get_db)):
+    updated_boat = crud.update_boat(db, boat_id, boat)
+    if updated_boat is None:
+        raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
+    return updated_boat
+
+@app.delete("/boats/{boat_id}")
+def delete_boat(boat_id: int, db: Session = Depends(get_db)):
+    deleted_boat = crud.delete_boat(db, boat_id)
+    if deleted_boat is None:
+        raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
+    return {"message": "Επιτυχής διαγραφή", "name": deleted_boat.name}
+
+@app.get("/boats/{boat_id}/analysis", response_model = schemas.BoatAnalysisResponse)
+def get_boat_analysis(boat_id: int, start: date, end: date, db: Session = Depends(get_db)):
+    report = crud.get_boat_analysis(db, boat_id, start_date=start, end_date=end)
+    if not report:
+        raise HTTPException(status_code=404, detail= "Το σκάφος δεν βρέθηκε")
+    return report
 
 # 3. -- Attendance --
 @app.post("/attendance", response_model= schemas.Attendance)
