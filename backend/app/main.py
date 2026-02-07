@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 from . import crud, models, schemas
@@ -100,3 +100,13 @@ def get_boat_analysis(boat_id: int, start: date, end: date, db: Session = Depend
 @app.post("/attendance", response_model= schemas.Attendance)
 def create_attendance_record(attendance: schemas.AttendanceCreate, db: Session = Depends(get_db)):
     return crud.create_attendance(db= db, attendance= attendance)
+
+# 4. -- Expenses endpoint --
+@app.get("/expenses/", response_model=schemas.ExpensesResponse)
+def read_expenses(
+    start: date,
+    end: date,
+    boat_id: Optional[int] = None,
+    emp_id: Optional[int] = None,
+    db: Session = Depends(get_db)): 
+    return crud.get_expenses_report(db, start, end, boat_id, emp_id)

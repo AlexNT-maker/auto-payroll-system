@@ -113,6 +113,42 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
             "analysis_data": analysis_data
         }
 
+# -- Expenses Report --
+def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, emp_id: int=None):
+    query = db.query(models.Attendance).filter(
+        models.Attendance.date >= start ,
+        models.Attendance.data <= end,
+        models.Attendance.present == True
+    )
+
+    if boat_id:
+        query = query.filter(models.Attendance.boat_id == boat_id)
+    
+    if emp_id:
+        query = query.filter(models.Attendance.employee_id == emp_id)
+
+    records = query.all()
+    report_data = []
+    total_sum = 0.0
+    for rec in records:
+        wage = rec.employee.daily_wage
+        ot_cost = rec.overtime_hours * rec.employee.overtime_rate
+        line_total = wage + ot_cost + rec.extra_amount
+        total_sum += line_total
+
+        report_data.append({
+            "date": rec.date,
+            "employee_name": rec.employee.name,
+            "boat_name": rec.boat.name, # Προσοχή: Σιγουρέψου ότι το μοντέλο Attendance έχει relationship 'boat'
+            "daily_cost": wage,
+            "overtime_cost": ot_cost,
+            "total_cost": line_total
+        })
+
+    return {
+        "total_sum": total_sum,
+        "results": report_data
+    }
 
 # -- Attendance --
 

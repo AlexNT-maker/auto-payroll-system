@@ -66,3 +66,17 @@ class BoatAnalysisResponse(BaseModel):
     boat_name: str
     total_cost: float
     analysis_data: List[AnalysisItem]
+
+# -- Schemas for expense report --
+
+class ExpenseItem(BaseModel):
+    date: date
+    employee_name: str 
+    boat_name: str 
+    daily_cost: float
+    overtime_cost: float
+    total_cost: float
+
+class ExpensesResponse(BaseModel):
+    total_sum: float
+    results: List[ExpenseItem]
