@@ -107,7 +107,7 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
             "total_cost": daily_total
         })
 
-        return {
+    return {
             "boat_name": boat.name,
             "total_cost": total_sum,
             "analysis_data": analysis_data
@@ -164,20 +164,37 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     }
 # -- Attendance --
 
+# -- Attendance (Update or Create) --
 def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
-    db_attendance = models.Attendance(
-        date = attendance.date , 
-        employee_id = attendance.employee_id,
-        boat_id = attendance.boat_id , 
-        present = attendance.present , 
-        overtime_hours = attendance.overtime_hours ,
-        extra_amount = attendance.extra_amount ,
-        extra_reason = attendance.extra_reason
-    )
-    db.add(db_attendance)
-    db.commit()
-    db.refresh(db_attendance)
-    return db_attendance
+    existing_record = db.query(models.Attendance).filter(
+        models.Attendance.date == attendance.date,
+        models.Attendance.employee_id == attendance.employee_id
+    ).first()
+
+    if existing_record:
+        existing_record.boat_id = attendance.boat_id
+        existing_record.present = attendance.present
+        existing_record.overtime_hours = attendance.overtime_hours
+        existing_record.extra_amount = attendance.extra_amount
+        existing_record.extra_reason = attendance.extra_reason
+        
+        db.commit()
+        db.refresh(existing_record)
+        return existing_record
+    else:
+        db_attendance = models.Attendance(
+            date = attendance.date, 
+            employee_id = attendance.employee_id,
+            boat_id = attendance.boat_id, 
+            present = attendance.present, 
+            overtime_hours = attendance.overtime_hours,
+            extra_amount = attendance.extra_amount,
+            extra_reason = attendance.extra_reason
+        )
+        db.add(db_attendance)
+        db.commit()
+        db.refresh(db_attendance)
+        return db_attendance
 
 # -- Fetch attendance for a specific date --
 def get_attendance_by_date(db: Session, target_date: date):

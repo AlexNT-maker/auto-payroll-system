@@ -27,19 +27,18 @@
         <h1>Ημερήσια Καταχώρηση</h1>
         
         <!--Calendar-->
-        <div class="date-selector">
-          <label for="date-picker">Ημερομηνία:</label>
-          <input type="date" id="date-picker">
+        <div class="date-selector" style="display: flex; align-items: center; gap: 1rem;">
+          <label for="date-picker" style="margin: 0; font-weight: bold;">Ημερομηνία:</label>
+          <input type="date" id="date-picker" style="padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
 
-        <!--Hidden edit button for modify the daily attendance--> 
-          <button type="button" id="btn-edit-daily" class="btn-cancel hidden" style="padding: 0.4rem 1rem; font-size: 0.9rem;">
-            Επεξεργασία
+          <button type="button" id="btn-edit-daily" class="btn-submit hidden" style="padding: 0.5rem 1rem;  margin-left: auto;">
+          Επεξεργασία
           </button>
         </div>
 
         <!--Daily form to fill about workers-->
         <form id="attendance-form">
-          <table class="attendance-table">
+          <table class ="attendance-table">
             <thead>
               <tr>
                 <th>Εργαζόμενος</th>
@@ -52,7 +51,7 @@
               </tbody>
           </table>
 
-          <button type="submit"  class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
+          <button type="submit" id="btn-submit-daily" class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
         </form>
       </div>
 

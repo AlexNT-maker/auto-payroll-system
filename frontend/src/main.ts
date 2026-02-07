@@ -19,6 +19,8 @@ let boats: Boat[] = []
 const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-list')!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
+const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
+const btnSubmitDaily = document.querySelector<HTMLButtonElement>('#btn-submit-daily')!;
 
 // Set as default today
 datePicker.valueAsDate = new Date();
@@ -32,6 +34,7 @@ async function fetchData() {
     const employeesResponse = await fetch('http://127.0.0.1:8000/employees/');
     employees = await employeesResponse.json();
     renderTable();
+    await loadDayData();
   } catch (error) {
     console.error("Error during fetching the data");
     alert("Not succesful connection with the server");
@@ -39,10 +42,11 @@ async function fetchData() {
 }
 
 // -- 4. Creating table --
-function renderTable(){
+function renderTable(existingData: any[]=[]){
   tableBody.innerHTML = '';
 
   employees.forEach((employee) => {
+    const record = existingData.find(r => r.employee_id === employee.id);
     const row = document.createElement('tr');
 
     // Cell No.1 Employees
@@ -56,6 +60,7 @@ function renderTable(){
     presentInput.type = 'checkbox';
     presentInput.dataset.empId = employee.id.toString();
     presentInput.classList.add('presence-checkbox');
+    if (record && record.present) presentInput.checked = true;
     presentCell.appendChild(presentInput);
     row.appendChild(presentCell);
 
@@ -71,12 +76,13 @@ function renderTable(){
     boatSelect.appendChild(defaultOption);
 
     // Fill the dropdown with boats from the database
-    boats.forEach(boat =>{
-    const option = document.createElement('option');
-    option.value = boat.id.toString() ; 
-    option.textContent = boat.name ; 
-    boatSelect.appendChild(option);
-    } )
+    boats.forEach(boat => {
+      const option = document.createElement('option');
+      option.value = boat.id.toString();
+      option.textContent = boat.name;
+      if (record && record.boat_id === boat.id) option.selected = true;
+      boatSelect.appendChild(option);
+    });
     boatCell.appendChild(boatSelect);
     row.appendChild(boatCell);
 
@@ -84,15 +90,16 @@ function renderTable(){
     const overtimeCell = document.createElement('td');
     const overtimeInput = document.createElement('input');
     overtimeInput.type = 'number';
-    overtimeInput.min = '0' ;
-    overtimeInput.value = '0' ;
-    overtimeInput.value = '0' ;
+    overtimeInput.min = '0';
     overtimeInput.classList.add('overtime-input');
-    overtimeCell.appendChild(overtimeInput) ;
+    // Αν υπάρχει record, βάζουμε την τιμή
+    overtimeInput.value = record ? record.overtime_hours.toString() : '0';
+    
+    overtimeCell.appendChild(overtimeInput);
     row.appendChild(overtimeCell);
 
     tableBody.appendChild(row);
-  })
+  });
 }
 
 // 5. -- Management of data when user clicks submit --
@@ -144,6 +151,8 @@ form.addEventListener('submit', async (event: Event)=>{
   }
 
   alert('Η αποθήκευση ολοκληρώθηκε!');
+
+  window.location.reload();
 })
 
 // -- 6. Navigation logic --
@@ -174,6 +183,51 @@ function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses') {
   if (pageName === 'boats') renderBoatsList() ;
   if (pageName === 'expenses') initExpensesPage();
 }
+
+// Functions to lock form when we submit and to unlock when the edit button is clicked
+function lockForm() {
+  const inputs = tableBody.querySelectorAll('input, select');
+  inputs.forEach((input: any) => input.disabled = true);
+  btnSubmitDaily.classList.add('hidden');
+  btnEditDaily.classList.remove('hidden');
+}
+
+function unlockForm() {
+  const inputs = tableBody.querySelectorAll('input, select');
+  inputs.forEach((input: any) => input.disabled = false);
+  btnSubmitDaily.classList.remove('hidden');
+  btnEditDaily.classList.add('hidden');
+}
+
+async function loadDayData() {
+  const date = datePicker.value;
+  if (!date) return;
+  try{
+    const response = await fetch(`http://127.0.0.1:8000/attendance/${date}`);
+    if(response.ok){
+      const data = await response.json();
+
+      console.log("Δεδομένα που ήρθαν", data);
+
+      if (data.length > 0){
+        renderTable(data);
+        lockForm();
+      } else {
+        renderTable([]);
+        unlockForm();
+      }
+    }
+  } catch(error) {
+    console.error("Error loading day data", error);
+  }
+}
+
+datePicker.addEventListener('change', loadDayData);
+
+btnEditDaily.addEventListener('click', () => {
+    unlockForm();
+    alert("Η φόρμα ξεκλείδωσε. Μην ξεχάσετε να πατήσετε 'Αποθήκευση' μετά τις αλλαγές!");
+});
 
 navButtons.home.addEventListener('click',() => navigateTo('home'));
 navButtons.employees.addEventListener('click',() => navigateTo('employees'));
@@ -321,6 +375,9 @@ employeeForm.addEventListener('submit', async (e) =>{
     console.error("Error saving employee:", error);
     alert("Σφάλμα επικοινωνίας με τον server.");
   }
+
+  await loadDayData();
+  alert("Επιτυχής αποθήκευση")
 });
 
 
