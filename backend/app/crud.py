@@ -117,7 +117,7 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
 def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, emp_id: int=None):
     query = db.query(models.Attendance).filter(
         models.Attendance.date >= start ,
-        models.Attendance.data <= end,
+        models.Attendance.date <= end,
         models.Attendance.present == True
     )
 
@@ -128,18 +128,31 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
         query = query.filter(models.Attendance.employee_id == emp_id)
 
     records = query.all()
+    
     report_data = []
     total_sum = 0.0
+
     for rec in records:
-        wage = rec.employee.daily_wage
-        ot_cost = rec.overtime_hours * rec.employee.overtime_rate
+        if not rec.employee:
+            continue
+
+        wage = rec.employee.daily_wage if rec.employee.daily_wage else 0.0
+        ot_rate = rec.employee.overtime_rate if rec.employee.overtime_rate else 0.0
+        
+        ot_cost = rec.overtime_hours * ot_rate
         line_total = wage + ot_cost + rec.extra_amount
+
         total_sum += line_total
+        boat_name = "-"
+        if rec.boat:
+            boat_name = rec.boat.name
+        elif rec.boat_id:
+            boat_name = f"Διεγραμμένο ({rec.boat_id})"
 
         report_data.append({
             "date": rec.date,
             "employee_name": rec.employee.name,
-            "boat_name": rec.boat.name, # Προσοχή: Σιγουρέψου ότι το μοντέλο Attendance έχει relationship 'boat'
+            "boat_name": boat_name, 
             "daily_cost": wage,
             "overtime_cost": ot_cost,
             "total_cost": line_total
@@ -149,7 +162,6 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
         "total_sum": total_sum,
         "results": report_data
     }
-
 # -- Attendance --
 
 def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
@@ -167,5 +179,6 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
     db.refresh(db_attendance)
     return db_attendance
 
+# -- Fetch attendance for a specific date --
 def get_attendance_by_date(db: Session, target_date: date):
     return db.query(models.Attendance).filter(models.Attendance.date == target_date).all()

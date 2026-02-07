@@ -30,6 +30,11 @@
         <div class="date-selector">
           <label for="date-picker">Ημερομηνία:</label>
           <input type="date" id="date-picker">
+
+        <!--Hidden edit button for modify the daily attendance--> 
+          <button type="button" id="btn-edit-daily" class="btn-cancel hidden" style="padding: 0.4rem 1rem; font-size: 0.9rem;">
+            Επεξεργασία
+          </button>
         </div>
 
         <!--Daily form to fill about workers-->
@@ -93,6 +98,67 @@
             </tr>
           </thead>
           <tbody id="boats-list">
+             </tbody>
+        </table>
+      </div>
+
+      <!--Page No.4 History of expenses for workers and boats-->
+      <div id="page-expenses" class="animate-enter hidden">
+        <h1>Υπολογισμός Εξόδων</h1>
+
+        <div class="filters-container" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+                
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Από:</label>
+                    <input type="date" id="exp-start" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Έως:</label>
+                    <input type="date" id="exp-end" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Σκάφος:</label>
+                    <select id="exp-boat" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">-- Όλα τα σκάφη --</option>
+                        </select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Εργαζόμενος:</label>
+                    <select id="exp-emp" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">-- Όλοι οι εργαζόμενοι --</option>
+                        </select>
+                </div>
+
+                <button id="btn-calc-expenses" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 42px;">
+                    Υπολογισμός
+                </button>
+            </div>
+        </div>
+
+        <div id="expenses-summary" class="hidden" style="text-align: right; margin-bottom: 1rem;">
+            <span style="font-size: 1.2rem; font-weight: bold;">Γενικό Σύνολο: </span>
+            <span id="exp-total-amount" style="font-size: 1.5rem; color: var(--primary-color); font-weight: 800;">0.00 €</span>
+            <br>
+            <button id="btn-export-pdf" class="btn-submit" style="margin-top: 10px; background-color: #000;">
+                Εξαγωγή σε PDF (Coming Soon)
+            </button>
+        </div>
+
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th>Ημερομηνία</th>
+              <th>Εργαζόμενος</th>
+              <th>Σκάφος</th>
+              <th>Μισθός</th>
+              <th>Υπερωρία</th>
+              <th>Σύνολο</th>
+            </tr>
+          </thead>
+          <tbody id="expenses-list">
              </tbody>
         </table>
       </div>

@@ -101,8 +101,13 @@ def get_boat_analysis(boat_id: int, start: date, end: date, db: Session = Depend
 def create_attendance_record(attendance: schemas.AttendanceCreate, db: Session = Depends(get_db)):
     return crud.create_attendance(db= db, attendance= attendance)
 
+@app.get("/attendance", response_model= schemas.Attendance)
+
 # 4. -- Expenses endpoint --
-@app.get("/expenses/", response_model=schemas.ExpensesResponse)
+@app.get("/expenses/", response_model= List[schemas.Attendance])
+def read_attendance_by_date(target_date: date, db: Session = Depends(get_db)):
+    return crud.get_attendance_by_date(db, target_date)
+
 def read_expenses(
     start: date,
     end: date,
