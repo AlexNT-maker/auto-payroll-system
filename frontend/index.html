@@ -121,14 +121,14 @@
                     <label style="font-weight: bold; font-size: 0.9rem;">Σκάφος:</label>
                     <select id="exp-boat" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="">-- Όλα τα σκάφη --</option>
-                        </select>
+                    </select>
                 </div>
 
                 <div style="flex: 1; min-width: 150px;">
                     <label style="font-weight: bold; font-size: 0.9rem;">Εργαζόμενος:</label>
                     <select id="exp-emp" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;">
                         <option value="">-- Όλοι οι εργαζόμενοι --</option>
-                        </select>
+                    </select>
                 </div>
 
                 <button id="btn-calc-expenses" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 42px;">
@@ -140,10 +140,6 @@
         <div id="expenses-summary" class="hidden" style="text-align: right; margin-bottom: 1rem;">
             <span style="font-size: 1.2rem; font-weight: bold;">Γενικό Σύνολο: </span>
             <span id="exp-total-amount" style="font-size: 1.5rem; color: var(--primary-color); font-weight: 800;">0.00 €</span>
-            <br>
-            <button id="btn-export-pdf" class="btn-submit" style="margin-top: 10px; background-color: #000;">
-                Εξαγωγή σε PDF (Coming Soon)
-            </button>
         </div>
 
         <table class="attendance-table">
@@ -157,8 +153,49 @@
               <th>Σύνολο</th>
             </tr>
           </thead>
-          <tbody id="expenses-list">
-             </tbody>
+          <tbody id="expenses-list"></tbody>
+        </table>
+      </div>
+
+      <!--Page No.5 Payroll Page-->
+      <div id="page-payments" class="animate-enter hidden">
+        <h1>Μισθοδοσία & Πληρωμές</h1>
+
+        <div class="filters-container" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Από:</label>
+                    <input type="date" id="pay-start" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Έως:</label>
+                    <input type="date" id="pay-end" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <button id="btn-calc-payroll" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 42px;">
+                    Υπολογισμός Μισθοδοσίας
+                </button>
+            </div>
+        </div>
+
+        <div id="payroll-actions" class="hidden" style="text-align: right; margin-bottom: 1rem;">
+             <button id="btn-print-payroll" class="btn-submit" style="background-color: #059669;">
+                🖨️ Εκτύπωση PDF
+            </button>
+        </div>
+
+        <table class="attendance-table">
+          <thead>
+            <tr>
+              <th>Εργαζόμενος</th>
+              <th>Ημέρες</th>
+              <th>Μισθός</th>
+              <th>Υπερωρία</th>
+              <th>Γενικό Σύνολο</th>
+              <th style="background-color: #dbeafe;">Τράπεζα</th>
+              <th style="background-color: #fef3c7;">Μετρητά</th>
+            </tr>
+          </thead>
+          <tbody id="payroll-list"></tbody>
         </table>
       </div>
 

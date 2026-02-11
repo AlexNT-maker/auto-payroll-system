@@ -80,3 +80,19 @@ class ExpenseItem(BaseModel):
 class ExpensesResponse(BaseModel):
     total_sum: float
     results: List[ExpenseItem]
+
+# -- Schemas for payroll --
+class PaymentItem(BaseModel):
+    employee_id: int
+    employee_name: str
+    days_worked: int
+    total_wage: float 
+    total_overtime: float
+    grand_total: float
+    bank_pay: float
+    cash_pay: float
+
+class PayrollReport (BaseModel):
+    start_date: date
+    end_date: date 
+    payments: List[PaymentItem]

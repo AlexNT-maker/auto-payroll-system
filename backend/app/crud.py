@@ -199,3 +199,60 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
 # -- Fetch attendance for a specific date --
 def get_attendance_by_date(db: Session, target_date: date):
     return db.query(models.Attendance).filter(models.Attendance.date == target_date).all()
+
+
+# -- Payroll calculation --
+def calculate_payroll(db: Session, start: date, end: date):
+    employees = get_employees(db)
+    results = []
+
+    for emp in employees:
+        records = db.query(models.Attendance).filter(
+            models.Attendance.employee_id == emp.id,
+            models.Attendance.date >= start,
+            models.Attendance.date <= end,
+            models.Attendance.present == True
+        ).all()
+
+        days_worked = 0
+        sum_wage = 0.0
+        sum_overtime = 0.0
+
+        for rec in records:
+            days_worked += 1
+            sum_wage += emp.daily_wage
+            sum_overtime += (rec.overtime_hours * emp.overtime_rate)
+
+        grand_total = sum_wage + sum_overtime
+        
+        if days_worked == 0:
+            continue
+
+        target_bank = emp.bank_daily_amount * days_worked
+        target_cash = grand_total - target_bank
+
+        if target_cash < 0 :
+            target_cash = 0
+            target_bank = grand_total
+
+        remainder = target_cash % 50
+
+        final_cash = target_cash - remainder
+        final_bank = grand_total - target_cash
+
+        results.append({
+            "employee_id": emp.id,
+            "employee_name": emp.name,
+            "days_worked": days_worked,
+            "total_wage": sum_wage,
+            "total_overtime": sum_overtime,
+            "grand_total": grand_total,
+            "bank_pay": final_bank,
+            "cash_pay": final_cash
+        })
+
+    return{
+    "start_date": start,
+    "end_date": end,
+    "payments": results
+    }

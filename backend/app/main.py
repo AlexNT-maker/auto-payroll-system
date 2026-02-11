@@ -115,3 +115,8 @@ def read_expenses(
     db: Session = Depends(get_db)
 ):
     return crud.get_expenses_report(db, start, end, boat_id, emp_id)
+
+# 5. --Payment Endpoint -- 
+@app.get("/payroll/", response_model= schemas.PayrollReport)
+def get_payroll(start: date, end: date, db: Session = Depends(get_db)):
+    return crud.calculate_payroll(db, start, end)

@@ -161,6 +161,7 @@ const pages={
   employees: document.getElementById('page-employees')!,
   boats: document.getElementById('page-boats')!,
   expenses: document.getElementById('page-expenses')!,
+  payments: document.getElementById('page-payments')!,
 };
 
 const navButtons = {
@@ -168,9 +169,10 @@ const navButtons = {
   employees: document.getElementById('nav-employees')!,
   boats: document.getElementById('nav-boats')!,
   expenses: document.getElementById('nav-expenses')!,
+  payments: document.getElementById('nav-payments')!,
 };
 
-function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses') {
+function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses'| 'payments') {
   Object.values(pages).forEach(page => {
     if (page) page.classList.add('hidden');
   });
@@ -182,6 +184,7 @@ function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses') {
   if (pageName === 'employees') renderEmployeesList();
   if (pageName === 'boats') renderBoatsList() ;
   if (pageName === 'expenses') initExpensesPage();
+  if (pageName === 'payments') initPayrollPage();
 }
 
 // Functions to lock form when we submit and to unlock when the edit button is clicked
@@ -233,6 +236,7 @@ navButtons.home.addEventListener('click',() => navigateTo('home'));
 navButtons.employees.addEventListener('click',() => navigateTo('employees'));
 navButtons.boats.addEventListener('click',() => navigateTo('boats'));
 navButtons.expenses.addEventListener('click',() => navigateTo('expenses'));
+navButtons.payments.addEventListener('click', () => navigateTo('payments'));
 
 // 7. -- Employee management logic -- 
 
@@ -690,7 +694,84 @@ btnCalcExpenses.addEventListener('click', async () => {
     }
 });
 
+// -- 15. Payments Logic/ Payroll --
 
+const payStart = document.querySelector<HTMLInputElement>('#pay-start')!;
+const payEnd = document.querySelector<HTMLInputElement>('#pay-end')!;
+const btnCalcPayroll = document.querySelector<HTMLButtonElement>('#btn-calc-payroll')!;
+const btnPrintPayroll = document.querySelector<HTMLButtonElement>('#btn-print-payroll')!;
+const payrollListBody = document.querySelector<HTMLTableSectionElement>('#payroll-list')!;
+const payrollActions = document.querySelector<HTMLDivElement>('#payroll-actions')!;
+
+function initPayrollPage(){
+  if (!payStart.value){
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(),1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); 
+        payStart.value = firstDay.toISOString().split('T')[0];
+        payEnd.value = lastDay.toISOString().split('T')[0];
+  }
+}
+
+// Calculate wage
+btnCalcPayroll.addEventListener('click', async () => {
+    const start = payStart.value;
+    const end = payEnd.value;
+
+    if (!start || !end) {
+        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/payroll/?start=${start}&end=${end}`);
+        
+        if (response.ok) {
+            const data = await response.json(); 
+            
+            // Εμφάνιση πίνακα
+            payrollListBody.innerHTML = '';
+            
+            if (data.payments.length === 0) {
+                payrollListBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Δεν βρέθηκαν πληρωμές για αυτό το διάστημα.</td></tr>';
+                payrollActions.classList.add('hidden');
+                return;
+            }
+            payrollActions.classList.remove('hidden');
+
+            data.payments.forEach((item: any) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td style="font-weight: 500;">${item.employee_name}</td>
+                    <td style="text-align: center;">${item.days_worked}</td>
+                    <td>${item.total_wage.toFixed(2)} €</td>
+                    <td>${item.total_overtime.toFixed(2)} €</td>
+                    <td style="font-weight: 800;">${item.grand_total.toFixed(2)} €</td>
+                    
+                    <td style="background-color: #eff6ff; color: #1e40af; font-weight: bold;">
+                        ${item.bank_pay.toFixed(2)} €
+                    </td>
+                    
+                    <td style="background-color: #fffbeb; color: #92400e; font-weight: bold;">
+                        ${item.cash_pay.toFixed(2)} €
+                    </td>
+                `;
+                payrollListBody.appendChild(row);
+            });
+
+        } else {
+            alert("Σφάλμα κατά τη λήψη μισθοδοσίας.");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Σφάλμα σύνδεσης.");
+    }
+});
+
+btnPrintPayroll.addEventListener('click', () => {
+    alert("Η λειτουργία εκτύπωσης PDF θα προστεθεί στο επόμενο βήμα!");
+});
 
 
 fetchData();
