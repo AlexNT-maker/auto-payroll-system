@@ -728,8 +728,7 @@ btnCalcPayroll.addEventListener('click', async () => {
         
         if (response.ok) {
             const data = await response.json(); 
-            
-            // Εμφάνιση πίνακα
+
             payrollListBody.innerHTML = '';
             
             if (data.payments.length === 0) {
@@ -769,8 +768,18 @@ btnCalcPayroll.addEventListener('click', async () => {
     }
 });
 
+
+// PDF Logic
 btnPrintPayroll.addEventListener('click', () => {
-    alert("Η λειτουργία εκτύπωσης PDF θα προστεθεί στο επόμενο βήμα!");
+    const start = payStart.value;
+    const end = payEnd.value;
+
+    if (!start || !end) {
+        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        return;
+    }
+    const url = `http://127.0.0.1:8000/payroll/pdf?start=${start}&end=${end}`;    
+    window.open(url, '_blank');
 });
 
 

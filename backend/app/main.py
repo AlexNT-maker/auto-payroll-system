@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import date
-
-from . import crud, models, schemas
+from fastapi.responses import StreamingResponse
+from . import crud, models, schemas, pdf_utils
 from .database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
@@ -116,7 +116,36 @@ def read_expenses(
 ):
     return crud.get_expenses_report(db, start, end, boat_id, emp_id)
 
-# 5. --Payment Endpoint -- 
+# 5. -- Payment Endpoint -- 
 @app.get("/payroll/", response_model= schemas.PayrollReport)
 def get_payroll(start: date, end: date, db: Session = Depends(get_db)):
     return crud.calculate_payroll(db, start, end)
+
+# 6. -- PDF Export --
+@app.get("/payroll/pdf")
+def export_payroll_pdf(start: date, end: date, db: Session = Depends(get_db)):
+    payroll_data = crud.calculate_payroll(db, start, end)
+    data_dict = {
+        "start_date": payroll_data["start_date"],
+        "end_date": payroll_data["end_date"],
+        "payments": [
+            {
+                "employee_name": p["employee_name"],
+                "days_worked": p["days_worked"],
+                "total_wage": p["total_wage"],
+                "total_overtime": p["total_overtime"],
+                "grand_total": p["grand_total"],
+                "bank_pay": p["bank_pay"],
+                "cash_pay": p["cash_pay"]
+            } 
+            for p in payroll_data["payments"]
+        ]
+    }
+
+    pdf_buffer = pdf_utils.generate_payroll_pdf(data_dict)
+    filename = f"payroll_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer, 
+        media_type="application/pdf", 
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
