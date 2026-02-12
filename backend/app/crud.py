@@ -172,11 +172,17 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
     ).first()
 
     if existing_record:
-        existing_record.boat_id = attendance.boat_id
-        existing_record.present = attendance.present
-        existing_record.overtime_hours = attendance.overtime_hours
-        existing_record.extra_amount = attendance.extra_amount
-        existing_record.extra_reason = attendance.extra_reason
+        if attendance.boat_id is not None:
+            existing_record.boat_id = attendance.boat_id
+        if attendance.present is not None:
+            existing_record.present = attendance.present
+        if attendance.overtime_hours is not None:
+            existing_record.overtime_hours = attendance.overtime_hours
+        
+        if attendance.extra_amount is not None:
+            existing_record.extra_amount = attendance.extra_amount
+        if attendance.extra_reason is not None:
+            existing_record.extra_reason = attendance.extra_reason
         
         db.commit()
         db.refresh(existing_record)
@@ -185,11 +191,11 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
         db_attendance = models.Attendance(
             date = attendance.date, 
             employee_id = attendance.employee_id,
-            boat_id = attendance.boat_id, 
-            present = attendance.present, 
-            overtime_hours = attendance.overtime_hours,
-            extra_amount = attendance.extra_amount,
-            extra_reason = attendance.extra_reason
+            boat_id = attendance.boat_id if attendance.boat_id is not None else 1, 
+            present = attendance.present if attendance.present is not None else False, 
+            overtime_hours = attendance.overtime_hours if attendance.overtime_hours is not None else 0.0,
+            extra_amount = attendance.extra_amount if attendance.extra_amount is not None else 0.0,
+            extra_reason = attendance.extra_reason if attendance.extra_reason is not None else ""
         )
         db.add(db_attendance)
         db.commit()
@@ -210,22 +216,30 @@ def calculate_payroll(db: Session, start: date, end: date):
         records = db.query(models.Attendance).filter(
             models.Attendance.employee_id == emp.id,
             models.Attendance.date >= start,
-            models.Attendance.date <= end,
-            models.Attendance.present == True
+            models.Attendance.date <= end
         ).all()
 
         days_worked = 0
         sum_wage = 0.0
         sum_overtime = 0.0
+        sum_extra = 0.0
+        reasons_list = []
 
         for rec in records:
-            days_worked += 1
-            sum_wage += emp.daily_wage
-            sum_overtime += (rec.overtime_hours * emp.overtime_rate)
+            if rec.present:
+                days_worked += 1
+                sum_wage += emp.daily_wage
+                sum_overtime += (rec.overtime_hours * emp.overtime_rate)
+            if rec.extra_amount > 0:
+                sum_extra += rec.extra_amount
+                if rec.extra_reason:
+                    reasons_list.append(rec.extra_reason)
 
-        grand_total = sum_wage + sum_overtime
+        final_reasons = ", ".join(list(set(reasons_list)))
+
+        grand_total = sum_wage + sum_overtime + sum_extra
         
-        if days_worked == 0:
+        if days_worked == 0 and sum_extra == 0:
             continue
 
         target_bank = emp.bank_daily_amount * days_worked
@@ -237,8 +251,9 @@ def calculate_payroll(db: Session, start: date, end: date):
 
         remainder = target_cash % 50
 
+        remainder = target_cash % 50
         final_cash = target_cash - remainder
-        final_bank = grand_total - target_cash
+        final_bank = grand_total - final_cash
 
         results.append({
             "employee_id": emp.id,
@@ -246,6 +261,8 @@ def calculate_payroll(db: Session, start: date, end: date):
             "days_worked": days_worked,
             "total_wage": sum_wage,
             "total_overtime": sum_overtime,
+            "total_extra": sum_extra,      
+            "extra_reasons": final_reasons,
             "grand_total": grand_total,
             "bank_pay": final_bank,
             "cash_pay": final_cash

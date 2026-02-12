@@ -134,6 +134,8 @@ def export_payroll_pdf(start: date, end: date, db: Session = Depends(get_db)):
                 "days_worked": p["days_worked"],
                 "total_wage": p["total_wage"],
                 "total_overtime": p["total_overtime"],
+                "total_extra": p["total_extra"],     
+                "extra_reasons": p["extra_reasons"],
                 "grand_total": p["grand_total"],
                 "bank_pay": p["bank_pay"],
                 "cash_pay": p["cash_pay"]

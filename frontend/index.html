@@ -193,6 +193,7 @@
               <th>Γενικό Σύνολο</th>
               <th style="background-color: #dbeafe;">Τράπεζα</th>
               <th style="background-color: #fef3c7;">Μετρητά</th>
+              <th>Ενέργειες</th> 
             </tr>
           </thead>
           <tbody id="payroll-list"></tbody>
@@ -298,7 +299,7 @@
       </div>
 
       <div id="modal-extra" class="modal-overlay hidden">
-        <div class="modal-content animate-enter" style="max-width: 400px;">
+        <div class="modal-content animate-enter" style="max-width: 500px;">
           <h2>Extra</h2>
           <form id="extra-form">
             <input type="hidden" id="extra-emp-id">
@@ -315,6 +316,9 @@
 
             <div class="modal-actions">
               <button type="submit" class="btn-submit hover-lift">Προσθήκη</button>
+              <button type="button" id="btn-clear-extra" class="btn-cancel"  style="background-color: #ef4444; color: white; margin-left: 10px;">
+                  Καθαρισμός
+              </button>
               <button type="button" id="btn-cancel-extra" class="btn-cancel">Ακύρωση</button>
             </div>
           </form>

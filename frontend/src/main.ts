@@ -697,7 +697,14 @@ btnCalcExpenses.addEventListener('click', async () => {
     }
 });
 
+
+
+// Calculate wage
 // -- 15. Payments Logic/ Payroll --
+
+// ΠΡΟΣΟΧΗ: Δεν βάζουμε 'const' αν οι μεταβλητές υπάρχουν ήδη. 
+// Χρησιμοποιούμε querySelector απευθείας ή διαφορετικά ονόματα αν χρειαστεί.
+// Εδώ τις ορίζουμε ΜΙΑ φορά σωστά για το module της πληρωμής.
 
 const payStart = document.querySelector<HTMLInputElement>('#pay-start')!;
 const payEnd = document.querySelector<HTMLInputElement>('#pay-end')!;
@@ -705,18 +712,19 @@ const btnCalcPayroll = document.querySelector<HTMLButtonElement>('#btn-calc-payr
 const btnPrintPayroll = document.querySelector<HTMLButtonElement>('#btn-print-payroll')!;
 const payrollListBody = document.querySelector<HTMLTableSectionElement>('#payroll-list')!;
 const payrollActions = document.querySelector<HTMLDivElement>('#payroll-actions')!;
+const btnClearExtra = document.querySelector<HTMLButtonElement>('#btn-clear-extra')!; 
 
 function initPayrollPage(){
   if (!payStart.value){
     const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(),1);
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); 
-        payStart.value = firstDay.toISOString().split('T')[0];
-        payEnd.value = lastDay.toISOString().split('T')[0];
+    payStart.value = firstDay.toISOString().split('T')[0];
+    payEnd.value = lastDay.toISOString().split('T')[0];
   }
 }
 
-// Calculate wage
+// Calculate wage & Render Table
 btnCalcPayroll.addEventListener('click', async () => {
     const start = payStart.value;
     const end = payEnd.value;
@@ -735,7 +743,7 @@ btnCalcPayroll.addEventListener('click', async () => {
             payrollListBody.innerHTML = '';
             
             if (data.payments.length === 0) {
-                payrollListBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Δεν βρέθηκαν πληρωμές για αυτό το διάστημα.</td></tr>';
+                payrollListBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Δεν βρέθηκαν πληρωμές για αυτό το διάστημα.</td></tr>';
                 payrollActions.classList.add('hidden');
                 return;
             }
@@ -758,10 +766,13 @@ btnCalcPayroll.addEventListener('click', async () => {
                     <td style="background-color: #fffbeb; color: #92400e; font-weight: bold;">
                         ${item.cash_pay.toFixed(2)} €
                     </td>
-                    <button class="action-btn btn-add-extra" data-id="${item.employee_id}"style="background-color: #b35b2f; color: white; margin-left : 10px;">
-            + Extra
-        </button>
-    </td>
+                    
+                    <td>
+                        <button class="action-btn btn-add-extra" data-id="${item.employee_id}" 
+                                style="background-color: #dd780b; color: white; cursor: pointer;">
+                            Πρόσθετα
+                        </button>
+                    </td>
                 `;
                 payrollListBody.appendChild(row);
             });
@@ -775,64 +786,115 @@ btnCalcPayroll.addEventListener('click', async () => {
     }
 });
 
+
+// -- Extra features logic ---
+
+// 1. Modal Open
 payrollListBody.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     if (target.classList.contains('btn-add-extra')) {
         const empId = target.dataset.id;
         (document.getElementById('extra-emp-id') as HTMLInputElement).value = empId!;
-        modalExtra.classList.remove('hidden');
+        (document.getElementById('extra-amount') as HTMLInputElement).value = '';
+        (document.getElementById('extra-reason') as HTMLInputElement).value = '';
+        
+        if(modalExtra) modalExtra.classList.remove('hidden');
     }
 });
 
-btnCancelExtra.addEventListener('click', () => modalExtra.classList.add('hidden'));
+// 2. Close Modal
+if(btnCancelExtra) {
+    btnCancelExtra.addEventListener('click', () => {
+        if(modalExtra) modalExtra.classList.add('hidden');
+    });
+}
 
-extraForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const empId = (document.getElementById('extra-emp-id') as HTMLInputElement).value;
-    const amount = parseFloat((document.getElementById('extra-amount') as HTMLInputElement).value);
-    const reason = (document.getElementById('extra-reason') as HTMLInputElement).value;
+// 3. Submit Logic
+if(extraForm) {
+    extraForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const empId = (document.getElementById('extra-emp-id') as HTMLInputElement).value;
+        const amount = parseFloat((document.getElementById('extra-amount') as HTMLInputElement).value);
+        const reason = (document.getElementById('extra-reason') as HTMLInputElement).value;
 
-const payload = {
-    date: payEnd.value, 
-    employee_id: parseInt(empId),
-    boat_id: 1, 
-    present: false, 
-    overtime_hours: 0,
-    extra_amount: amount,
-    extra_reason: reason
-    };
+        const payload = {
+            date: payEnd.value,
+            employee_id: parseInt(empId),
+            boat_id: null,      
+            present: null,      
+            overtime_hours: null,
+            extra_amount: amount,
+            extra_reason: reason
+        };
 
-try {
-        const res = await fetch('http://127.0.0.1:8000/attendance/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+        try {
+            const res = await fetch('http://127.0.0.1:8000/attendance/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        if (res.ok) {
-            modalExtra.classList.add('hidden');
-            extraForm.reset();
-            btnCalcPayroll.click(); // Ανανέωση πίνακα για να δούμε το νέο σύνολο
-            alert("Το Extra προστέθηκε!");
+            if (res.ok) {
+                if(modalExtra) modalExtra.classList.add('hidden');
+                btnCalcPayroll.click(); 
+                alert("Το Extra αποθηκεύτηκε!");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Σφάλμα σύνδεσης");
         }
-    } catch (err) {
-        console.error(err);
-    }
-});
+    });
+}
 
+// 4. Reset Logic
+if (btnClearExtra) {
+    btnClearExtra.addEventListener('click', async () => {
+        const empId = (document.getElementById('extra-emp-id') as HTMLInputElement).value;
+        
+        const payload = {
+            date: payEnd.value,
+            employee_id: parseInt(empId),
+            boat_id: null,
+            present: null,
+            overtime_hours: null,
+            extra_amount: 0,    
+            extra_reason: ""    
+        };
+
+        if (confirm("Θέλετε να διαγράψετε το Extra ποσό;")) {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/attendance/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    if(modalExtra) modalExtra.classList.add('hidden');
+                    btnCalcPayroll.click(); 
+                    alert("Το Extra διαγράφηκε!");
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    });
+}
 
 // PDF Logic
-btnPrintPayroll.addEventListener('click', () => {
-    const start = payStart.value;
-    const end = payEnd.value;
+if(btnPrintPayroll) {
+    btnPrintPayroll.addEventListener('click', () => {
+        const start = payStart.value;
+        const end = payEnd.value;
 
-    if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
-        return;
-    }
-    const url = `http://127.0.0.1:8000/payroll/pdf?start=${start}&end=${end}`;    
-    window.open(url, '_blank');
-});
+        if (!start || !end) {
+            alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+            return;
+        }
+        const url = `http://127.0.0.1:8000/payroll/pdf?start=${start}&end=${end}`;    
+        window.open(url, '_blank');
+    });
+}
 
-
+// Start App
 fetchData();

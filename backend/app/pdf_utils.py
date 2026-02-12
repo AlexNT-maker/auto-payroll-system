@@ -45,13 +45,15 @@ def generate_payroll_pdf(payroll_data):
     elements.append(Paragraph(title_text, title_style))
     
     data = [[
-        "Εργαζόμενος", "Ημέρες", "Μισθός (€)", "Υπερωρία (€)", 
-        "Σύνολο (€)", "Τράπεζα (€)", "Μετρητά (€)"
+        "Εργαζόμενος", "Ημέρες", "Μισθός", "Υπερωρία", 
+        "Extra", "Αιτιολογία", 
+        "Σύνολο", "Τράπεζα", "Μετρητά"
     ]]
     
     total_bank = 0
     total_cash = 0
     total_grand = 0
+    total_extra_sum = 0
 
     for item in payroll_data["payments"]:
         row = [
@@ -59,6 +61,8 @@ def generate_payroll_pdf(payroll_data):
             str(item["days_worked"]),
             f"{item['total_wage']:.2f}",
             f"{item['total_overtime']:.2f}",
+            f"{item['total_extra']:.2f}",    
+            item['extra_reasons'],
             f"{item['grand_total']:.2f}",
             f"{item['bank_pay']:.2f}",
             f"{item['cash_pay']:.2f}"
@@ -68,9 +72,11 @@ def generate_payroll_pdf(payroll_data):
         total_bank += item['bank_pay']
         total_cash += item['cash_pay']
         total_grand += item['grand_total']
+        total_extra_sum += item['total_extra']
 
     data.append([
         "ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", "", "", 
+        f"{total_extra_sum:.2f}", "", 
         f"{total_grand:.2f}", f"{total_bank:.2f}", f"{total_cash:.2f}"
     ])
 
@@ -78,15 +84,15 @@ def generate_payroll_pdf(payroll_data):
     
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
         ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'), 
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
         
-        ('BACKGROUND', (5, 0), (5, -1), colors.aliceblue), 
-        ('BACKGROUND', (6, 0), (6, -1), colors.lightyellow), 
+        ('BACKGROUND', (7, 0), (7, -1), colors.aliceblue), 
+        ('BACKGROUND', (8, 0), (8, -1), colors.lightyellow), 
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])

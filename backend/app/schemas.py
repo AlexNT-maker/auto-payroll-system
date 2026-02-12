@@ -46,7 +46,11 @@ class AttendanceBase(BaseModel):
     extra_reason: Optional[str] = None
 
 class AttendanceCreate(AttendanceBase):
-    pass
+    boat_id: Optional[int] = None
+    present: Optional[bool] = None
+    overtime_hours: Optional[float] = None
+    extra_amount: Optional[float] = None
+    extra_reason: Optional[str] = None
 
 class Attendance(AttendanceBase):
     id: int
@@ -88,6 +92,8 @@ class PaymentItem(BaseModel):
     days_worked: int
     total_wage: float 
     total_overtime: float
+    total_extra: float
+    extra_reasons: str
     grand_total: float
     bank_pay: float
     cash_pay: float
