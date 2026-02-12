@@ -1,5 +1,3 @@
-# backend/app/pdf_utils.py
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -29,7 +27,7 @@ def generate_payroll_pdf(payroll_data):
     doc = SimpleDocTemplate(buffer, pagesize=landscape(A4))
     elements = []
     
-    font_name = register_greek_font()
+    font_name = register_greek_font()   
     
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle(
@@ -82,7 +80,7 @@ def generate_payroll_pdf(payroll_data):
         ('FONT', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'), 
         ('GRID', (0, 0), (-1, -1), 1, colors.black),

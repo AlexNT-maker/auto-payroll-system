@@ -246,6 +246,9 @@ const btnAddEmployee = document.querySelector<HTMLButtonElement>('#btn-add-emplo
 const btnCancel = document.querySelector<HTMLButtonElement>('#btn-cancel')!;
 const employeeForm = document.querySelector<HTMLFormElement>('#employee-form')!;
 const employeesListBody = document.querySelector<HTMLTableSectionElement>('#employees-list')!;
+const modalExtra = document.querySelector<HTMLDivElement>('#modal-extra')!;
+const extraForm = document.querySelector<HTMLFormElement>('#extra-form')!;
+const btnCancelExtra = document.querySelector<HTMLButtonElement>('#btn-cancel-extra')!;
 
 // Form Inputs
 const inputName = document.querySelector<HTMLInputElement>('#emp-name')!;
@@ -755,6 +758,10 @@ btnCalcPayroll.addEventListener('click', async () => {
                     <td style="background-color: #fffbeb; color: #92400e; font-weight: bold;">
                         ${item.cash_pay.toFixed(2)} €
                     </td>
+                    <button class="action-btn btn-add-extra" data-id="${item.employee_id}"style="background-color: #b35b2f; color: white; margin-left : 10px;">
+            + Extra
+        </button>
+    </td>
                 `;
                 payrollListBody.appendChild(row);
             });
@@ -765,6 +772,51 @@ btnCalcPayroll.addEventListener('click', async () => {
     } catch (error) {
         console.error(error);
         alert("Σφάλμα σύνδεσης.");
+    }
+});
+
+payrollListBody.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('btn-add-extra')) {
+        const empId = target.dataset.id;
+        (document.getElementById('extra-emp-id') as HTMLInputElement).value = empId!;
+        modalExtra.classList.remove('hidden');
+    }
+});
+
+btnCancelExtra.addEventListener('click', () => modalExtra.classList.add('hidden'));
+
+extraForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const empId = (document.getElementById('extra-emp-id') as HTMLInputElement).value;
+    const amount = parseFloat((document.getElementById('extra-amount') as HTMLInputElement).value);
+    const reason = (document.getElementById('extra-reason') as HTMLInputElement).value;
+
+const payload = {
+    date: payEnd.value, 
+    employee_id: parseInt(empId),
+    boat_id: 1, 
+    present: false, 
+    overtime_hours: 0,
+    extra_amount: amount,
+    extra_reason: reason
+    };
+
+try {
+        const res = await fetch('http://127.0.0.1:8000/attendance/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            modalExtra.classList.add('hidden');
+            extraForm.reset();
+            btnCalcPayroll.click(); // Ανανέωση πίνακα για να δούμε το νέο σύνολο
+            alert("Το Extra προστέθηκε!");
+        }
+    } catch (err) {
+        console.error(err);
     }
 });
 

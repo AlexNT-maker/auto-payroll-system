@@ -296,6 +296,31 @@
           </div>
         </div>
       </div>
+
+      <div id="modal-extra" class="modal-overlay hidden">
+        <div class="modal-content animate-enter" style="max-width: 400px;">
+          <h2>Extra</h2>
+          <form id="extra-form">
+            <input type="hidden" id="extra-emp-id">
+            
+            <div class="form-group">
+              <label>Ποσό (€):</label>
+              <input type="number" id="extra-amount" step="0.01" required>
+            </div>
+
+            <div class="form-group">
+              <label>Αιτιολογία:</label>
+              <input type="text" id="extra-reason" required>
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn-submit hover-lift">Προσθήκη</button>
+              <button type="button" id="btn-cancel-extra" class="btn-cancel">Ακύρωση</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
     </main>
 
     <script type="module" src="/src/main.ts"></script>
