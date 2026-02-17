@@ -110,3 +110,50 @@ def generate_payroll_pdf(payroll_data):
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
+def generate_boat_analysis_pdf(data):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    
+    font_name = register_greek_font()   
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontName=font_name, alignment=1)
+    
+    elements.append(Paragraph(f"Ανάλυση Σκάφους: {data['boat_name']}", title_style))
+    elements.append(Spacer(1, 20))
+    
+    table_data = [["Ημερομηνία", "Εργαζόμενος", "Μισθός", "Υπερωρία", "Σύνολο"]]
+    
+    for item in data["analysis_data"]:
+        table_data.append([
+            str(item["date"]), 
+            item["employee_name"],
+            f"{item['daily_cost']:.2f}",
+            f"{item['overtime_cost']:.2f}",
+            f"{item['total_cost']:.2f}"
+        ])
+        
+    table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", "", "", f"{data['total_cost']:.2f}"])
+    
+    table = Table(table_data)
+    style = TableStyle([
+        ('FONT', (0, 0), (-1, -1), font_name),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
+        ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+    ])
+    try:
+        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
+        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold') 
+        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold') 
+    except: pass
+
+    table.setStyle(style)
+    elements.append(table)
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

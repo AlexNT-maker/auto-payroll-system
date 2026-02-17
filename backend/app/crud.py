@@ -87,25 +87,27 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
         models.Attendance.boat_id == boat_id,
         models.Attendance.date >= start_date,
         models.Attendance.date <= end_date,
-        models.Attendance.present == True
     ).all ()
+
     analysis_data = []
     total_sum = 0.0
 
     for rec in records:
-        wage = rec.employee.daily_wage
-        ot_cost = rec.overtime_hours * rec.employee.overtime_rate
-        daily_total = wage + ot_cost + rec.extra_amount
+        if rec.present or rec.is_half_day:
+            multiplier = 0.5 if rec.is_half_day else 1.0
+            wage = rec.employee.daily_wage * multiplier
+            ot_cost = rec.overtime_hours * rec.employee.overtime_rate
+            daily_total = wage + ot_cost + rec.extra_amount
 
-        total_sum += daily_total
+            total_sum += daily_total
 
-        analysis_data.append({
-            "date": rec.date,
-            "employee_name": rec.employee.name,
-            "daily_cost": wage,
-            "overtime_cost": ot_cost,
-            "total_cost": daily_total
-        })
+            analysis_data.append({
+                "date": rec.date,
+                "employee_name": rec.employee.name,
+                "daily_cost": wage,
+                "overtime_cost": ot_cost,
+                "total_cost": daily_total
+            })
 
     return {
             "boat_name": boat.name,
@@ -118,7 +120,6 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     query = db.query(models.Attendance).filter(
         models.Attendance.date >= start ,
         models.Attendance.date <= end,
-        models.Attendance.present == True
     )
 
     if boat_id:
@@ -133,10 +134,12 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     total_sum = 0.0
 
     for rec in records:
-        if not rec.employee:
+        if not (rec.present or rec.is_half_day):
             continue
 
-        wage = rec.employee.daily_wage if rec.employee.daily_wage else 0.0
+        multiplier = 0.5 if rec.is_half_day else 1.0
+        wage = (rec.employee.daily_wage * multiplier) if rec.employee.daily_wage else 0.0
+
         ot_rate = rec.employee.overtime_rate if rec.employee.overtime_rate else 0.0
         
         ot_cost = rec.overtime_hours * ot_rate
@@ -183,6 +186,9 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
             existing_record.extra_amount = attendance.extra_amount
         if attendance.extra_reason is not None:
             existing_record.extra_reason = attendance.extra_reason
+
+        if attendance.is_half_day is not None:
+            existing_record.is_half_day = attendance.is_half_day
         
         db.commit()
         db.refresh(existing_record)
@@ -195,7 +201,8 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
             present = attendance.present if attendance.present is not None else False, 
             overtime_hours = attendance.overtime_hours if attendance.overtime_hours is not None else 0.0,
             extra_amount = attendance.extra_amount if attendance.extra_amount is not None else 0.0,
-            extra_reason = attendance.extra_reason if attendance.extra_reason is not None else ""
+            extra_reason = attendance.extra_reason if attendance.extra_reason is not None else "",
+            is_half_day = attendance.is_half_day if attendance.is_half_day is not None else False
         )
         db.add(db_attendance)
         db.commit()
@@ -222,16 +229,17 @@ def calculate_payroll(db: Session, start: date, end: date):
             models.Attendance.date <= end
         ).all()
 
-        days_worked = 0
+        days_worked = 0.0
         sum_wage = 0.0
         sum_overtime = 0.0
         sum_extra = 0.0
         reasons_list = []
 
         for rec in records:
-            if rec.present:
-                days_worked += 1
-                sum_wage += emp.daily_wage
+            if rec.present or rec.is_half_day:
+                multiplier = 0.5 if rec.is_half_day else 1.0
+                days_worked += multiplier
+                sum_wage += (emp.daily_wage * multiplier)
                 sum_overtime += (rec.overtime_hours * emp.overtime_rate)
             if rec.extra_amount > 0:
                 sum_extra += rec.extra_amount
@@ -254,7 +262,6 @@ def calculate_payroll(db: Session, start: date, end: date):
 
         remainder = target_cash % 50
 
-        remainder = target_cash % 50
         final_cash = target_cash - remainder
         final_bank = grand_total - final_cash
 

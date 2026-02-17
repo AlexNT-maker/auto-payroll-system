@@ -96,6 +96,20 @@ def get_boat_analysis(boat_id: int, start: date, end: date, db: Session = Depend
         raise HTTPException(status_code=404, detail= "Το σκάφος δεν βρέθηκε")
     return report
 
+@app.get("/boats/{boat_id}/analysis/pdf")
+def export_boat_analysis_pdf(boat_id: int, start: date, end: date, db: Session = Depends(get_db)):
+    report = crud.get_boat_analysis(db, boat_id, start_date=start, end_date=end)
+    if not report:
+        raise HTTPException(status_code=404, detail="Δεν βρέθηκαν δεδομένα")
+    
+    pdf_buffer = pdf_utils.generate_boat_analysis_pdf(report)
+    filename = f"boat_{boat_id}_analysis_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer, 
+        media_type="application/pdf", 
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # 3. -- Attendance --
 @app.post("/attendance/", response_model=schemas.Attendance)
 def create_attendance_record(attendance: schemas.AttendanceCreate, db: Session = Depends(get_db)):

@@ -39,6 +39,7 @@ class Attendance(Base):
     boat_id = Column(Integer, ForeignKey("boats.id"))
 
     present = Column(Boolean, default=False) # Checkbox for attendance
+    is_half_day = Column(Boolean, default=False)
     overtime_hours = Column(Float, default = 0.0)
 
     extra_amount = Column(Float, default = 0.0)

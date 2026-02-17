@@ -64,6 +64,18 @@ function renderTable(existingData: any[]=[]){
     presentCell.appendChild(presentInput);
     row.appendChild(presentCell);
 
+    const halfCell = document.createElement('td');
+    const halfInput = document.createElement('input');
+    halfInput.type = 'checkbox';
+    halfInput.dataset.empId = employee.id.toString();
+    halfInput.classList.add('half-checkbox');
+    if (record && record.is_half_day) halfInput.checked = true;
+    halfCell.appendChild(halfInput);
+    row.appendChild(halfCell);
+
+    presentInput.addEventListener('change', () => { if(presentInput.checked) halfInput.checked = false; });
+    halfInput.addEventListener('change', () => { if(halfInput.checked) presentInput.checked = false; });
+
     // Cell No.3 Boat (Dropdown style)
     const boatCell = document.createElement('td');
     const boatSelect = document.createElement('select');
@@ -116,13 +128,15 @@ form.addEventListener('submit', async (event: Event)=>{
 
   for (const row of rows) {
     const checkbox = row.querySelector('.presence-checkbox') as HTMLInputElement;
+    const halfbox = row.querySelector('.half-checkbox') as HTMLInputElement;
     const boatSelect = row.querySelector('.boat-select') as HTMLSelectElement;
     const overtimeInput = row.querySelector('.overtime-input') as HTMLInputElement;
 
     const empId = parseInt(checkbox.dataset.empId!);
     const isPresent = checkbox.checked;
+    const isHalf = halfbox.checked;
 
-    if(isPresent && !boatSelect.value){
+    if((isPresent || isHalf) && !boatSelect.value){
       alert ('Παρακαλώ επιλέξτε σκάφος, για όλους τους παρόντες');
       return ;
     }
@@ -132,24 +146,22 @@ form.addEventListener('submit', async (event: Event)=>{
       employee_id: empId,
       boat_id: boatSelect.value ? parseInt(boatSelect.value) : 1, 
       present: isPresent,
+      is_half_day: isHalf,
       overtime_hours: parseFloat(overtimeInput.value) || 0,
       extra_amount: 0,
       extra_reason: ""
     };
 
-    if (isPresent) {
-        try {
-            await fetch('http://127.0.0.1:8000/attendance/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        } catch (err) {
-            console.error('Error saving row', err);
-        }
+    try {
+        await fetch('http://127.0.0.1:8000/attendance/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    } catch (err) {
+        console.error('Error saving row', err);
     }
   }
-
   alert('Η αποθήκευση ολοκληρώθηκε!');
 
   window.location.reload();
@@ -249,6 +261,8 @@ const employeesListBody = document.querySelector<HTMLTableSectionElement>('#empl
 const modalExtra = document.querySelector<HTMLDivElement>('#modal-extra')!;
 const extraForm = document.querySelector<HTMLFormElement>('#extra-form')!;
 const btnCancelExtra = document.querySelector<HTMLButtonElement>('#btn-cancel-extra')!;
+const btnPrintBoatPdf = document.querySelector<HTMLButtonElement>('#btn-print-boat-pdf')!;
+
 
 // Form Inputs
 const inputName = document.querySelector<HTMLInputElement>('#emp-name')!;
@@ -485,6 +499,7 @@ function openAnalysisModal(boatId: number){
     inputStart.valueAsDate = firstDay; 
     inputEnd.valueAsDate = lastDay;
 
+    btnPrintBoatPdf.classList.add('hidden');
     resultsDiv.classList.add('hidden'); 
     modalAnalysis.classList.remove('hidden');
 }
@@ -522,6 +537,7 @@ btnRunAnalysis.addEventListener('click', async () => {
             });
 
             resultsDiv.classList.remove('hidden');
+            btnPrintBoatPdf.classList.remove('hidden');
 
         } else {
             alert("Σφάλμα κατά τη λήψη δεδομένων.");
@@ -531,6 +547,15 @@ btnRunAnalysis.addEventListener('click', async () => {
         alert("Σφάλμα σύνδεσης.");
     }
 });
+
+btnPrintBoatPdf.addEventListener('click', () => {
+    if (!currentAnalysisBoatId) return;
+    const start = inputStart.value;
+    const end = inputEnd.value;
+    const url = `http://127.0.0.1:8000/boats/${currentAnalysisBoatId}/analysis/pdf?start=${start}&end=${end}`;
+    window.open(url, '_blank');
+});
+
 
 btnAddBoat.addEventListener('click', () => openBoatModal());
 btnCancelBoat.addEventListener('click', () => modalBoat.classList.add('hidden'));

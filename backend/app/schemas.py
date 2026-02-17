@@ -41,6 +41,7 @@ class AttendanceBase(BaseModel):
     employee_id: Optional[int] = None
     boat_id: Optional[int] = None
     present: bool = False
+    is_half_day: bool = False
     overtime_hours: float = 0.0
     extra_amount: float = 0.0
     extra_reason: Optional[str] = None
@@ -48,6 +49,7 @@ class AttendanceBase(BaseModel):
 class AttendanceCreate(AttendanceBase):
     boat_id: Optional[int] = None
     present: Optional[bool] = None
+    is_half_day: Optional[bool] = None
     overtime_hours: Optional[float] = None
     extra_amount: Optional[float] = None
     extra_reason: Optional[str] = None
@@ -89,7 +91,7 @@ class ExpensesResponse(BaseModel):
 class PaymentItem(BaseModel):
     employee_id: int
     employee_name: str
-    days_worked: int
+    days_worked: float
     total_wage: float 
     total_overtime: float
     total_extra: float
