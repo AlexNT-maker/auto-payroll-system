@@ -204,7 +204,10 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
 
 # -- Fetch attendance for a specific date --
 def get_attendance_by_date(db: Session, target_date: date):
-    return db.query(models.Attendance).filter(models.Attendance.date == target_date).all()
+    return db.query(models.Attendance).filter(
+        models.Attendance.date == target_date,
+        models.Attendance.employee_id.isnot(None) 
+    ).all()
 
 
 # -- Payroll calculation --

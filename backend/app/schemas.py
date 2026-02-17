@@ -38,8 +38,8 @@ class Employee(EmployeeBase):
 
 class AttendanceBase(BaseModel):
     date: date 
-    employee_id: int 
-    boat_id: int 
+    employee_id: Optional[int] = None
+    boat_id: Optional[int] = None
     present: bool = False
     overtime_hours: float = 0.0
     extra_amount: float = 0.0
