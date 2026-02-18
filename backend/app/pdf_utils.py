@@ -45,7 +45,7 @@ def generate_payroll_pdf(payroll_data):
     elements.append(Paragraph(title_text, title_style))
     
     data = [[
-        "Εργαζόμενος", "Ημέρες", "Μισθός", "Υπερωρία", 
+        "Εργαζόμενος", "Ημέρες", "Μισθός","Ώρες Υπ.", "Υπερωρία", 
         "Extra", "Αιτιολογία", 
         "Σύνολο", "Τράπεζα", "Μετρητά"
     ]]
@@ -60,6 +60,7 @@ def generate_payroll_pdf(payroll_data):
             item["employee_name"],
             str(item["days_worked"]),
             f"{item['total_wage']:.2f}",
+            f"{item['total_overtime_hours']:.1f}",
             f"{item['total_overtime']:.2f}",
             f"{item['total_extra']:.2f}",    
             item['extra_reasons'],
@@ -84,7 +85,7 @@ def generate_payroll_pdf(payroll_data):
     
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
         ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),

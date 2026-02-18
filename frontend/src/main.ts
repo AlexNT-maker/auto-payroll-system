@@ -98,6 +98,26 @@ function renderTable(existingData: any[]=[]){
     boatCell.appendChild(boatSelect);
     row.appendChild(boatCell);
 
+    // Cell No.3.5 Overtime Boat (Dropdown style)
+    const otBoatCell = document.createElement('td');
+    const otBoatSelect = document.createElement('select');
+    otBoatSelect.classList.add('ot-boat-select');
+
+    const defaultOtOption = document.createElement('option');
+    defaultOtOption.text = '-- Ίδιο με Ημερ. --'; 
+    defaultOtOption.value = '';
+    otBoatSelect.appendChild(defaultOtOption);
+
+    boats.forEach(boat => {
+      const option = document.createElement('option');
+      option.value = boat.id.toString();
+      option.textContent = boat.name;
+      if (record && record.overtime_boat_id === boat.id) option.selected = true;
+      otBoatSelect.appendChild(option);
+    });
+    otBoatCell.appendChild(otBoatSelect);
+    row.appendChild(otBoatCell)
+
     // Cell No.4 Overtime
     const overtimeCell = document.createElement('td');
     const overtimeInput = document.createElement('input');
@@ -130,7 +150,9 @@ form.addEventListener('submit', async (event: Event)=>{
     const checkbox = row.querySelector('.presence-checkbox') as HTMLInputElement;
     const halfbox = row.querySelector('.half-checkbox') as HTMLInputElement;
     const boatSelect = row.querySelector('.boat-select') as HTMLSelectElement;
+    const otBoatSelect = row.querySelector('.ot-boat-select') as HTMLSelectElement;
     const overtimeInput = row.querySelector('.overtime-input') as HTMLInputElement;
+    const otHours = parseFloat(overtimeInput.value) || 0;
 
     const empId = parseInt(checkbox.dataset.empId!);
     const isPresent = checkbox.checked;
@@ -141,16 +163,24 @@ form.addEventListener('submit', async (event: Event)=>{
       return ;
     }
 
+    if (otHours > 0 && !otBoatSelect.value && !boatSelect.value) {
+      alert ('Παρακαλώ επιλέξτε Σκάφος Υπερωρίας, για όσους έχουν ώρες.');
+      return;
+    }
+
+    const finalOtBoat = otBoatSelect.value ? parseInt(otBoatSelect.value) : (boatSelect.value ? parseInt(boatSelect.value) : null);
+
     const payload = {
       date: date,
       employee_id: empId,
-      boat_id: boatSelect.value ? parseInt(boatSelect.value) : 1, 
+      boat_id: boatSelect.value ? parseInt(boatSelect.value) : null, 
+      overtime_boat_id: finalOtBoat, 
       present: isPresent,
       is_half_day: isHalf,
-      overtime_hours: parseFloat(overtimeInput.value) || 0,
+      overtime_hours: otHours,
       extra_amount: 0,
       extra_reason: ""
-    };
+    }; 
 
     try {
         await fetch('http://127.0.0.1:8000/attendance/', {

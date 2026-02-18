@@ -84,7 +84,7 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
         return None
     
     records = db.query(models.Attendance).join(models.Employee).filter(
-        models.Attendance.boat_id == boat_id,
+        (models.Attendance.boat_id == boat_id) | (models.Attendance.overtime_boat_id == boat_id),
         models.Attendance.date >= start_date,
         models.Attendance.date <= end_date,
     ).all ()
@@ -93,27 +93,34 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
     total_sum = 0.0
 
     for rec in records:
-        if rec.present or rec.is_half_day:
-            multiplier = 0.5 if rec.is_half_day else 1.0
-            wage = rec.employee.daily_wage * multiplier
+        wage = 0.0
+        ot_cost = 0.0
+        extra = 0.0
+
+        if rec.boat_id == boat_id:
+            if rec.present or rec.is_half_day:
+                multiplier = 0.5 if rec.is_half_day else 1.0
+                wage = rec.employee.daily_wage * multiplier
+            extra = rec.extra_amount
+
+        if rec.overtime_boat_id == boat_id:
             ot_cost = rec.overtime_hours * rec.employee.overtime_rate
-            daily_total = wage + ot_cost + rec.extra_amount
 
+        daily_total = wage + ot_cost + extra
+
+        if daily_total > 0: 
             total_sum += daily_total
-
             analysis_data.append({
                 "date": rec.date,
                 "employee_name": rec.employee.name,
-                "daily_cost": wage,
+                "daily_cost": wage + extra, 
                 "overtime_cost": ot_cost,
                 "total_cost": daily_total
             })
 
-    return {
-            "boat_name": boat.name,
-            "total_cost": total_sum,
-            "analysis_data": analysis_data
-        }
+    return {"boat_name": boat.name, 
+            "total_cost": total_sum, 
+            "analysis_data": analysis_data}
 
 # -- Expenses Report --
 def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, emp_id: int=None):
@@ -134,37 +141,30 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     total_sum = 0.0
 
     for rec in records:
-        if not (rec.present or rec.is_half_day):
-            continue
-
-        multiplier = 0.5 if rec.is_half_day else 1.0
+        multiplier = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
         wage = (rec.employee.daily_wage * multiplier) if rec.employee.daily_wage else 0.0
+        ot_cost = rec.overtime_hours * (rec.employee.overtime_rate if rec.employee.overtime_rate else 0.0)
+        extra = rec.extra_amount
 
-        ot_rate = rec.employee.overtime_rate if rec.employee.overtime_rate else 0.0
-        
-        ot_cost = rec.overtime_hours * ot_rate
-        line_total = wage + ot_cost + rec.extra_amount
+        if (wage > 0 or extra > 0) and (not boat_id or rec.boat_id == boat_id):
+            total_sum += (wage + extra)
+            report_data.append({
+                "date": rec.date, "employee_name": rec.employee.name,
+                "boat_name": rec.boat.name if rec.boat else "-", 
+                "daily_cost": wage + extra, "overtime_cost": 0.0, "total_cost": wage + extra
+            })
+            
+        if ot_cost > 0 and (not boat_id or rec.overtime_boat_id == boat_id):
+            total_sum += ot_cost
+            report_data.append({
+                "date": rec.date, "employee_name": rec.employee.name,
+                "boat_name": (rec.overtime_boat.name + " (Υπερ)") if rec.overtime_boat else "-", 
+                "daily_cost": 0.0, "overtime_cost": ot_cost, "total_cost": ot_cost
+            })
 
-        total_sum += line_total
-        boat_name = "-"
-        if rec.boat:
-            boat_name = rec.boat.name
-        elif rec.boat_id:
-            boat_name = f"Διεγραμμένο ({rec.boat_id})"
+    report_data.sort(key=lambda x: x["date"]) 
+    return {"total_sum": total_sum, "results": report_data}
 
-        report_data.append({
-            "date": rec.date,
-            "employee_name": rec.employee.name,
-            "boat_name": boat_name, 
-            "daily_cost": wage,
-            "overtime_cost": ot_cost,
-            "total_cost": line_total
-        })
-
-    return {
-        "total_sum": total_sum,
-        "results": report_data
-    }
 # -- Attendance --
 
 # -- Attendance (Update or Create) --
@@ -175,39 +175,32 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
     ).first()
 
     if existing_record:
-        if attendance.boat_id is not None:
-            existing_record.boat_id = attendance.boat_id
-        if attendance.present is not None:
-            existing_record.present = attendance.present
-        if attendance.overtime_hours is not None:
-            existing_record.overtime_hours = attendance.overtime_hours
-        
-        if attendance.extra_amount is not None:
-            existing_record.extra_amount = attendance.extra_amount
-        if attendance.extra_reason is not None:
-            existing_record.extra_reason = attendance.extra_reason
-
-        if attendance.is_half_day is not None:
-            existing_record.is_half_day = attendance.is_half_day
-        
+        if attendance.boat_id is not None: existing_record.boat_id = attendance.boat_id
+        if attendance.overtime_boat_id is not None: existing_record.overtime_boat_id = attendance.overtime_boat_id
+        if attendance.present is not None: existing_record.present = attendance.present
+        if attendance.is_half_day is not None: existing_record.is_half_day = attendance.is_half_day
+        if attendance.overtime_hours is not None: existing_record.overtime_hours = attendance.overtime_hours
+        if attendance.extra_amount is not None: existing_record.extra_amount = attendance.extra_amount
+        if attendance.extra_reason is not None: existing_record.extra_reason = attendance.extra_reason
         db.commit()
         db.refresh(existing_record)
         return existing_record
     else:
         db_attendance = models.Attendance(
-            date = attendance.date, 
-            employee_id = attendance.employee_id,
-            boat_id = attendance.boat_id if attendance.boat_id is not None else 1, 
+            date = attendance.date, employee_id = attendance.employee_id,
+            boat_id = attendance.boat_id, 
+            overtime_boat_id = attendance.overtime_boat_id,
             present = attendance.present if attendance.present is not None else False, 
+            is_half_day = attendance.is_half_day if attendance.is_half_day is not None else False,
             overtime_hours = attendance.overtime_hours if attendance.overtime_hours is not None else 0.0,
             extra_amount = attendance.extra_amount if attendance.extra_amount is not None else 0.0,
             extra_reason = attendance.extra_reason if attendance.extra_reason is not None else "",
-            is_half_day = attendance.is_half_day if attendance.is_half_day is not None else False
         )
         db.add(db_attendance)
         db.commit()
         db.refresh(db_attendance)
         return db_attendance
+        
 
 # -- Fetch attendance for a specific date --
 def get_attendance_by_date(db: Session, target_date: date):
@@ -232,6 +225,7 @@ def calculate_payroll(db: Session, start: date, end: date):
         days_worked = 0.0
         sum_wage = 0.0
         sum_overtime = 0.0
+        sum_overtime_hours = 0.0
         sum_extra = 0.0
         reasons_list = []
 
@@ -241,6 +235,7 @@ def calculate_payroll(db: Session, start: date, end: date):
                 days_worked += multiplier
                 sum_wage += (emp.daily_wage * multiplier)
                 sum_overtime += (rec.overtime_hours * emp.overtime_rate)
+                sum_overtime_hours += rec.overtime_hours
             if rec.extra_amount > 0:
                 sum_extra += rec.extra_amount
                 if rec.extra_reason:
@@ -274,6 +269,7 @@ def calculate_payroll(db: Session, start: date, end: date):
             "employee_name": emp.name,
             "days_worked": days_worked,
             "total_wage": sum_wage,
+            "total_overtime_hours": sum_overtime_hours,
             "total_overtime": sum_overtime,
             "total_extra": sum_extra,      
             "extra_reasons": final_reasons,
