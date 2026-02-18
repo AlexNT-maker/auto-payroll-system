@@ -262,8 +262,12 @@ def calculate_payroll(db: Session, start: date, end: date):
 
         remainder = target_cash % 50
 
-        final_cash = target_cash - remainder
-        final_bank = grand_total - final_cash
+        if target_bank == 0 or target_bank < remainder:
+            final_cash = target_cash
+            final_bank = target_bank
+        else:
+            final_cash = target_cash - remainder
+            final_bank = grand_total - final_cash
 
         results.append({
             "employee_id": emp.id,
