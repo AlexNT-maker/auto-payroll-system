@@ -166,3 +166,18 @@ def export_payroll_pdf(start: date, end: date, db: Session = Depends(get_db)):
         media_type="application/pdf", 
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+# -- Short analysis --
+@app.get("/boats/{boat_id}/short-analysis/pdf")
+def export_short_boat_analysis_pdf(boat_id: int, start: date, end: date, db: Session = Depends(get_db)):
+    data = crud.get_short_boat_analysis_data(db, boat_id, start_date=start, end_date=end)
+    if not data:
+        raise HTTPException(status_code=404, detail="Δεν βρέθηκαν δεδομένα")
+    
+    pdf_buffer = pdf_utils.generate_short_boat_analysis_pdf(data)
+    filename = f"short_analysis_boat_{boat_id}_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer, 
+        media_type="application/pdf", 
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )

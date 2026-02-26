@@ -15,6 +15,7 @@
     <button id="nav-home" class="active hover-lift click-shrink">Καταχώρηση</button>
     <button id="nav-employees" class="hover-lift click-shrink">Εργαζόμενοι</button>
     <button id="nav-boats" class="hover-lift click-shrink">Σκάφοι</button>
+    <button id="nav-short-analysis" class="hover-lift click-shrink">Σύντομη Ανάλυση</button>
     <button id="nav-expenses" class="hover-lift click-shrink">Έξοδα</button>
     <button id="nav-payments" class="hover-lift click-shrink">Πληρωμές</button>
   </div>
@@ -101,7 +102,41 @@
         </table>
       </div>
 
-      <!--Page No.4 History of expenses for workers and boats-->
+      <!--Page No.4 Short analysis for boat expenses-->
+      <div id="page-short-analysis" class="animate-enter hidden">
+        <h1>Σύντομη Ανάλυση Σκάφους</h1>
+        
+        <div class="filters-container" style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 2rem;">
+            <p style="margin-top: 0; margin-bottom: 1rem; color: #4b5563; font-size: 0.95rem;">
+               Επιλέξτε ημερομηνίες
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Σκάφος:</label>
+                    <select id="short-boat-select" style="width: 100%; padding: 0.6rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">-- Επιλογή Σκάφους --</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Από:</label>
+                    <input type="date" id="short-start" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="font-weight: bold; font-size: 0.9rem;">Έως:</label>
+                    <input type="date" id="short-end" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <button id="btn-print-short-analysis" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 42px; background-color: #10b981;">
+                    Εκτύπωση PDF
+                </button>
+            </div>
+        </div>
+      </div>
+
+      <!--Page No.5 History of expenses for workers and boats-->
       <div id="page-expenses" class="animate-enter hidden">
         <h1>Υπολογισμός Εξόδων</h1>
 
@@ -157,7 +192,7 @@
         </table>
       </div>
 
-      <!--Page No.5 Payroll Page-->
+      <!--Page No.6 Payroll Page-->
       <div id="page-payments" class="animate-enter hidden">
         <h1>Μισθοδοσία & Πληρωμές</h1>
 

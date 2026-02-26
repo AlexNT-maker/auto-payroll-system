@@ -122,6 +122,58 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
             "total_cost": total_sum, 
             "analysis_data": analysis_data}
 
+# -- Short Analysis Boat (Per Employee) --
+def get_short_boat_analysis_data(db: Session, boat_id: int, start_date: date, end_date: date):
+    boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+    if not boat: return None
+
+    records = db.query(models.Attendance).join(models.Employee).filter(
+        (models.Attendance.boat_id == boat_id) | (models.Attendance.overtime_boat_id == boat_id),
+        models.Attendance.date >= start_date,
+        models.Attendance.date <= end_date,
+    ).all()
+
+    emp_totals = {}
+    grand_total = 0.0
+
+    for rec in records:
+        emp_id = rec.employee.id
+        if emp_id not in emp_totals:
+            emp_totals[emp_id] = {
+                "name": rec.employee.name,
+                "days": 0.0,
+                "ot_hours": 0.0,
+                "cost": 0.0
+            }
+
+        daily_cost = 0.0
+        
+        if rec.boat_id == boat_id:
+            multiplier = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
+            emp_totals[emp_id]["days"] += multiplier
+            wage = (rec.employee.daily_wage * multiplier) if rec.employee.daily_wage else 0.0
+            extra = rec.extra_amount or 0.0
+            daily_cost += (wage + extra)
+
+        if rec.overtime_boat_id == boat_id:
+            emp_totals[emp_id]["ot_hours"] += rec.overtime_hours
+            ot_cost = rec.overtime_hours * (rec.employee.overtime_rate or 0.0)
+            daily_cost += ot_cost
+
+        emp_totals[emp_id]["cost"] += daily_cost
+        grand_total += daily_cost
+
+    valid_employees = [e for e in emp_totals.values() if e["cost"] > 0 or e["days"] > 0 or e["ot_hours"] > 0]
+    valid_employees.sort(key=lambda x: x["name"]) 
+
+    return {
+        "boat_name": boat.name,
+        "start_date": start_date,
+        "end_date": end_date,
+        "total_cost": grand_total,
+        "employees": valid_employees
+    }
+
 # -- Expenses Report --
 def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, emp_id: int=None):
     query = db.query(models.Attendance).filter(
