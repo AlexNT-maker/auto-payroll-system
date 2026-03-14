@@ -123,8 +123,8 @@ function renderTable(existingData: any[]=[]){
     const overtimeInput = document.createElement('input');
     overtimeInput.type = 'number';
     overtimeInput.min = '0';
+    overtimeInput.step = '0.5';
     overtimeInput.classList.add('overtime-input');
-    // Αν υπάρχει record, βάζουμε την τιμή
     overtimeInput.value = record ? record.overtime_hours.toString() : '0';
     
     overtimeCell.appendChild(overtimeInput);
