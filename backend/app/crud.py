@@ -193,6 +193,10 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     total_sum = 0.0
 
     for rec in records:
+
+        if not rec.employee:
+            continue
+        
         multiplier = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
         wage = (rec.employee.daily_wage * multiplier) if rec.employee.daily_wage else 0.0
         ot_cost = rec.overtime_hours * (rec.employee.overtime_rate if rec.employee.overtime_rate else 0.0)

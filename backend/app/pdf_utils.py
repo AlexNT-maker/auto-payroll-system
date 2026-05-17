@@ -160,7 +160,7 @@ def generate_boat_analysis_pdf(data):
     return buffer
 
 
-def generate_short_boat_analysis_pdf(data):
+def generate_short_boat_analysis_pdf(data, is_captain=False):
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     elements = []
@@ -169,21 +169,38 @@ def generate_short_boat_analysis_pdf(data):
     styles = getSampleStyleSheet()
     title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontName=font_name, alignment=1)
     
-    elements.append(Paragraph(f"Συνοπτική Ανάλυση: {data['boat_name']}", title_style))
+    title_text = f"Συνοπτική Αναφορά Καπετάνιου: {data['boat_name']}" if is_captain else f"Συνοπτική Ανάλυση: {data['boat_name']}"
+    elements.append(Paragraph(title_text, title_style))
     elements.append(Paragraph(f"Διάστημα: {data['start_date']} έως {data['end_date']}", ParagraphStyle('Sub', fontName=font_name, alignment=1)))
     elements.append(Spacer(1, 20))
     
-    table_data = [["Εργαζόμενος", "Μεροκάματα", "Ώρες Υπερ.", "Συνολικό Κόστος"]]
-    
-    for emp in data["employees"]:
-        table_data.append([
-            emp["name"],
-            str(emp["days"]),
-            f"{emp['ot_hours']:.1f}",
-            f"{emp['cost']:.2f} €"
-        ])
+    if is_captain:
+        table_data = [["Εργαζόμενος", "Μεροκάματα", "Ώρες Υπερ."]]
+        total_days = 0.0
+        total_hours = 0.0
         
-    table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", "", f"{data['total_cost']:.2f} €"])
+        for emp in data["employees"]:
+            table_data.append([
+                emp["name"],
+                str(emp["days"]),
+                f"{emp['ot_hours']:.1f}"
+            ])
+            total_days += emp["days"]
+            total_hours += emp["ot_hours"]
+            
+        table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", str(total_days), f"{total_hours:.1f}"])
+    else:
+        table_data = [["Εργαζόμενος", "Μεροκάματα", "Ώρες Υπερ.", "Συνολικό Κόστος"]]
+        
+        for emp in data["employees"]:
+            table_data.append([
+                emp["name"],
+                str(emp["days"]),
+                f"{emp['ot_hours']:.1f}",
+                f"{emp['cost']:.2f} €"
+            ])
+            
+        table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", "", f"{data['total_cost']:.2f} €"])
     
     table = Table(table_data)
     style = TableStyle([

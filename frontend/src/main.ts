@@ -959,6 +959,7 @@ if(btnPrintPayroll) {
 const shortBoatSelect = document.querySelector<HTMLSelectElement>('#short-boat-select')!;
 const shortStart = document.querySelector<HTMLInputElement>('#short-start')!;
 const shortEnd = document.querySelector<HTMLInputElement>('#short-end')!;
+const shortIsCaptain = document.querySelector<HTMLInputElement>('#short-is-captain')!; // ΝΕΟ
 const btnPrintShort = document.querySelector<HTMLButtonElement>('#btn-print-short-analysis')!;
 
 function initShortAnalysisPage() {
@@ -985,6 +986,9 @@ btnPrintShort.addEventListener('click', () => {
     const boatId = shortBoatSelect.value;
     const start = shortStart.value;
     const end = shortEnd.value;
+    
+    // ΝΕΟ: Ελέγχουμε αν το checkbox είναι τικαρισμένο
+    const isCaptain = shortIsCaptain ? shortIsCaptain.checked : false;
 
     if (!boatId) {
         alert("Παρακαλώ επιλέξτε σκάφος.");
@@ -995,7 +999,8 @@ btnPrintShort.addEventListener('click', () => {
         return;
     }
 
-    const url = `http://127.0.0.1:8000/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}`;
+    // ΝΕΟ: Προσθέτουμε το is_captain στο URL
+    const url = `http://127.0.0.1:8000/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}&is_captain=${isCaptain}`;
     window.open(url, '_blank');
 });
 
