@@ -271,6 +271,9 @@ def calculate_payroll(db: Session, start: date, end: date):
     employees = get_employees(db)
     results = []
 
+    period_length = (end - start).days + 1
+    max_bank_days = 26 if period_length > 16 else 13
+
     for emp in employees:
         records = db.query(models.Attendance).filter(
             models.Attendance.employee_id == emp.id,
@@ -304,7 +307,9 @@ def calculate_payroll(db: Session, start: date, end: date):
         if days_worked == 0 and sum_extra == 0:
             continue
 
-        target_bank = emp.bank_daily_amount * days_worked
+        bank_days = min(days_worked, max_bank_days)
+
+        target_bank = emp.bank_daily_amount * bank_days
         target_cash = grand_total - target_bank
 
         if target_cash < 0 :
