@@ -5,6 +5,11 @@ interface Employee {
   daily_wage: number;
   overtime_rate: number;
   bank_daily_amount: number;
+  tempPresent?: boolean;
+  tempHalfDay?: boolean;
+  tempBoat?: string;
+  tempOtBoat?: string;    
+  tempOvertime?: string;
 }
 
 interface Boat{
@@ -21,6 +26,7 @@ const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
 const btnSubmitDaily = document.querySelector<HTMLButtonElement>('#btn-submit-daily')!;
+const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
 
 // Set as default today
 datePicker.valueAsDate = new Date();
@@ -42,6 +48,7 @@ async function fetchData() {
 }
 
 // -- 4. Creating table --
+// -- 4. Creating table --
 function renderTable(existingData: any[]=[]){
   tableBody.innerHTML = '';
 
@@ -60,7 +67,6 @@ function renderTable(existingData: any[]=[]){
     presentInput.type = 'checkbox';
     presentInput.dataset.empId = employee.id.toString();
     presentInput.classList.add('presence-checkbox');
-    if (record && record.present) presentInput.checked = true;
     presentCell.appendChild(presentInput);
     row.appendChild(presentCell);
 
@@ -69,9 +75,16 @@ function renderTable(existingData: any[]=[]){
     halfInput.type = 'checkbox';
     halfInput.dataset.empId = employee.id.toString();
     halfInput.classList.add('half-checkbox');
-    if (record && record.is_half_day) halfInput.checked = true;
     halfCell.appendChild(halfInput);
     row.appendChild(halfCell);
+
+    // -- TEMP SYNC: Checkboxes --
+    if (employee.tempPresent !== undefined ? employee.tempPresent : (record && record.present)) {
+        presentInput.checked = true;
+    }
+    if (employee.tempHalfDay !== undefined ? employee.tempHalfDay : (record && record.is_half_day)) {
+        halfInput.checked = true;
+    }
 
     presentInput.addEventListener('change', () => { if(presentInput.checked) halfInput.checked = false; });
     halfInput.addEventListener('change', () => { if(halfInput.checked) presentInput.checked = false; });
@@ -81,18 +94,20 @@ function renderTable(existingData: any[]=[]){
     const boatSelect = document.createElement('select');
     boatSelect.classList.add('boat-select');
 
-    // Create an empty default option for the dropdown menu
     const defaultOption = document.createElement('option');
     defaultOption.text = '-- Επιλογή --' ;
     defaultOption.value = '';
     boatSelect.appendChild(defaultOption);
 
-    // Fill the dropdown with boats from the database
     boats.forEach(boat => {
       const option = document.createElement('option');
       option.value = boat.id.toString();
       option.textContent = boat.name;
-      if (record && record.boat_id === boat.id) option.selected = true;
+      
+      // -- TEMP SYNC: Βασικό Σκάφος --
+      const targetBoat = employee.tempBoat !== undefined ? employee.tempBoat : (record && record.boat_id ? record.boat_id.toString() : "");
+      if (targetBoat === boat.id.toString()) option.selected = true;
+      
       boatSelect.appendChild(option);
     });
     boatCell.appendChild(boatSelect);
@@ -112,11 +127,15 @@ function renderTable(existingData: any[]=[]){
       const option = document.createElement('option');
       option.value = boat.id.toString();
       option.textContent = boat.name;
-      if (record && record.overtime_boat_id === boat.id) option.selected = true;
+      
+      // -- TEMP SYNC: Σκάφος Υπερωρίας --
+      const targetOtBoat = employee.tempOtBoat !== undefined ? employee.tempOtBoat : (record && record.overtime_boat_id ? record.overtime_boat_id.toString() : "");
+      if (targetOtBoat === boat.id.toString()) option.selected = true;
+      
       otBoatSelect.appendChild(option);
     });
     otBoatCell.appendChild(otBoatSelect);
-    row.appendChild(otBoatCell)
+    row.appendChild(otBoatCell);
 
     // Cell No.4 Overtime
     const overtimeCell = document.createElement('td');
@@ -125,7 +144,9 @@ function renderTable(existingData: any[]=[]){
     overtimeInput.min = '0';
     overtimeInput.step = '0.5';
     overtimeInput.classList.add('overtime-input');
-    overtimeInput.value = record ? record.overtime_hours.toString() : '0';
+    
+    // -- TEMP SYNC: Ώρες Υπερωρίας --
+    overtimeInput.value = employee.tempOvertime !== undefined ? employee.tempOvertime : (record ? record.overtime_hours.toString() : '0');
     
     overtimeCell.appendChild(overtimeInput);
     row.appendChild(overtimeCell);
@@ -480,6 +501,7 @@ const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-titl
 let currentAnalysisBoatId: number | null = null;
 
 function renderBoatsList(){
+    
   boatsListBody.innerHTML = '';
   boats.forEach(boat => {
     const row = document.createElement('tr');
@@ -1003,6 +1025,63 @@ btnPrintShort.addEventListener('click', () => {
     const url = `http://127.0.0.1:8000/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}&is_captain=${isCaptain}`;
     window.open(url, '_blank');
 });
+
+
+const syncDOMToState = (): void => {
+  const rows = document.querySelectorAll('#attendance-list tr');
+
+  for (const row of rows) {
+    // SOS: Το data attribute που βάζεις στο checkbox σου είναι dataset.empId (γραμμή 61), όχι στη γραμμή (tr)!
+    const checkbox = row.querySelector('.presence-checkbox') as HTMLInputElement | null;
+    if (!checkbox) continue; 
+    
+    const empId = Number(checkbox.dataset.empId);
+    const employee = employees.find(emp => emp.id === empId);
+
+    if (employee) {
+      employee.tempPresent = checkbox.checked;
+      employee.tempHalfDay = (row.querySelector('.half-checkbox') as HTMLInputElement)?.checked ?? false;
+      employee.tempBoat = (row.querySelector('.boat-select') as HTMLSelectElement)?.value ?? "";
+      employee.tempOtBoat = (row.querySelector('.ot-boat-select') as HTMLSelectElement)?.value ?? "";
+      employee.tempOvertime = (row.querySelector('.overtime-input') as HTMLInputElement)?.value ?? "0";
+    }
+  }
+};
+
+
+const lockFormInputs = (): void => {
+  const attendanceList = document.getElementById('attendance-list');
+  const inputs = attendanceList?.querySelectorAll('input, select');
+  
+  if (inputs) {
+    for (const input of inputs) {
+      (input as HTMLInputElement | HTMLSelectElement).disabled = true;
+    }
+  }
+};
+
+
+const handleSortChange = (event: Event): void => {
+  const value = (event.target as HTMLSelectElement).value;
+  console.log('Επιλέχθηκε το:', value);
+
+  syncDOMToState();
+
+  value === 'asc' 
+    ? employees.sort((a, b) => a.name.localeCompare(b.name, 'el'))
+    : value === 'desc'
+      ? employees.sort((a, b) => b.name.localeCompare(a.name, 'el'))
+      : employees.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)); 
+
+  renderTable();
+
+  const isLocked = !(btnEditDaily?.classList.contains('hidden') ?? true);
+  
+  isLocked ? lockFormInputs() : null; 
+};
+
+sortSelect?.addEventListener('change', handleSortChange);
+
 
 // Start App
 fetchData();
