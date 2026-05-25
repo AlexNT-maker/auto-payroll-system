@@ -118,24 +118,69 @@ input[type="date"] {
 }
 
 
+/* ------------------------------------ */
+/* MODERN SAAS TABLE STYLES (FIXED)     */
+/* ------------------------------------ */
+
 .attendance-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse; /* CHANGED: Remove gaps between cells */
   background: var(--white);
-  border-radius: 8px;
-  overflow: hidden; 
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
-.attendance-table th, .attendance-table td {
-  padding: 1rem;
+.attendance-table th,
+.attendance-table td {
+  padding: 1rem 1.2rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e2e8f0; /* Use a slightly stronger border color */
+  vertical-align: middle;
 }
 
-.attendance-table th {
-  background-color: #f9fafb;
+/* Sticky Header - The Ultimate Wall */
+.attendance-table thead th { 
+  background-color: #f8fafc; 
   font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #cbd5e1; 
+  background-clip: padding-box; 
+}
+
+.attendance-table tbody {
+    position: relative;
+    z-index: 10; 
+}
+
+/* Visual Grouping: Body Cells (Overtime) */
+.attendance-table thead th:nth-child(5),
+.attendance-table thead th:nth-child(6) {
+  background-color: #fdf7ec;
+}
+
+/* Visual Grouping: Header Cells (Overtime) - Solid Color */
+.attendance-table thead th:nth-child(5),
+.attendance-table thead th:nth-child(6) {
+  background-color: #fdf7ec; /* Solid color, absolutely no transparency */
+}
+
+/* Hover Effect for the entire row in the body */
+.attendance-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.attendance-table tbody tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Hover Effect specifically for overtime columns */
+.attendance-table tbody tr:hover td:nth-child(5),
+.attendance-table tbody tr:hover td:nth-child(6) {
+  background-color: rgba(245, 158, 11, 0.08);
 }
 
 
