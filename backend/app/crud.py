@@ -103,6 +103,8 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
                 wage = rec.employee.daily_wage * multiplier
             extra = rec.extra_amount
 
+        
+
         if rec.overtime_boat_id == boat_id:
             ot_cost = rec.overtime_hours * rec.employee.overtime_rate
 
@@ -293,6 +295,8 @@ def calculate_payroll(db: Session, start: date, end: date):
                 multiplier = 0.5 if rec.is_half_day else 1.0
                 days_worked += multiplier
                 sum_wage += (emp.daily_wage * multiplier)
+
+            if rec.overtime_hours > 0:
                 sum_overtime += (rec.overtime_hours * emp.overtime_rate)
                 sum_overtime_hours += rec.overtime_hours
             if rec.extra_amount > 0:
@@ -304,7 +308,7 @@ def calculate_payroll(db: Session, start: date, end: date):
 
         grand_total = sum_wage + sum_overtime + sum_extra
         
-        if days_worked == 0 and sum_extra == 0:
+        if days_worked == 0 and sum_extra == 0 and sum_overtime == 0:
             continue
 
         bank_days = min(days_worked, max_bank_days)
