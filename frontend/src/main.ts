@@ -1,9 +1,4 @@
 import { store } from "./state/store";
-import {
-    createEmployee,
-    updateEmployee,
-    deleteEmployee
-} from "./api/employeesApi";
 import { renderTable } from "./ui/renderTable";
 import { renderBoatsList } from "./ui/renderBoatList";
 import { openBoatModal } from "./handlers/boatEvents";
@@ -13,6 +8,8 @@ import {
      unlockForm,
     loadDayData,
  } from "./handlers/attendanceEvents"
+import { renderEmployeesList } from "./ui/renderEmployeesList";
+import { initEmployeeEvents } from "./handlers/employeeEvents";
 
 
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -77,150 +74,17 @@ navButtons.shortAnalysis.addEventListener('click', () => navigateTo('shortAnalys
 // 7. -- Employee management logic -- 
 
 // Modal and list items
-const modal = document.querySelector<HTMLDivElement>('#modal-employee')!;
-const btnAddEmployee = document.querySelector<HTMLButtonElement>('#btn-add-employee')!;
-const btnCancel = document.querySelector<HTMLButtonElement>('#btn-cancel')!;
-const employeeForm = document.querySelector<HTMLFormElement>('#employee-form')!;
-const employeesListBody = document.querySelector<HTMLTableSectionElement>('#employees-list')!;
 const modalExtra = document.querySelector<HTMLDivElement>('#modal-extra')!;
 const extraForm = document.querySelector<HTMLFormElement>('#extra-form')!;
 const btnCancelExtra = document.querySelector<HTMLButtonElement>('#btn-cancel-extra')!;
 const btnPrintBoatPdf = document.querySelector<HTMLButtonElement>('#btn-print-boat-pdf')!;
 
 
-// Form Inputs
-const inputName = document.querySelector<HTMLInputElement>('#emp-name')!;
-const inputWage = document.querySelector<HTMLInputElement>('#emp-wage')!;
-const inputOvertime = document.querySelector<HTMLInputElement>('#emp-overtime')!;
-const inputBank = document.querySelector<HTMLInputElement>('#emp-bank')!;
-const inputId = document.querySelector<HTMLInputElement>('#emp-id')!;
-
-// Function to display the list
-function renderEmployeesList(){
-  employeesListBody.innerHTML = '';
-  store.employees.forEach(emp =>{
-  const row = document.createElement('tr');
-
-  row.innerHTML=`
-  <td>${emp.name}</td>
-  <td>${emp.daily_wage}€</td>
-  <td>${emp.overtime_rate}€</td>
-  <td>${emp.bank_daily_amount}€</td>
-  <td>
-  <button class="action-btn btn-edit hover-lift" data-id="${emp.id}">Επεξεργασία</button>
-  <button class="action-btn btn-delete hover-lift" data-id="${emp.id}">Διαγραφή</button>
-  </td>
-  `;
-  employeesListBody.appendChild(row);
-  });
-  attachActionListeners();
-}
-
-function attachActionListeners() {
-    // Logic for Edit buttons
-    document.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            openEditModal(id);
-        });
-    });
-
-    // Logic for Delete buttons 
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(confirm("Είστε σίγουρος για τη διαγραφή;")) {
-                handleDeleteEmployee(id);
-            }
-        });
-    });
-}
 
 
-// -- 8. Modal functions --
-function openModal() {
-    modal.classList.remove('hidden');
-    employeeForm.reset(); 
-    inputId.value = '';   
-    document.getElementById('modal-title')!.textContent = "Νέος Εργαζόμενος";
-}
+renderEmployeesList();
 
-function closeModal() {
-    modal.classList.add('hidden');
-}
-
-function openEditModal(id: number) {
-    const emp = store.employees.find(e => e.id === id);
-    if (!emp) return;
-    inputName.value = emp.name;
-    inputWage.value = emp.daily_wage.toString();
-    inputOvertime.value = emp.overtime_rate.toString();
-    inputBank.value = emp.bank_daily_amount.toString();
-    inputId.value = emp.id.toString();
-
-    document.getElementById('modal-title')!.textContent = "Επεξεργασία Εργαζόμενου";
-    modal.classList.remove('hidden');
-}
-
-
-// 9. -- Modal Event Listeners --
-
-btnAddEmployee.addEventListener('click', openModal);
-
-btnCancel.addEventListener('click', () => {
-  modal.classList.add('hidden');
-});
-
-
-
-
-// 10. -- Save employee logic --
-
-employeeForm.addEventListener('submit', async (e) =>{
-  e.preventDefault();
-
-  const formData = {
-    name: inputName.value,
-    daily_wage: parseFloat(inputWage.value),
-    overtime_rate: parseFloat(inputOvertime.value),
-    bank_daily_amount: parseFloat(inputBank.value)
-  };
-
-  const id = inputId.value;
-
-  try {
- if (id) {
-    await updateEmployee(Number(id), formData);
-} else {
-    await createEmployee(formData);
-}
-
-closeModal();
-
-await fetchData();
-
-alert(id ? "Τα στοιχεία ενημερώθηκαν!" : "Ο εργαζόμενος προστέθηκε!");
-  }catch(error){
-    console.error(typeof error);
-    alert("Δεν ήταν δυνατή η ενημέρωση του εργαζομένου")
-  }
-});
-
-
-// 11. -- Delete logic --
-async function handleDeleteEmployee(id:number) {
-try {
-    await deleteEmployee(id);
-
-    await fetchData();
-
-    alert("Ο εργαζόμενος διαγράφηκε επιτυχώς");
-} catch (error) {
-    console.error(error);
-
-    alert("Δεν ήταν δυνατή η διαγραφή");
-}
-}
+initEmployeeEvents();
 
 // 12. --Boats create logic --
 // Selectors
