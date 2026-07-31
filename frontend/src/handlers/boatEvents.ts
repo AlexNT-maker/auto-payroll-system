@@ -1,5 +1,55 @@
+import { store } from "../state/store";
 import { deleteBoat } from "../api/boatsApi";
+import { renderBoatsList } from "../ui/renderBoatList";
+
+import { fetchData } from "../main.ts";
+import {
+    createBoat,
+    updateBoat
+} from "../api/boatsApi";
+
+const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
+const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
 const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
+const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
+const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
+const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
+const inputStart = document.querySelector<HTMLInputElement>('#analysis-start')!;
+const inputEnd = document.querySelector<HTMLInputElement>('#analysis-end')!;
+const resultsDiv = document.querySelector<HTMLDivElement>('#analysis-results')!;
+const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-title')!;
+const btnPrintBoatPdf = document.querySelector<HTMLButtonElement>('#btn-print-boat-pdf')!;
+
+
+boatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = inputBoatName.value;
+    const id = inputBoatId.value;
+    
+try {
+
+    if (id) {
+        await updateBoat(Number(id), { name });
+    } else {
+        await createBoat({ name });
+    }
+
+    modalBoat.classList.add('hidden');
+
+    await fetchData();
+
+    renderBoatsList();
+
+    alert("Επιτυχία!");
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Σφάλμα δικτύου");
+
+}
+});
 
 export function attachBoatListeners() {
     boatsListBody.querySelectorAll('.btn-edit').forEach(btn => {
@@ -23,3 +73,59 @@ export function attachBoatListeners() {
         });
     });
 }
+
+export function openBoatModal(id?: number) { 
+    modalBoat.classList.remove('hidden');
+    boatForm.reset();
+    
+    if (id) {
+        
+        const boat = store.boats.find(b => b.id === id);
+        if (boat) {
+            inputBoatName.value = boat.name;
+            inputBoatId.value = boat.id.toString();
+            document.getElementById('modal-boat-title')!.textContent = "Επεξεργασία Σκάφους";
+        }
+    } else {
+        inputBoatId.value = '';
+        document.getElementById('modal-boat-title')!.textContent = "Νέο Σκάφος";
+    }
+}
+
+// 13. -- Boats Delete Logic --
+export async function handleDeleteBoat(id: number) {
+  try {
+
+    await deleteBoat(id);
+
+    await fetchData();
+
+    renderBoatsList();
+
+    alert("Το σκάφος διαγράφηκε");
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Αδυναμία διαγραφής");
+
+}
+  }
+
+ export function openAnalysisModal(boatId: number){
+  const boat = store.boats.find(b => b.id === boatId);
+    analysisTitle.textContent = `Ανάλυση: ${boat ? boat.name : ''}`;
+
+    const now = new Date() ;
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() +1, 0) ;
+    inputStart.valueAsDate = firstDay; 
+    inputEnd.valueAsDate = lastDay;
+
+    btnPrintBoatPdf.classList.add('hidden');
+    resultsDiv.classList.add('hidden'); 
+    modalAnalysis.classList.remove('hidden');
+}
+
+

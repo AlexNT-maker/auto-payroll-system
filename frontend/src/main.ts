@@ -1,20 +1,15 @@
 import { store } from "./state/store";
-import {
-    getBoats,
-    createBoat,
-    updateBoat,
-    deleteBoat
-}
-     from "./api/boatsApi" ; 
 import { loadAttendance } from "./api/attendanceApi";
 import {
-    getEmployees,
     createEmployee,
     updateEmployee,
     deleteEmployee
 } from "./api/employeesApi";
 import { renderTable } from "./ui/renderTable";
 import { renderBoatsList } from "./ui/renderBoatList";
+import { openBoatModal } from "./handlers/boatEvents";
+import { getEmployees } from "./api/employeesApi";
+import { getBoats } from "./api/boatsApi";
 
 const tableBody = document.querySelector<HTMLTableSectionElement>("#attendance-list")!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -26,20 +21,6 @@ const sortSelect = document.getElementById('sort-select') as HTMLSelectElement |
 // Set as default today
 datePicker.valueAsDate = new Date();
 
-async function fetchData() {
-    try {
-        store.boats = await getBoats(); 
-
-        store.employees = await getEmployees();
-
-        renderTable();
-
-        await loadDayData();
-
-    } catch (error) {
-        console.error(error);
-    }
-}
 
 
 
@@ -156,7 +137,7 @@ function unlockForm() {
   btnEditDaily.classList.add('hidden');
 }
 
-async function loadDayData() {
+export async function loadDayData() {
     const date = datePicker.value;
 
     if (!date) return;
@@ -346,7 +327,6 @@ const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
 const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
 const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boat')!;
 const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
-const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
 const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
 const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
 const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
@@ -363,24 +343,6 @@ const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-titl
 let currentAnalysisBoatId: number | null = null;
 
 
-
-
-
-function openAnalysisModal(boatId: number){
-  currentAnalysisBoatId = boatId;
-  const boat = store.boats.find(b => b.id === boatId);
-    analysisTitle.textContent = `Ανάλυση: ${boat ? boat.name : ''}`;
-
-    const now = new Date() ;
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() +1, 0) ;
-    inputStart.valueAsDate = firstDay; 
-    inputEnd.valueAsDate = lastDay;
-
-    btnPrintBoatPdf.classList.add('hidden');
-    resultsDiv.classList.add('hidden'); 
-    modalAnalysis.classList.remove('hidden');
-}
 
 btnRunAnalysis.addEventListener('click', async () => {
     if (!currentAnalysisBoatId) return;
@@ -442,75 +404,10 @@ btnCloseAnalysis.addEventListener('click', () => {
 });
 
 
-boatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = inputBoatName.value;
-    const id = inputBoatId.value;
-    
-try {
-
-    if (id) {
-        await updateBoat(Number(id), { name });
-    } else {
-        await createBoat({ name });
-    }
-
-    modalBoat.classList.add('hidden');
-
-    await fetchData();
-
-    renderBoatsList();
-
-    alert("Επιτυχία!");
-
-} catch (err) {
-
-    console.error(err);
-
-    alert("Σφάλμα δικτύου");
-
-}
-});
 
 
-function openBoatModal(id?: number) { 
-    modalBoat.classList.remove('hidden');
-    boatForm.reset();
-    
-    if (id) {
-        
-        const boat = store.boats.find(b => b.id === id);
-        if (boat) {
-            inputBoatName.value = boat.name;
-            inputBoatId.value = boat.id.toString();
-            document.getElementById('modal-boat-title')!.textContent = "Επεξεργασία Σκάφους";
-        }
-    } else {
-        inputBoatId.value = '';
-        document.getElementById('modal-boat-title')!.textContent = "Νέο Σκάφος";
-    }
-}
 
-// 13. -- Boats Delete Logic --
-async function handleDeleteBoat(id: number) {
-  try {
 
-    await deleteBoat(id);
-
-    await fetchData();
-
-    renderBoatsList();
-
-    alert("Το σκάφος διαγράφηκε");
-
-} catch (err) {
-
-    console.error(err);
-
-    alert("Αδυναμία διαγραφής");
-
-}
-  }
 
   // -- 14. Expenses Logic --
 
@@ -848,6 +745,23 @@ btnPrintShort.addEventListener('click', () => {
     const url = `http://127.0.0.1:8000/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}&is_captain=${isCaptain}`;
     window.open(url, '_blank');
 });
+
+
+
+export async function fetchData() {
+    try {
+        store.boats = await getBoats(); 
+
+        store.employees = await getEmployees();
+
+        renderTable();
+
+        await loadDayData();
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 
 const syncDOMToState = (): void => {
