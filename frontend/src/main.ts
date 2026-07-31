@@ -1,26 +1,20 @@
-// -- 1. The kind of data we expect --
-interface Employee {
-  id: number;
-  name: string;
-  daily_wage: number;
-  overtime_rate: number;
-  bank_daily_amount: number;
-  tempPresent?: boolean;
-  tempHalfDay?: boolean;
-  tempBoat?: string;
-  tempOtBoat?: string;    
-  tempOvertime?: string;
+import { store } from "./state/store";
+import {
+    getBoats,
+    createBoat,
+    updateBoat,
+    deleteBoat
 }
+     from "./api/boatsApi" ; 
+import { loadAttendance } from "./api/attendanceApi";
+import {
+    getEmployees,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee
+} from "./api/employeesApi";
 
-interface Boat{
-  id: number;
-  name: string;
-}
 
-let employees: Employee[] = [];
-let boats: Boat[] = []
-
-// -- 2. Choose html elements --
 const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-list')!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
@@ -31,28 +25,26 @@ const sortSelect = document.getElementById('sort-select') as HTMLSelectElement |
 // Set as default today
 datePicker.valueAsDate = new Date();
 
-// -- 3. Fetch data from backend --
 async function fetchData() {
-  try{
-    const boatResponse = await fetch('http://127.0.0.1:8000/boats/');
-    boats = await boatResponse.json();
+    try {
+        store.boats = await getBoats(); 
 
-    const employeesResponse = await fetch('http://127.0.0.1:8000/employees/');
-    employees = await employeesResponse.json();
-    renderTable();
-    await loadDayData();
-  } catch (error) {
-    console.error("Error during fetching the data");
-    alert("Not succesful connection with the server");
-  }
+        store.employees = await getEmployees();
+
+        renderTable();
+
+        await loadDayData();
+
+    } catch (error) {
+        console.error(error);
+    }
 }
 
-// -- 4. Creating table --
 // -- 4. Creating table --
 function renderTable(existingData: any[]=[]){
   tableBody.innerHTML = '';
 
-  employees.forEach((employee) => {
+  store.employees.forEach((employee) => {
     const record = existingData.find(r => r.employee_id === employee.id);
     const row = document.createElement('tr');
 
@@ -99,7 +91,7 @@ function renderTable(existingData: any[]=[]){
     defaultOption.value = '';
     boatSelect.appendChild(defaultOption);
 
-    boats.forEach(boat => {
+    store.boats.forEach(boat => {
       const option = document.createElement('option');
       option.value = boat.id.toString();
       option.textContent = boat.name;
@@ -123,7 +115,7 @@ function renderTable(existingData: any[]=[]){
     defaultOtOption.value = '';
     otBoatSelect.appendChild(defaultOtOption);
 
-    boats.forEach(boat => {
+    store.boats.forEach(boat => {
       const option = document.createElement('option');
       option.value = boat.id.toString();
       option.textContent = boat.name;
@@ -269,26 +261,25 @@ function unlockForm() {
 }
 
 async function loadDayData() {
-  const date = datePicker.value;
-  if (!date) return;
-  try{
-    const response = await fetch(`http://127.0.0.1:8000/attendance/${date}`);
-    if(response.ok){
-      const data = await response.json();
+    const date = datePicker.value;
 
-      console.log("Δεδομένα που ήρθαν", data);
+    if (!date) return;
 
-      if (data.length > 0){
-        renderTable(data);
-        lockForm();
-      } else {
-        renderTable([]);
-        unlockForm();
-      }
+    try {
+
+        const data = await loadAttendance(date);
+
+        if (data.length > 0) {
+            renderTable(data);
+            lockForm();
+        } else {
+            renderTable([]);
+            unlockForm();
+        }
+
+    } catch (error) {
+        console.error("Error loading day data", error);
     }
-  } catch(error) {
-    console.error("Error loading day data", error);
-  }
 }
 
 datePicker.addEventListener('change', loadDayData);
@@ -329,7 +320,7 @@ const inputId = document.querySelector<HTMLInputElement>('#emp-id')!;
 // Function to display the list
 function renderEmployeesList(){
   employeesListBody.innerHTML = '';
-  employees.forEach(emp =>{
+  store.employees.forEach(emp =>{
   const row = document.createElement('tr');
 
   row.innerHTML=`
@@ -361,7 +352,7 @@ function attachActionListeners() {
         btn.addEventListener('click', (e) => {
             const id = parseInt((e.target as HTMLElement).dataset.id!);
             if(confirm("Είστε σίγουρος για τη διαγραφή;")) {
-                deleteEmployee(id);
+                handleDeleteEmployee(id);
             }
         });
     });
@@ -381,7 +372,7 @@ function closeModal() {
 }
 
 function openEditModal(id: number) {
-    const emp = employees.find(e => e.id === id);
+    const emp = store.employees.find(e => e.id === id);
     if (!emp) return;
     inputName.value = emp.name;
     inputWage.value = emp.daily_wage.toString();
@@ -420,63 +411,38 @@ employeeForm.addEventListener('submit', async (e) =>{
   const id = inputId.value;
 
   try {
-    let response;
+ if (id) {
+    await updateEmployee(Number(id), formData);
+} else {
+    await createEmployee(formData);
+}
 
-    // --- PUT ---
-    if (id) {
-      response = await fetch(`http://127.0.0.1:8000/employees/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-      
-    } else {
-      // --- POST ---
-      response = await fetch('http://127.0.0.1:8000/employees/', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-    }
+closeModal();
 
-    if (response.ok) {
-      closeModal();
-      await fetchData(); 
-      alert(id ? "Τα στοιχεία ενημερώθηκαν!" : "Ο εργαζόμενος προστέθηκε!");
-    } else {
-      alert("Υπήρξε πρόβλημα κατά την αποθήκευση.");
-    }
+await fetchData();
 
-  } catch (error) {
-    console.error("Error saving employee:", error);
-    alert("Σφάλμα επικοινωνίας με τον server.");
+alert(id ? "Τα στοιχεία ενημερώθηκαν!" : "Ο εργαζόμενος προστέθηκε!");
+  }catch(error){
+    console.error(typeof error);
+    alert("Δεν ήταν δυνατή η ενημέρωση του εργαζομένου")
   }
-
-  await loadDayData();
-  alert("Επιτυχής αποθήκευση")
 });
 
 
 // 11. -- Delete logic --
-async function deleteEmployee(id:number) {
-  try{
-    const response = await fetch(`http://127.0.0.1:8000/employees/${id}`, {
-      method: 'DELETE'
-  });
+async function handleDeleteEmployee(id:number) {
+try {
+    await deleteEmployee(id);
 
-  if(response.ok){
-  await fetchData();
-  alert("Ο εργαζόμενος διαγράφηκε επιτυχώς");
-} else{
-  const errorData = await response.json();
-  alert("Σφάλμα διαγραφής: " + (errorData.detail || "Άγνωστο σφάλμα"));
-}
+    await fetchData();
+
+    alert("Ο εργαζόμενος διαγράφηκε επιτυχώς");
 } catch (error) {
-  console.error("Delete error:", error);
-  alert("Δεν ήταν δυνατή η σύνδεση με τον server");
-}
-}
+    console.error(error);
 
+    alert("Δεν ήταν δυνατή η διαγραφή");
+}
+}
 
 // 12. --Boats create logic --
 // Selectors
@@ -503,7 +469,7 @@ let currentAnalysisBoatId: number | null = null;
 function renderBoatsList(){
     
   boatsListBody.innerHTML = '';
-  boats.forEach(boat => {
+  store.boats.forEach(boat => {
     const row = document.createElement('tr');
     row.innerHTML = `
     <td>${boat.name}</td>
@@ -532,7 +498,7 @@ function attachBoatListeners() {
     boatsListBody.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(confirm("Είστε σίγουρος για τη διαγραφή;")) deleteBoat(id);
+            if(confirm("Είστε σίγουρος για τη διαγραφή;")) handleDeleteBoat(id);
         });
     });
 
@@ -546,7 +512,7 @@ function attachBoatListeners() {
 
 function openAnalysisModal(boatId: number){
   currentAnalysisBoatId = boatId;
-  const boat = boats.find(b => b.id === boatId);
+  const boat = store.boats.find(b => b.id === boatId);
     analysisTitle.textContent = `Ανάλυση: ${boat ? boat.name : ''}`;
 
     const now = new Date() ;
@@ -625,33 +591,29 @@ boatForm.addEventListener('submit', async (e) => {
     const name = inputBoatName.value;
     const id = inputBoatId.value;
     
-    try {
-        let response;
-        if (id) {
-            response = await fetch(`http://127.0.0.1:8000/boats/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }) 
-            });
-        } else {
-            response = await fetch('http://127.0.0.1:8000/boats/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name })
-            });
-        }
-        if (response.ok) {
-            modalBoat.classList.add('hidden');
-            await fetchData(); 
-            renderBoatsList(); 
-            alert("Επιτυχία!");
-        } else {
-            alert("Σφάλμα αποθήκευσης");
-        }
-    } catch (err) {
-        console.error(err);
-        alert("Σφάλμα δικτύου");
+try {
+
+    if (id) {
+        await updateBoat(Number(id), { name });
+    } else {
+        await createBoat({ name });
     }
+
+    modalBoat.classList.add('hidden');
+
+    await fetchData();
+
+    renderBoatsList();
+
+    alert("Επιτυχία!");
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Σφάλμα δικτύου");
+
+}
 });
 
 
@@ -661,7 +623,7 @@ function openBoatModal(id?: number) {
     
     if (id) {
         
-        const boat = boats.find(b => b.id === id);
+        const boat = store.boats.find(b => b.id === id);
         if (boat) {
             inputBoatName.value = boat.name;
             inputBoatId.value = boat.id.toString();
@@ -674,19 +636,24 @@ function openBoatModal(id?: number) {
 }
 
 // 13. -- Boats Delete Logic --
-async function deleteBoat(id: number) {
-    try {
-        const res = await fetch(`http://127.0.0.1:8000/boats/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-            await fetchData();
-            renderBoatsList();
-            alert("Το σκάφος διαγράφηκε");
-        } else {
-            alert("Αδυναμία διαγραφής");
-        }
-    } catch (err) {
-        console.error(err);
-    }
+async function handleDeleteBoat(id: number) {
+  try {
+
+    await deleteBoat(id);
+
+    await fetchData();
+
+    renderBoatsList();
+
+    alert("Το σκάφος διαγράφηκε");
+
+} catch (err) {
+
+    console.error(err);
+
+    alert("Αδυναμία διαγραφής");
+
+}
   }
 
   // -- 14. Expenses Logic --
@@ -702,7 +669,7 @@ const expensesSummaryDiv = document.querySelector<HTMLDivElement>('#expenses-sum
 
 function initExpensesPage() {
     expBoatSelect.innerHTML = '<option value="">-- Όλα τα σκάφη --</option>';
-    boats.forEach(boat => {
+    store.boats.forEach(boat => {
         const opt = document.createElement('option');
         opt.value = boat.id.toString();
         opt.textContent = boat.name;
@@ -710,7 +677,7 @@ function initExpensesPage() {
     });
 
     expEmpSelect.innerHTML = '<option value="">-- Όλοι οι εργαζόμενοι --</option>';
-    employees.forEach(emp => {
+    store.employees.forEach(emp => {
         const opt = document.createElement('option');
         opt.value = emp.id.toString();
         opt.textContent = emp.name;
@@ -986,7 +953,7 @@ const btnPrintShort = document.querySelector<HTMLButtonElement>('#btn-print-shor
 
 function initShortAnalysisPage() {
     shortBoatSelect.innerHTML = '<option value="">-- Επιλογή Σκάφους --</option>';
-    boats.forEach(boat => {
+    store.boats.forEach(boat => {
         const opt = document.createElement('option');
         opt.value = boat.id.toString();
         opt.textContent = boat.name;
@@ -1036,7 +1003,7 @@ const syncDOMToState = (): void => {
     if (!checkbox) continue; 
     
     const empId = Number(checkbox.dataset.empId);
-    const employee = employees.find(emp => emp.id === empId);
+    const employee = store.employees.find(emp => emp.id === empId);
 
     if (employee) {
       employee.tempPresent = checkbox.checked;
@@ -1068,10 +1035,10 @@ const handleSortChange = (event: Event): void => {
   syncDOMToState();
 
   value === 'asc' 
-    ? employees.sort((a, b) => a.name.localeCompare(b.name, 'el'))
+    ? store.employees.sort((a, b) => a.name.localeCompare(b.name, 'el'))
     : value === 'desc'
-      ? employees.sort((a, b) => b.name.localeCompare(a.name, 'el'))
-      : employees.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)); 
+      ? store.employees.sort((a, b) => b.name.localeCompare(a.name, 'el'))
+      : store.employees.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)); 
 
   renderTable();
 
