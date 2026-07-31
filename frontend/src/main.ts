@@ -1,5 +1,4 @@
 import { store } from "./state/store";
-import { loadAttendance } from "./api/attendanceApi";
 import {
     createEmployee,
     updateEmployee,
@@ -10,82 +9,20 @@ import { renderBoatsList } from "./ui/renderBoatList";
 import { openBoatModal } from "./handlers/boatEvents";
 import { getEmployees } from "./api/employeesApi";
 import { getBoats } from "./api/boatsApi";
+import {
+     unlockForm,
+    loadDayData,
+ } from "./handlers/attendanceEvents"
 
-const tableBody = document.querySelector<HTMLTableSectionElement>("#attendance-list")!;
+
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
-const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
-const btnSubmitDaily = document.querySelector<HTMLButtonElement>('#btn-submit-daily')!;
 const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
 
 // Set as default today
 datePicker.valueAsDate = new Date();
 
 
-
-
-// 5. -- Management of data when user clicks submit --
-form.addEventListener('submit', async (event: Event)=>{
-  event.preventDefault() ; 
-
-  const date = datePicker.value;
-  if(!date){
-    alert('Παρακαλώ επιλέξτε ημερομηνία');
-    return ;
-  }
-
-  const rows = tableBody.querySelectorAll('tr');
-
-  for (const row of rows) {
-    const checkbox = row.querySelector('.presence-checkbox') as HTMLInputElement;
-    const halfbox = row.querySelector('.half-checkbox') as HTMLInputElement;
-    const boatSelect = row.querySelector('.boat-select') as HTMLSelectElement;
-    const otBoatSelect = row.querySelector('.ot-boat-select') as HTMLSelectElement;
-    const overtimeInput = row.querySelector('.overtime-input') as HTMLInputElement;
-    const otHours = parseFloat(overtimeInput.value) || 0;
-
-    const empId = parseInt(checkbox.dataset.empId!);
-    const isPresent = checkbox.checked;
-    const isHalf = halfbox.checked;
-
-    if((isPresent || isHalf) && !boatSelect.value){
-      alert ('Παρακαλώ επιλέξτε σκάφος, για όλους τους παρόντες');
-      return ;
-    }
-
-    if (otHours > 0 && !otBoatSelect.value && !boatSelect.value) {
-      alert ('Παρακαλώ επιλέξτε Σκάφος Υπερωρίας, για όσους έχουν ώρες.');
-      return;
-    }
-
-    const finalOtBoat = otBoatSelect.value ? parseInt(otBoatSelect.value) : (boatSelect.value ? parseInt(boatSelect.value) : null);
-
-    const payload = {
-      date: date,
-      employee_id: empId,
-      boat_id: boatSelect.value ? parseInt(boatSelect.value) : null, 
-      overtime_boat_id: finalOtBoat, 
-      present: isPresent,
-      is_half_day: isHalf,
-      overtime_hours: otHours,
-      extra_amount: 0,
-      extra_reason: ""
-    }; 
-
-    try {
-        await fetch('http://127.0.0.1:8000/attendance/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-    } catch (err) {
-        console.error('Error saving row', err);
-    }
-  }
-  alert('Η αποθήκευση ολοκληρώθηκε!');
-
-  window.location.reload();
-})
 
 // -- 6. Navigation logic --
 const pages={
@@ -122,44 +59,8 @@ function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses'| 'payme
   if (pageName === 'shortAnalysis') initShortAnalysisPage();
 }
 
-// Functions to lock form when we submit and to unlock when the edit button is clicked
-function lockForm() {
-  const inputs = tableBody.querySelectorAll('input, select');
-  inputs.forEach((input: any) => input.disabled = true);
-  btnSubmitDaily.classList.add('hidden');
-  btnEditDaily.classList.remove('hidden');
-}
 
-function unlockForm() {
-  const inputs = tableBody.querySelectorAll('input, select');
-  inputs.forEach((input: any) => input.disabled = false);
-  btnSubmitDaily.classList.remove('hidden');
-  btnEditDaily.classList.add('hidden');
-}
 
-export async function loadDayData() {
-    const date = datePicker.value;
-
-    if (!date) return;
-
-    try {
-
-        const data = await loadAttendance(date);
-
-        if (data.length > 0) {
-            renderTable(data);
-            lockForm();
-        } else {
-            renderTable([]);
-            unlockForm();
-        }
-
-    } catch (error) {
-        console.error("Error loading day data", error);
-    }
-}
-
-datePicker.addEventListener('change', loadDayData);
 
 btnEditDaily.addEventListener('click', () => {
     unlockForm();
@@ -326,9 +227,6 @@ try {
 const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
 const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
 const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boat')!;
-const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
-const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
-const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
 const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
 const btnCloseAnalysis = document.querySelector<HTMLButtonElement>('#btn-close-analysis')!;
 const btnRunAnalysis = document.querySelector<HTMLButtonElement>('#btn-run-analysis')!;
