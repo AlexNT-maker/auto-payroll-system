@@ -13,9 +13,10 @@ import {
     updateEmployee,
     deleteEmployee
 } from "./api/employeesApi";
+import { renderTable } from "./ui/renderTable";
+import { renderBoatsList } from "./ui/renderBoatList";
 
-
-const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-list')!;
+const tableBody = document.querySelector<HTMLTableSectionElement>("#attendance-list")!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
@@ -40,112 +41,7 @@ async function fetchData() {
     }
 }
 
-// -- 4. Creating table --
-function renderTable(existingData: any[]=[]){
-  tableBody.innerHTML = '';
 
-  store.employees.forEach((employee) => {
-    const record = existingData.find(r => r.employee_id === employee.id);
-    const row = document.createElement('tr');
-
-    // Cell No.1 Employees
-    const nameCell = document.createElement('td');
-    nameCell.textContent = employee.name ;
-    row.appendChild(nameCell);
-
-    // Cell No.2 Input checkbox
-    const presentCell = document.createElement('td');
-    const presentInput = document.createElement('input');
-    presentInput.type = 'checkbox';
-    presentInput.dataset.empId = employee.id.toString();
-    presentInput.classList.add('presence-checkbox');
-    presentCell.appendChild(presentInput);
-    row.appendChild(presentCell);
-
-    const halfCell = document.createElement('td');
-    const halfInput = document.createElement('input');
-    halfInput.type = 'checkbox';
-    halfInput.dataset.empId = employee.id.toString();
-    halfInput.classList.add('half-checkbox');
-    halfCell.appendChild(halfInput);
-    row.appendChild(halfCell);
-
-    // -- TEMP SYNC: Checkboxes --
-    if (employee.tempPresent !== undefined ? employee.tempPresent : (record && record.present)) {
-        presentInput.checked = true;
-    }
-    if (employee.tempHalfDay !== undefined ? employee.tempHalfDay : (record && record.is_half_day)) {
-        halfInput.checked = true;
-    }
-
-    presentInput.addEventListener('change', () => { if(presentInput.checked) halfInput.checked = false; });
-    halfInput.addEventListener('change', () => { if(halfInput.checked) presentInput.checked = false; });
-
-    // Cell No.3 Boat (Dropdown style)
-    const boatCell = document.createElement('td');
-    const boatSelect = document.createElement('select');
-    boatSelect.classList.add('boat-select');
-
-    const defaultOption = document.createElement('option');
-    defaultOption.text = '-- Επιλογή --' ;
-    defaultOption.value = '';
-    boatSelect.appendChild(defaultOption);
-
-    store.boats.forEach(boat => {
-      const option = document.createElement('option');
-      option.value = boat.id.toString();
-      option.textContent = boat.name;
-      
-      // -- TEMP SYNC: Βασικό Σκάφος --
-      const targetBoat = employee.tempBoat !== undefined ? employee.tempBoat : (record && record.boat_id ? record.boat_id.toString() : "");
-      if (targetBoat === boat.id.toString()) option.selected = true;
-      
-      boatSelect.appendChild(option);
-    });
-    boatCell.appendChild(boatSelect);
-    row.appendChild(boatCell);
-
-    // Cell No.3.5 Overtime Boat (Dropdown style)
-    const otBoatCell = document.createElement('td');
-    const otBoatSelect = document.createElement('select');
-    otBoatSelect.classList.add('ot-boat-select');
-
-    const defaultOtOption = document.createElement('option');
-    defaultOtOption.text = '-- Ίδιο με Ημερ. --'; 
-    defaultOtOption.value = '';
-    otBoatSelect.appendChild(defaultOtOption);
-
-    store.boats.forEach(boat => {
-      const option = document.createElement('option');
-      option.value = boat.id.toString();
-      option.textContent = boat.name;
-      
-      // -- TEMP SYNC: Σκάφος Υπερωρίας --
-      const targetOtBoat = employee.tempOtBoat !== undefined ? employee.tempOtBoat : (record && record.overtime_boat_id ? record.overtime_boat_id.toString() : "");
-      if (targetOtBoat === boat.id.toString()) option.selected = true;
-      
-      otBoatSelect.appendChild(option);
-    });
-    otBoatCell.appendChild(otBoatSelect);
-    row.appendChild(otBoatCell);
-
-    // Cell No.4 Overtime
-    const overtimeCell = document.createElement('td');
-    const overtimeInput = document.createElement('input');
-    overtimeInput.type = 'number';
-    overtimeInput.min = '0';
-    overtimeInput.step = '0.5';
-    overtimeInput.classList.add('overtime-input');
-    
-    // -- TEMP SYNC: Ώρες Υπερωρίας --
-    overtimeInput.value = employee.tempOvertime !== undefined ? employee.tempOvertime : (record ? record.overtime_hours.toString() : '0');
-    
-    overtimeCell.appendChild(overtimeInput);
-    row.appendChild(overtimeCell);
-
-    tableBody.appendChild(row);
-  });
-}
 
 // 5. -- Management of data when user clicks submit --
 form.addEventListener('submit', async (event: Event)=>{
@@ -466,49 +362,9 @@ const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-titl
 
 let currentAnalysisBoatId: number | null = null;
 
-function renderBoatsList(){
-    
-  boatsListBody.innerHTML = '';
-  store.boats.forEach(boat => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-    <td>${boat.name}</td>
-    <td style="display: flex; align-items:center;">
-    <button class="action-btn hover-lift btn-analysis" data-id="${boat.id}" 
-                style="background-color: #3b82f6; color: white; margin-right: 0.5rem;">
-          Ανάλυση
-        </button>
-        <button class="action-btn btn-edit hover-lift" data-id="${boat.id}" data-type="boat">Επεξεργασία</button>
-        <button class="action-btn btn-delete hover-lift" data-id="${boat.id}" data-type="boat">Διαγραφή</button>
-      </td>
-      `;
-      boatsListBody.appendChild(row);
-  })
-   attachBoatListeners();
-}
 
-function attachBoatListeners() {
-    boatsListBody.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            openBoatModal(id);
-        });
-    });
 
-    boatsListBody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(confirm("Είστε σίγουρος για τη διαγραφή;")) handleDeleteBoat(id);
-        });
-    });
 
-    boatsListBody.querySelectorAll('.btn-analysis').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            openAnalysisModal(id);
-        });
-    });
-}
 
 function openAnalysisModal(boatId: number){
   currentAnalysisBoatId = boatId;
