@@ -7,21 +7,24 @@ import {
     createBoat,
     updateBoat
 } from "../api/boatsApi";
+import { openAnalysisModal } from "./boatAnalysisEvents.ts";
 
 const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
 const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
 const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
 const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
 const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
-const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
-const inputStart = document.querySelector<HTMLInputElement>('#analysis-start')!;
-const inputEnd = document.querySelector<HTMLInputElement>('#analysis-end')!;
-const resultsDiv = document.querySelector<HTMLDivElement>('#analysis-results')!;
-const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-title')!;
-const btnPrintBoatPdf = document.querySelector<HTMLButtonElement>('#btn-print-boat-pdf')!;
+const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
+const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boat')!;
+
+export  function initBoatEvents() {
+boatForm.addEventListener('submit', handleBoatSubmit);
+btnAddBoat.addEventListener('click', () => openBoatModal);
+btnCancelBoat.addEventListener('click', closeBoatModal);
+}
 
 
-boatForm.addEventListener('submit', async (e) => {
+ export async function handleBoatSubmit(e : Event){
     e.preventDefault();
     const name = inputBoatName.value;
     const id = inputBoatId.value;
@@ -49,7 +52,7 @@ try {
     alert("Σφάλμα δικτύου");
 
 }
-});
+};
 
 export function attachBoatListeners() {
     boatsListBody.querySelectorAll('.btn-edit').forEach(btn => {
@@ -74,7 +77,7 @@ export function attachBoatListeners() {
     });
 }
 
-export function openBoatModal(id?: number) { 
+function openBoatModal(id?: number) { 
     modalBoat.classList.remove('hidden');
     boatForm.reset();
     
@@ -113,19 +116,10 @@ export async function handleDeleteBoat(id: number) {
 }
   }
 
- export function openAnalysisModal(boatId: number){
-  const boat = store.boats.find(b => b.id === boatId);
-    analysisTitle.textContent = `Ανάλυση: ${boat ? boat.name : ''}`;
+  function closeBoatModal(){
+modalBoat.classList.add('hidden')
+  }
 
-    const now = new Date() ;
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDay = new Date(now.getFullYear(), now.getMonth() +1, 0) ;
-    inputStart.valueAsDate = firstDay; 
-    inputEnd.valueAsDate = lastDay;
 
-    btnPrintBoatPdf.classList.add('hidden');
-    resultsDiv.classList.add('hidden'); 
-    modalAnalysis.classList.remove('hidden');
-}
 
 

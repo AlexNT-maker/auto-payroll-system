@@ -1,7 +1,6 @@
 import { store } from "./state/store";
 import { renderTable } from "./ui/renderTable";
 import { renderBoatsList } from "./ui/renderBoatList";
-import { openBoatModal } from "./handlers/boatEvents";
 import { getEmployees } from "./api/employeesApi";
 import { getBoats } from "./api/boatsApi";
 import {
@@ -10,6 +9,8 @@ import {
  } from "./handlers/attendanceEvents"
 import { renderEmployeesList } from "./ui/renderEmployeesList";
 import { initEmployeeEvents } from "./handlers/employeeEvents";
+import { initBoatAnalysisEvents } from "./handlers/boatAnalysisEvents";
+import { initBoatEvents } from "./handlers/boatEvents";
 
 
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -18,8 +19,6 @@ const sortSelect = document.getElementById('sort-select') as HTMLSelectElement |
 
 // Set as default today
 datePicker.valueAsDate = new Date();
-
-
 
 // -- 6. Navigation logic --
 const pages={
@@ -57,8 +56,6 @@ function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses'| 'payme
 }
 
 
-
-
 btnEditDaily.addEventListener('click', () => {
     unlockForm();
     alert("Η φόρμα ξεκλείδωσε. Μην ξεχάσετε να πατήσετε 'Αποθήκευση' μετά τις αλλαγές!");
@@ -73,102 +70,17 @@ navButtons.shortAnalysis.addEventListener('click', () => navigateTo('shortAnalys
 
 // 7. -- Employee management logic -- 
 
-// Modal and list items
 const modalExtra = document.querySelector<HTMLDivElement>('#modal-extra')!;
 const extraForm = document.querySelector<HTMLFormElement>('#extra-form')!;
 const btnCancelExtra = document.querySelector<HTMLButtonElement>('#btn-cancel-extra')!;
-const btnPrintBoatPdf = document.querySelector<HTMLButtonElement>('#btn-print-boat-pdf')!;
-
-
-
 
 renderEmployeesList();
 
 initEmployeeEvents();
 
-// 12. --Boats create logic --
-// Selectors
-const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
-const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
-const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boat')!;
-const modalAnalysis = document.querySelector<HTMLDivElement>('#modal-boat-analysis')!;
-const btnCloseAnalysis = document.querySelector<HTMLButtonElement>('#btn-close-analysis')!;
-const btnRunAnalysis = document.querySelector<HTMLButtonElement>('#btn-run-analysis')!;
-const inputStart = document.querySelector<HTMLInputElement>('#analysis-start')!;
-const inputEnd = document.querySelector<HTMLInputElement>('#analysis-end')!;
-const resultsDiv = document.querySelector<HTMLDivElement>('#analysis-results')!;
-const totalCostSpan = document.querySelector<HTMLSpanElement>('#total-cost')!;
-const analysisListBody = document.querySelector<HTMLTableSectionElement>('#analysis-list')!;
-const analysisTitle = document.querySelector<HTMLHeadingElement>('#analysis-title')!;
+initBoatEvents();
 
-
-let currentAnalysisBoatId: number | null = null;
-
-
-
-btnRunAnalysis.addEventListener('click', async () => {
-    if (!currentAnalysisBoatId) return;
-    
-    const start = inputStart.value;
-    const end = inputEnd.value;
-
-    if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
-        return;
-    }
-    
-    try {
-        const response = await fetch(`http://127.0.0.1:8000/boats/${currentAnalysisBoatId}/analysis?start=${start}&end=${end}`);
-        
-        if (response.ok) {
-            const data = await response.json();
-            
-            analysisTitle.textContent = `Ανάλυση: ${data.boat_name}`;
-            totalCostSpan.textContent = `${data.total_cost.toFixed(2)} €`;
-
-            analysisListBody.innerHTML = ''; 
-            
-            data.analysis_data.forEach((item: any) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.employee_name}</td>
-                    <td style="font-weight: bold;">${item.total_cost.toFixed(2)} €</td>
-                `;
-                analysisListBody.appendChild(row);
-            });
-
-            resultsDiv.classList.remove('hidden');
-            btnPrintBoatPdf.classList.remove('hidden');
-
-        } else {
-            alert("Σφάλμα κατά τη λήψη δεδομένων.");
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Σφάλμα σύνδεσης.");
-    }
-});
-
-btnPrintBoatPdf.addEventListener('click', () => {
-    if (!currentAnalysisBoatId) return;
-    const start = inputStart.value;
-    const end = inputEnd.value;
-    const url = `http://127.0.0.1:8000/boats/${currentAnalysisBoatId}/analysis/pdf?start=${start}&end=${end}`;
-    window.open(url, '_blank');
-});
-
-
-btnAddBoat.addEventListener('click', () => openBoatModal());
-btnCancelBoat.addEventListener('click', () => modalBoat.classList.add('hidden'));
-btnCloseAnalysis.addEventListener('click', () => {
-  modalAnalysis.classList.add('hidden');
-});
-
-
-
-
-
+initBoatAnalysisEvents();
 
 
   // -- 14. Expenses Logic --
@@ -264,10 +176,6 @@ btnCalcExpenses.addEventListener('click', async () => {
 
 // Calculate wage
 // -- 15. Payments Logic/ Payroll --
-
-// ΠΡΟΣΟΧΗ: Δεν βάζουμε 'const' αν οι μεταβλητές υπάρχουν ήδη. 
-// Χρησιμοποιούμε querySelector απευθείας ή διαφορετικά ονόματα αν χρειαστεί.
-// Εδώ τις ορίζουμε ΜΙΑ φορά σωστά για το module της πληρωμής.
 
 const payStart = document.querySelector<HTMLInputElement>('#pay-start')!;
 const payEnd = document.querySelector<HTMLInputElement>('#pay-end')!;
