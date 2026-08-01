@@ -11,7 +11,10 @@ import { renderEmployeesList } from "./ui/renderEmployeesList";
 import { initEmployeeEvents } from "./handlers/employeeEvents";
 import { initBoatAnalysisEvents } from "./handlers/boatAnalysisEvents";
 import { initBoatEvents } from "./handlers/boatEvents";
-
+import {
+    initExpensesEvents,
+    initExpensesPage,
+} from "./handlers/expenseEvents"
 
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
@@ -82,98 +85,7 @@ initBoatEvents();
 
 initBoatAnalysisEvents();
 
-
-  // -- 14. Expenses Logic --
-
-const expStart = document.querySelector<HTMLInputElement>('#exp-start')!;
-const expEnd = document.querySelector<HTMLInputElement>('#exp-end')!;
-const expBoatSelect = document.querySelector<HTMLSelectElement>('#exp-boat')!;
-const expEmpSelect = document.querySelector<HTMLSelectElement>('#exp-emp')!;
-const btnCalcExpenses = document.querySelector<HTMLButtonElement>('#btn-calc-expenses')!;
-const expensesListBody = document.querySelector<HTMLTableSectionElement>('#expenses-list')!;
-const expTotalAmount = document.querySelector<HTMLSpanElement>('#exp-total-amount')!;
-const expensesSummaryDiv = document.querySelector<HTMLDivElement>('#expenses-summary')!;
-
-function initExpensesPage() {
-    expBoatSelect.innerHTML = '<option value="">-- Όλα τα σκάφη --</option>';
-    store.boats.forEach(boat => {
-        const opt = document.createElement('option');
-        opt.value = boat.id.toString();
-        opt.textContent = boat.name;
-        expBoatSelect.appendChild(opt);
-    });
-
-    expEmpSelect.innerHTML = '<option value="">-- Όλοι οι εργαζόμενοι --</option>';
-    store.employees.forEach(emp => {
-        const opt = document.createElement('option');
-        opt.value = emp.id.toString();
-        opt.textContent = emp.name;
-        expEmpSelect.appendChild(opt);
-    });
-
-    if (!expStart.value) {
-        const now = new Date();
-        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1); 
-        const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); 
-        expStart.value = firstDay.toISOString().split('T')[0];
-        expEnd.value = lastDay.toISOString().split('T')[0];
-    }
-}
-
-btnCalcExpenses.addEventListener('click', async () => {
-    const start = expStart.value;
-    const end = expEnd.value;
-    const boatId = expBoatSelect.value;
-    const empId = expEmpSelect.value;
-
-    if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
-        return;
-    }
-
-    try {
-        let url = `http://127.0.0.1:8000/expenses/?start=${start}&end=${end}`;
-        if (boatId) url += `&boat_id=${boatId}`;
-        if (empId) url += `&emp_id=${empId}`;
-
-        const response = await fetch(url);
-        
-        if (response.ok) {
-            const data = await response.json(); 
-            
-            expTotalAmount.textContent = `${data.total_sum.toFixed(2)} €`;
-            expensesSummaryDiv.classList.remove('hidden');
-
-            expensesListBody.innerHTML = '';
-            if (data.results.length === 0) {
-                expensesListBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Δεν βρέθηκαν εγγραφές.</td></tr>';
-                return;
-            }
-
-            data.results.forEach((item: any) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.employee_name}</td>
-                    <td>${item.boat_name}</td>
-                    <td>${item.daily_cost.toFixed(2)} €</td>
-                    <td>${item.overtime_cost.toFixed(2)} €</td>
-                    <td style="font-weight: bold;">${item.total_cost.toFixed(2)} €</td>
-                `;
-                expensesListBody.appendChild(row);
-            });
-
-            } else {
-            alert("Σφάλμα κατά τη λήψη δεδομένων.");
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Σφάλμα σύνδεσης.");
-    }
-});
-
-
-
+initExpensesEvents();
 // Calculate wage
 // -- 15. Payments Logic/ Payroll --
 
