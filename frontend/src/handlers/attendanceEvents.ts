@@ -1,3 +1,4 @@
+import { store } from "../state/store";
 import { loadAttendance } from "../api/attendanceApi";
 import { renderTable } from "../ui/renderTable";    
 
@@ -6,6 +7,8 @@ const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
 const tableBody = document.querySelector<HTMLTableSectionElement>("#attendance-list")!;
 const btnSubmitDaily = document.querySelector<HTMLButtonElement>('#btn-submit-daily')!;
+const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
+
 
 
 
@@ -27,15 +30,23 @@ export function initAttendanceEvents() {
         "submit",
         handleAttendanceSubmit
     );
+
+ sortSelect?.addEventListener(
+    'change', handleSortChange
+);
+
+btnEditDaily.addEventListener('click', handleUnlockForm);
+
 }
+
 
 export function handleUnlockForm() {
     unlockForm();
     alert("Η φόρμα ξεκλείδωσε. Μην ξεχάσετε να πατήσετε 'Αποθήκευση' μετά τις αλλαγές!");
 }
 
-export async function handleAttendanceSubmit(event: Event) {
-    event.preventDefault();
+export async function handleAttendanceSubmit(e: Event) {
+    e.preventDefault();
     const date = datePicker.value; 
     if(!date){ 
         alert('Παρακαλώ επιλέξτε ημερομηνία'); 
@@ -132,4 +143,54 @@ export async function loadDayData() {
     }
 }
 
+export function lockFormInputs(): void {
+  const attendanceList = document.getElementById('attendance-list');
+  const inputs = attendanceList?.querySelectorAll('input, select');
+  
+  if (inputs) {
+    for (const input of inputs) {
+      (input as HTMLInputElement | HTMLSelectElement).disabled = true;
+    }
+  };
+}
+
+export function syncDOMToState(): void{
+  const rows = document.querySelectorAll('#attendance-list tr');
+
+  for (const row of rows) {
+    const checkbox = row.querySelector('.presence-checkbox') as HTMLInputElement | null;
+    if (!checkbox) continue; 
+    
+    const empId = Number(checkbox.dataset.empId);
+    const employee = store.employees.find(emp => emp.id === empId);
+
+    if (employee) {
+      employee.tempPresent = checkbox.checked;
+      employee.tempHalfDay = (row.querySelector('.half-checkbox') as HTMLInputElement)?.checked ?? false;
+      employee.tempBoat = (row.querySelector('.boat-select') as HTMLSelectElement)?.value ?? "";
+      employee.tempOtBoat = (row.querySelector('.ot-boat-select') as HTMLSelectElement)?.value ?? "";
+      employee.tempOvertime = (row.querySelector('.overtime-input') as HTMLInputElement)?.value ?? "0";
+    }
+  }
+};
+
+
+export function handleSortChange(event: Event): void{
+  const value = (event.target as HTMLSelectElement).value;
+  console.log('Επιλέχθηκε το:', value);
+
+  syncDOMToState();
+
+  value === 'asc' 
+    ? store.employees.sort((a, b) => a.name.localeCompare(b.name, 'el'))
+    : value === 'desc'
+      ? store.employees.sort((a, b) => b.name.localeCompare(a.name, 'el'))
+      : store.employees.sort((a, b) => (a.id ?? 0) - (b.id ?? 0)); 
+
+  renderTable();
+
+  const isLocked = !(btnEditDaily?.classList.contains('hidden') ?? true);
+  
+  isLocked ? lockFormInputs() : null; 
+};
 

@@ -2,7 +2,7 @@ import { store } from "../state/store";
 import { deleteBoat } from "../api/boatsApi";
 import { renderBoatsList } from "../ui/renderBoatList";
 
-import { fetchData } from "../main.ts";
+import { fetchData } from "../services/appLoader.ts";
 import {
     createBoat,
     updateBoat

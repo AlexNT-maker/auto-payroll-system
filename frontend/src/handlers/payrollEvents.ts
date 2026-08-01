@@ -42,6 +42,16 @@ btnClearExtra.addEventListener(
 );
 }
 
+export function initPayrollPage() {
+  if (!payStart.value){
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0); 
+    payStart.value = firstDay.toISOString().split('T')[0];
+    payEnd.value = lastDay.toISOString().split('T')[0];
+  }
+}
+
 async function handlePayrollCalculation() {
     const start = payStart.value;
     const end = payEnd.value;
