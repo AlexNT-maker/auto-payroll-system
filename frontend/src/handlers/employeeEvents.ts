@@ -4,7 +4,7 @@ import {
 updateEmployee,
 createEmployee
  } from "../api/employeesApi";
- import { fetchData } from "../main";
+ import { fetchData } from "../services/appLoader";
 
 
 const btnAddEmployee = document.querySelector<HTMLButtonElement>('#btn-add-employee')!;
