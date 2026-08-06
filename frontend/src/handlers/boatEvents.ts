@@ -19,7 +19,7 @@ const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boa
 
 export  function initBoatEvents() {
 boatForm.addEventListener('submit', handleBoatSubmit);
-btnAddBoat.addEventListener('click', () => openBoatModal);
+btnAddBoat.addEventListener('click', () => openBoatModal());
 btnCancelBoat.addEventListener('click', closeBoatModal);
 }
 
