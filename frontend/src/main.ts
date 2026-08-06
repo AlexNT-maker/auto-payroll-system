@@ -16,6 +16,7 @@ import {
     initShortAnalysisPage } from "./handlers/shortAnalysisEvents";
 import { fetchData } from "./services/appLoader";
 
+
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
 datePicker.valueAsDate = new Date();
 

@@ -2,7 +2,7 @@ import { store } from "../state/store";
 import { deleteBoat } from "../api/boatsApi";
 import { renderBoatsList } from "../ui/renderBoatList";
 
-import { fetchData } from "../services/appLoader.ts";
+import { fetchData } from "../services/appLoader";
 import {
     createBoat,
     updateBoat
@@ -19,7 +19,7 @@ const btnCancelBoat = document.querySelector<HTMLButtonElement>('#btn-cancel-boa
 
 export  function initBoatEvents() {
 boatForm.addEventListener('submit', handleBoatSubmit);
-btnAddBoat.addEventListener('click', () => openBoatModal);
+btnAddBoat.addEventListener('click', () => openBoatModal());
 btnCancelBoat.addEventListener('click', closeBoatModal);
 }
 

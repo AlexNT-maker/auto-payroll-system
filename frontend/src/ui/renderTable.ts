@@ -1,5 +1,4 @@
 import { store } from "../state/store";
-import { renderBoatOptions } from "./renderBoatOptions";
 import { renderEmployeeRow } from "./renderEmployeeRow";
 
 const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-list')!;
