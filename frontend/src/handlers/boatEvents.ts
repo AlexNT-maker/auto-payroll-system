@@ -8,6 +8,8 @@ import {
     updateBoat
 } from "../api/boatsApi";
 import { openAnalysisModal } from "./boatAnalysisEvents.ts";
+import { showMessageModal } from "../utils/messageModal.ts";
+import { showConfirmModal } from "../utils/confirmModal.ts";
 
 const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
 const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
@@ -43,13 +45,13 @@ try {
 
     renderBoatsList();
 
-    alert("Επιτυχία!");
+    showMessageModal("Επιτυχία","Επιτυχής αποθήκευση", "success");
 
 } catch (err) {
 
     console.error(err);
 
-    alert("Σφάλμα δικτύου");
+    showMessageModal("Σφάλμα","Πρόβλημα κατά την αποθήκευση", "error");
 
 }
 };
@@ -63,9 +65,9 @@ export function attachBoatListeners() {
     });
 
     boatsListBody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(confirm("Είστε σίγουρος για τη διαγραφή;")) handleDeleteBoat(id);
+            if(await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) handleDeleteBoat(id);
         });
     });
 
@@ -105,13 +107,13 @@ export async function handleDeleteBoat(id: number) {
 
     renderBoatsList();
 
-    alert("Το σκάφος διαγράφηκε");
+    showMessageModal("Επιτυχία", "Το σκάφος διαγράφηκε", "success");
 
 } catch (err) {
 
     console.error(err);
 
-    alert("Αδυναμία διαγραφής");
+    showMessageModal("Σφάλμα", "Προέκυψε σφάλμα κατά τη διαγραφή", "success");
 
 }
   }

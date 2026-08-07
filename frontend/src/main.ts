@@ -15,6 +15,8 @@ import {
     initShortAnalysisEvents,
     initShortAnalysisPage } from "./handlers/shortAnalysisEvents";
 import { fetchData } from "./services/appLoader";
+import { initMessageModal } from "./utils/messageModal";
+import { initAttendanceEvents } from "./handlers/attendanceEvents";
 
 
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -62,19 +64,21 @@ navButtons.payments.addEventListener('click', () => navigateTo('payments'));
 navButtons.shortAnalysis.addEventListener('click', () => navigateTo('shortAnalysis'));
 
 
+
+async function initApp(): Promise<void>{
+  
+await fetchData();
+
 renderEmployeesList();
 
+initAttendanceEvents();
 initEmployeeEvents();
-
 initBoatEvents();
-
 initBoatAnalysisEvents();
-
 initExpensesEvents();
-
 initPayrollEvents();
-
 initShortAnalysisEvents();
+initMessageModal();
+}
 
-// Start App
-fetchData();
+initApp();

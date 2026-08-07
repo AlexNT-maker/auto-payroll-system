@@ -1,9 +1,11 @@
 import { store } from "../state/store";
 import { renderEmployeeRow } from "./renderEmployeeRow";
+import type { AttendanceRecord } from "../models/attendance";
 
 const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-list')!;
 
-export function renderTable(existingData: any[]=[]){
+
+export function renderTable(existingData: AttendanceRecord[]=[]){
   tableBody.innerHTML = '';
 
   store.employees.forEach((employee) => {
@@ -14,3 +16,5 @@ export function renderTable(existingData: any[]=[]){
     tableBody.appendChild(row);
   });
 }
+
+

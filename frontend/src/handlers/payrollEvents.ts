@@ -1,3 +1,6 @@
+import { showConfirmModal } from "../utils/confirmModal";
+import { showMessageModal } from "../utils/messageModal";
+
 const payStart = document.querySelector<HTMLInputElement>('#pay-start')!;
 const payEnd = document.querySelector<HTMLInputElement>('#pay-end')!;
 const btnCalcPayroll = document.querySelector<HTMLButtonElement>('#btn-calc-payroll')!;
@@ -57,7 +60,7 @@ async function handlePayrollCalculation() {
     const end = payEnd.value;
 
     if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
         return;
     }
 
@@ -105,11 +108,11 @@ async function handlePayrollCalculation() {
             });
 
         } else {
-            alert("Σφάλμα κατά τη λήψη μισθοδοσίας.");
+            showMessageModal("Σφάλμα", "Πρόβλημα κατά τη λήψη μισθοδοσίας.", "error" );
         }
     } catch (error) {
         console.error(error);
-        alert("Σφάλμα σύνδεσης.");
+        showMessageModal("Σφάλμα", "Πρόβλημα σύνδεσης.");
     }
 }
 
@@ -136,7 +139,7 @@ function printPayrollPdf() {
         const end = payEnd.value;
 
         if (!start || !end) {
-            alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+            showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
             return;
         }
         const url = `http://127.0.0.1:8000/payroll/pdf?start=${start}&end=${end}`;    
@@ -169,11 +172,11 @@ async function handleExtraSubmit(e: Event) {
             if (res.ok) {
                 if(modalExtra) modalExtra.classList.add('hidden');
                 btnCalcPayroll.click(); 
-                alert("Το Extra αποθηκεύτηκε!");
+                showMessageModal("Επιτυχία", "Το Extra αποθηκεύτηκε!", "success");
             }
         } catch (err) {
             console.error(err);
-            alert("Σφάλμα σύνδεσης");
+            showMessageModal("Σφάλμα", "Πρόβλημα σύνδεσης", "error");
         }
 }
 
@@ -190,7 +193,7 @@ async function handleResetExtra() {
             extra_reason: ""    
         };
 
-        if (confirm("Θέλετε να διαγράψετε το Extra ποσό;")) {
+        if (await showConfirmModal("Προειδοποίηση", "Θέλετε να διαγράψετε το Extra ποσό;", "error")) {
             try {
                 const res = await fetch('http://127.0.0.1:8000/attendance/', {
                     method: 'POST',
@@ -201,7 +204,7 @@ async function handleResetExtra() {
                 if (res.ok) {
                     if(modalExtra) modalExtra.classList.add('hidden');
                     btnCalcPayroll.click(); 
-                    alert("Το Extra διαγράφηκε!");
+                    showMessageModal("Επιτυχία", "Το Extra διαγράφηκε!", "success");
                 }
             } catch (err) {
                 console.error(err);
