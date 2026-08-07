@@ -1,4 +1,5 @@
 import { store } from "../state/store";
+import { showMessageModal } from "../utils/messageModal";
 
 const shortBoatSelect = document.querySelector<HTMLSelectElement>('#short-boat-select')!;
 const shortStart = document.querySelector<HTMLInputElement>('#short-start')!;
@@ -30,11 +31,11 @@ function printShortAnalysis() {
     const isCaptain = shortIsCaptain ? shortIsCaptain.checked : false;
 
     if (!boatId) {
-        alert("Παρακαλώ επιλέξτε σκάφος.");
+        showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε σκάφος.", "warning");
         return;
     }
     if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
         return;
     }
 

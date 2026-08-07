@@ -1,6 +1,7 @@
 import { store } from "../state/store";
 import { loadAttendance } from "../api/attendanceApi";
-import { renderTable } from "../ui/renderTable";    
+import { renderTable } from "../ui/renderTable";   
+import { showMessageModal,  } from "../utils/messageModal"; 
 
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -34,22 +35,20 @@ export function initAttendanceEvents() {
  sortSelect?.addEventListener(
     'change', handleSortChange
 );
-
-btnEditDaily.addEventListener('click', handleUnlockForm);
-
 }
 
 
 export function handleUnlockForm() {
     unlockForm();
-    alert("Η φόρμα ξεκλείδωσε. Μην ξεχάσετε να πατήσετε 'Αποθήκευση' μετά τις αλλαγές!");
+    showMessageModal("Ενημέρωση", "Η φόρμα ξεκλείδωσε. Μην ξεχάσετε να πατήσετε 'Αποθήκευση' μετά τις αλλαγές!", 
+      "info");
 }
 
 export async function handleAttendanceSubmit(e: Event) {
     e.preventDefault();
     const date = datePicker.value; 
     if(!date){ 
-        alert('Παρακαλώ επιλέξτε ημερομηνία'); 
+        showMessageModal("Σφάλμα", 'Παρακαλώ επιλέξτε ημερομηνία.', "error"); 
         return ;
 }
 
@@ -67,13 +66,16 @@ export async function handleAttendanceSubmit(e: Event) {
     const isPresent = checkbox.checked;
     const isHalf = halfbox.checked;
 
+    const employeeName =
+    row.querySelector("td")?.textContent?.trim() ?? "Άγνωστος εργαζόμενος";  //employeer name is in the first section so the query selector finds it immediately.
+
     if((isPresent || isHalf) && !boatSelect.value){
-      alert ('Παρακαλώ επιλέξτε σκάφος, για όλους τους παρόντες');
+      showMessageModal("Σφάλμα", `Παρακαλώ επιλέξτε σκάφος, για τον ${employeeName}.`, "error");
       return ;
     }
 
     if (otHours > 0 && !otBoatSelect.value && !boatSelect.value) {
-      alert ('Παρακαλώ επιλέξτε Σκάφος Υπερωρίας, για όσους έχουν ώρες.');
+       showMessageModal('Προσοχή', `Παρακαλώ επιλέξτε Σκάφος Υπερωρίας, για ${employeeName}.`, "warning");
       return;
     }
 
@@ -101,7 +103,7 @@ export async function handleAttendanceSubmit(e: Event) {
         console.error('Error saving row', err);
     }
   }
-  alert('Η αποθήκευση ολοκληρώθηκε!');
+  showMessageModal("Επιτυχία",'Η αποθήκευση ολοκληρώθηκε!', "success");
 
   window.location.reload();
 }

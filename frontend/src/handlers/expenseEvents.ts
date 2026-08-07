@@ -1,4 +1,5 @@
 import { store } from "../state/store";
+import { showMessageModal } from "../utils/messageModal";
 
 const expStart = document.querySelector<HTMLInputElement>('#exp-start')!;
 const expEnd = document.querySelector<HTMLInputElement>('#exp-end')!;
@@ -46,7 +47,7 @@ export async function handleExpensesCalculation() {
     const empId = expEmpSelect.value;
 
     if (!start || !end) {
-        alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+        showMessageModal("Προειδοποίηση", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
         return;
     }
 
@@ -83,10 +84,10 @@ export async function handleExpensesCalculation() {
             });
 
             } else {
-            alert("Σφάλμα κατά τη λήψη δεδομένων.");
+            showMessageModal("Σφάλμα", "Πρόβλημα κατά τη λήψη δεδομένων.", "error");
         }
     } catch (error) {
         console.error(error);
-        alert("Σφάλμα σύνδεσης.");
+        showMessageModal("Σφάλμα", "Πρόβλημα σύνδεσης.", "error");
     }
 };

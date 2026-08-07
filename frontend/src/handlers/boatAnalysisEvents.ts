@@ -1,4 +1,5 @@
 import { store } from "../state/store";
+import { showMessageModal } from "../utils/messageModal";
 
 
 const btnRunAnalysis = document.querySelector<HTMLButtonElement>('#btn-run-analysis')!;
@@ -40,7 +41,7 @@ async function handleBoatAnalysis() {
         const end = inputEnd.value;
     
         if (!start || !end) {
-            alert("Παρακαλώ επιλέξτε ημερομηνίες.");
+            showMessageModal("Σφάλμα", "Παρακαλώ επιλέξτε ημερομηνίες.", "error");
             return;
         }
         
@@ -69,7 +70,7 @@ async function handleBoatAnalysis() {
                 btnPrintBoatPdf.classList.remove('hidden');
     
             } else {
-                alert("Σφάλμα κατά τη λήψη δεδομένων.");
+                showMessageModal("Σφάλμα","Πρόβλημα κατά τη λήψη δεδομένων.","error");
             }
         } catch (error) {
             console.error(error);

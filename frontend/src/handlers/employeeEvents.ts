@@ -5,6 +5,8 @@ updateEmployee,
 createEmployee
  } from "../api/employeesApi";
  import { fetchData } from "../services/appLoader";
+import { showMessageModal } from "../utils/messageModal";
+import { showConfirmModal } from "../utils/confirmModal";
 
 
 const btnAddEmployee = document.querySelector<HTMLButtonElement>('#btn-add-employee')!;
@@ -62,11 +64,11 @@ try {
 
     await fetchData();
 
-    alert("Ο εργαζόμενος διαγράφηκε επιτυχώς");
+    showMessageModal("Επιτυχία", "Ο εργαζόμενος διαγράφηκε επιτυχώς", "success");
 } catch (error) {
     console.error(error);
 
-    alert("Δεν ήταν δυνατή η διαγραφή");
+    showMessageModal("Σφάλμα","Προέκυψε σφάλμα κατά τη διαγραφή του εργαζομένου", "error");
 }
 }
 
@@ -79,9 +81,9 @@ export function attachActionListeners() {
     });
 
     document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(confirm("Είστε σίγουρος για τη διαγραφή;")) {
+            if(await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
                 handleDeleteEmployee(id);
             }
         });
@@ -111,9 +113,12 @@ closeModal();
 
 await fetchData();
 
-alert(id ? "Τα στοιχεία ενημερώθηκαν!" : "Ο εργαζόμενος προστέθηκε!");
+if(id){
+    showMessageModal("Επιτυχία","Τα στοιχεία ενημερώθηκαν","success");
+}else showMessageModal("Επιτυχία","Ο εργαζόμενος προστέθηκε!", "success");
+
   }catch(error){
     console.error(typeof error);
-    alert("Δεν ήταν δυνατή η ενημέρωση του εργαζομένου")
+    showMessageModal("Σφάλμα", "Δεν ήταν δυνατή η ενημέρωση του εργαζομένου", "error")
   }
 };
