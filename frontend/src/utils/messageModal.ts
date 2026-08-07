@@ -19,21 +19,21 @@ export function showMessageModal(
 ): void {
     if (!messageModal || !messageText || !messageTitle || !messageWindow) return;
 
-        messageTitle.style.color = "#2b2b2b"
+        messageTitle.style.color = "#264653"
 
     switch(type){
         case "info":
-            btnOk.style.backgroundColor = "#3b82f6";
+            btnOk.style.backgroundColor = "#264653";
             break;
         case "warning":
-            btnOk.style.backgroundColor = "#f59e0b";
+            btnOk.style.backgroundColor = "#d97706";
             break;
         case "success":
-            btnOk.style.backgroundColor = "#22c55e";
+            btnOk.style.backgroundColor = "#16a34a";
             break;
         case "error":
-            btnOk.style.backgroundColor = "#ef4444";
-            messageTitle.style.color = "#ef4444";
+            btnOk.style.backgroundColor = "#dc2626";
+            messageTitle.style.color = "#dc2626";
             break;
     }
     messageTitle.textContent = title;

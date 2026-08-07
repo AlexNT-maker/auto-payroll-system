@@ -3,11 +3,12 @@
 }
 
 :root {
-  --primary-color: #2563eb; /* Μπλε */
-  --bg-color: #f3f4f6;      /* Απαλό Γκρι */
-  --text-color: #1f2937;    /* Σκούρο Γκρι */
+  --primary-color: #2563eb; 
+  --bg-color: #f3f4f6;      
+  --text-color: #1f2937;    
   --white: #ffffff;
   --black: #000 ;
+  --button: #264653
 }
 
 body {
@@ -20,7 +21,7 @@ body {
 
 
 .navbar {
-  background-color: var(--black);
+  background-color: #264653;
   padding: 0 2rem; 
   height: 70px;    
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
@@ -37,20 +38,18 @@ body {
   align-items: center;
   justify-content: center;
   
-  height: 65px; 
-  width: 90px;
+  height: 95px; 
+  width: 120px;
   
-  background-color: #ffffff; 
-  
+  background-color: transparent; 
     
   overflow: hidden; 
   
   
-  padding: 5px;
-  transition: transform 0.2s ease;
+  padding-top: 5px;
+  transition: transform 0.3s ease;
 }
 
-/* Ρύθμιση της εικόνας μέσα στο logo */
 .logo img {
   max-height: 100%;
   max-width: 100%;
@@ -58,7 +57,8 @@ body {
 }
 
 .logo:hover {
-  transform: scale(1.03);
+  transform: scale(1.07);
+  cursor: pointer;
 }
 
 .nav-links {
@@ -79,16 +79,16 @@ body {
 }
 
 .nav-links button:hover {
-  color: var(--primary-color);
+  color: var(--text-color);
   background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15); 
 }
 
 .nav-links button.active {
-  color: var(--primary-color);
+  color: var(--bg-color);
   background-color: transparent;
   font-weight: 600;
-  box-shadow: inset 0 -2px 0 0 #ffffff;
+  box-shadow: inset 0 -2px 0 0 #8ecae6;
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 6px ;
 }
@@ -209,7 +209,7 @@ select {
 }
 
 .btn-submit {
-  background-color: #111827; 
+  background-color: var(--button); 
   color: white;
   border-color: #111827; 
   margin-top: 10px;    
@@ -428,7 +428,7 @@ select {
 }
 
 .modal-info{
-    border: 3px solid #3b82f6;
+    border: 3px solid var(--button);
 }
 
 #message-modal-title {
