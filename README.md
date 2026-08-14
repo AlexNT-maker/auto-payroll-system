@@ -2,14 +2,21 @@
 
 ## App screenshots
 
-![Home page](./images/home_page.png)
-![Edit employees tab](./images/CRUD_workers.png)
-![CRUD ships page](./images/CRUD_ships.png)
-![Extract full analysis to pdf](./images/analysis_to_pdf.png)
-![info modal](./images/infoModal.png)
-![payroll tab](./images/payroll_tab.png)
-![danger modal](./images/danger_Modal.png)
-![Locked Form](./images/lock_form.png)
+![Home Page - Daily Attendance](./images/home_page.png)
+
+![Employee Management](./images/CRUD_workers.png)
+
+![Boat Management](./images/CRUD_ships.png)
+
+![Payroll Tab](./images/payroll_tab.png)
+
+![Analysis PDF Export](./images/analysis_to_pdf.png)
+
+![Form Lock](./images/lock_form.png)
+
+![Information Modal](./images/infoModal.png)
+
+![Danger Warning Modal](./images/danger_Modal.png)
 
 
 A full-stack web application designed to manage daily attendance, calculate complex payrolls, and track operational costs for maritime personnel and boats.
