@@ -1,5 +1,7 @@
 # Payroll Manager & Maritime Resource System
 
+## App screenshots
+
 ![Home page](./images/Home_page)
 ![Edit employees tab](./images/Edit_tab.png)
 ![CRUD ships page](./images/Manage_ships.png)
