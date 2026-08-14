@@ -3,10 +3,10 @@
 ## App screenshots
 
 ![Home page](./images/Home_page.png)
-![Edit employees tab](./images/Edit_tab.png)
-![CRUD ships page](./images/Manage_ships.png)
+![Edit employees tab](./images/CRUD_workers.png)
+![CRUD ships page](./images/CRUD_ships.png)
 ![Extract full analysis to pdf](./images/Analysis_to_pdf.png)
-![info modal](./images/info_modal.png)
+![info modal](./images/info_Modal.png)
 ![payroll tab](./images/payroll.png)
 ![danger modal](./images/Danger_Modal.png)
 ![Locked Form](./images/Lock_form.png)
