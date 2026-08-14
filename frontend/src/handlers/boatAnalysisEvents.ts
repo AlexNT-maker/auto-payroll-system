@@ -74,7 +74,7 @@ async function handleBoatAnalysis() {
             }
         } catch (error) {
             console.error(error);
-            alert("Σφάλμα σύνδεσης.");
+            showMessageModal("Σφάλμα","Πρόβλημα σύνδεσης.","error");
         }
     }
     
