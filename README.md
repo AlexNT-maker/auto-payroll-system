@@ -1,5 +1,17 @@
 # Payroll Manager & Maritime Resource System
 
+## App screenshots
+
+![Home page](./images/Home_page)
+![Edit employees tab](./images/Edit_tab.png)
+![CRUD ships page](./images/Manage_ships.png)
+![Extract full analysis to pdf](./images/Analysis_to_pdf.png)
+![info modal](./images/info_modal.png)
+![payroll tab](./images/payroll.png)
+![danger modal](./images/Danger_modal.png)
+![Locked Form](./images/Lock_form.png)
+
+
 A full-stack web application designed to manage daily attendance, calculate complex payrolls, and track operational costs for maritime personnel and boats.
 
 Built with **FastAPI (Python)** and **TypeScript**, focusing on strict financial logic and automated reporting.
@@ -33,7 +45,7 @@ Built with **FastAPI (Python)** and **TypeScript**, focusing on strict financial
 ## Tech Stack
 
 ### Backend
-- **Python 3.x**
+- **Python 3**
 - **FastAPI:** High-performance web framework for building APIs.
 - **SQLAlchemy:** ORM for database interactions.
 - **SQLite:** Lightweight relational database.
@@ -111,3 +123,5 @@ npm run dev
 
 ### PDF export
 ![Pdf look](./screenshots/pdf.png)
+
+
