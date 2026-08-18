@@ -1,7 +1,6 @@
 import { renderBoatsList } from "./ui/renderBoatList";
 import { renderEmployeesList } from "./ui/renderEmployeesList";
 import { initEmployeeEvents } from "./handlers/employeeEvents";
-import { initBoatAnalysisEvents } from "./handlers/boatAnalysisEvents";
 import { initBoatEvents } from "./handlers/boatEvents";
 import {
     initExpensesEvents,
@@ -74,7 +73,6 @@ renderEmployeesList();
 initAttendanceEvents();
 initEmployeeEvents();
 initBoatEvents();
-initBoatAnalysisEvents();
 initExpensesEvents();
 initPayrollEvents();
 initShortAnalysisEvents();

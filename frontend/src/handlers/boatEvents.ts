@@ -7,7 +7,6 @@ import {
     createBoat,
     updateBoat
 } from "../api/boatsApi";
-import { openAnalysisModal } from "./boatAnalysisEvents.ts";
 import { showMessageModal } from "../utils/messageModal.ts";
 import { showConfirmModal } from "../utils/confirmModal.ts";
 
@@ -68,13 +67,6 @@ export function attachBoatListeners() {
         btn.addEventListener('click', async (e) => {
             const id = parseInt((e.target as HTMLElement).dataset.id!);
             if(await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) handleDeleteBoat(id);
-        });
-    });
-
-    boatsListBody.querySelectorAll('.btn-analysis').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            openAnalysisModal(id);
         });
     });
 }
