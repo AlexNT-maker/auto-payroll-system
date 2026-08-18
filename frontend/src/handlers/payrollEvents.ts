@@ -89,6 +89,7 @@ async function handlePayrollCalculation() {
                     <td>${item.total_overtime.toFixed(2)} €</td>
                     <td style="font-weight: 800;">${item.grand_total.toFixed(2)} €</td>
                     
+                    
                     <td style="background-color: #eff6ff; color: #1e40af; font-weight: bold;">
                         ${item.bank_pay.toFixed(2)} €
                     </td>
@@ -103,6 +104,9 @@ async function handlePayrollCalculation() {
                             Πρόσθετα
                         </button>
                     </td>
+                    <td style="font-weight: 700; color: #dd780b;">
+    ${(item.total_extra ?? 0).toFixed(2)} €
+</td>
                 `;
                 payrollListBody.appendChild(row);
             });

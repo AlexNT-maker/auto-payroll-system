@@ -229,7 +229,7 @@
         </div>
 
         <div id="payroll-actions" class="hidden" style="text-align: right; margin-bottom: 1rem;">
-             <button id="btn-print-payroll" class="btn-submit" style="background-color: #000">
+             <button id="btn-print-payroll" class="btn-submit" style="background-color: #264653">
                 🖨️ Εκτύπωση PDF
             </button>
         </div>
@@ -245,6 +245,8 @@
               <th style="background-color: #dbeafe;">Τράπεζα</th>
               <th style="background-color: #fef3c7;">Μετρητά</th>
               <th>Ενέργειες</th> 
+              <th style="background-color: #fff3cd;">Πρόσθετα</th>
+
             </tr>
           </thead>
           <tbody id="payroll-list"></tbody>
@@ -309,46 +311,7 @@
       </div>
 
       <!--Modal for cost analysis and history about boats-->
-      <div id="modal-boat-analysis" class="modal-overlay hidden">
-        <div class="modal-content animate-enter" style="max-width: 600px;"> <h2 id="analysis-title">Ανάλυση Κόστους</h2>
-          
-          <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: flex-end;">
-            <div style="flex: 1;">
-              <label style="font-weight: bold; font-size: 0.9rem;">Από:</label>
-              <input type="date" id="analysis-start" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-            <div style="flex: 1;">
-              <label style="font-weight: bold; font-size: 0.9rem;">Έως:</label>
-              <input type="date" id="analysis-end" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-            </div>
-            <button id="btn-run-analysis" class="btn-submit hover-lift click-shrink" style="margin: 0; height: 38px;">Προβολή</button>
-            <button id="btn-print-boat-pdf" class="btn-submit hover-lift click-shrink hidden" style="margin: 0; height: 38px; background-color: #10b981;">Εκτύπωση PDF</button>
-          </div>
-
-          <div id="analysis-results" class="hidden">
-            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-              <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem;">Σύνολο Κόστους: <span id="total-cost" style="color: var(--primary-color);">0.00 €</span></h3>
-              <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">(Μεροκάματα + Υπερωρίες)</p>
-            </div>
-
-            <table class="attendance-table" style="font-size: 0.9rem;">
-              <thead>
-                <tr>
-                  <th>Ημερομηνία</th>
-                  <th>Εργαζόμενος</th>
-                  <th>Κόστος</th>
-                </tr>
-              </thead>
-              <tbody id="analysis-list">
-                </tbody>
-            </table>
-          </div>
-
-          <div class="modal-actions">
-            <button type="button" id="btn-close-analysis" class="btn-cancel hover-lift">Κλείσιμο</button>
-          </div>
-        </div>
-      </div>
+      
 
       <div id="modal-extra" class="modal-overlay hidden">
         <div class="modal-content animate-enter" style="max-width: 500px;">
