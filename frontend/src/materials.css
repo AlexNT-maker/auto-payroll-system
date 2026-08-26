@@ -1,8 +1,4 @@
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+
 
 :root {
     --materials-primary: #1D6F42;
@@ -222,5 +218,3 @@ body {
     opacity: 1;
     pointer-events: auto;
 }
-
-

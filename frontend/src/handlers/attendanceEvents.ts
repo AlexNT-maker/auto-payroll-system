@@ -103,9 +103,7 @@ export async function handleAttendanceSubmit(e: Event) {
         console.error('Error saving row', err);
     }
   }
-  showMessageModal("Επιτυχία",'Η αποθήκευση ολοκληρώθηκε!', "success");
-
-  setTimeout(() => window.location.reload(), 10000);
+  showMessageModal("Επιτυχία",'Η αποθήκευση ολοκληρώθηκε!', "success", () => window.location.reload());
 }
 
 
