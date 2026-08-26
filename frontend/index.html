@@ -10,6 +10,9 @@
     
     <!--Navbar-->
    <nav class="navbar animate-enter">
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Άνοιγμα μενού">
+    ☰
+</button>
   <img class="logo" src="src/icon/logo.svg"></img>
   <div class="nav-links">
     <button id="nav-home" class="active hover-lift click-shrink">Καταχώρηση</button>
@@ -21,6 +24,33 @@
   </div>
 </nav>
 
+<aside id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <h2>Μενού</h2>
+        <button
+            id="sidebar-close"
+            class="sidebar-close"
+            type="button"
+            aria-label="Κλείσιμο μενού">
+            x
+        </button>
+    </div>
+    <div class="sidebar-menu">
+        <button class="sidebar-item" type="button">
+            Αρχική
+        </button>
+
+        <button class="sidebar-item" type="button">
+            Υλικά
+        </button>
+        <button class="sidebar-item" type="button">
+            Ρυθμίσεις
+        </button>
+    </div>
+</aside>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
 
     <!--Home page-->
     <main id="app">
