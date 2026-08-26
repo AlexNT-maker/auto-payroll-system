@@ -64,7 +64,9 @@ try {
 
     await fetchData();
 
-    showMessageModal("Επιτυχία", "Ο εργαζόμενος διαγράφηκε επιτυχώς", "success");
+    showMessageModal("Επιτυχία", "Ο εργαζόμενος διαγράφηκε επιτυχώς", "success", () => window.location.reload());
+
+
 } catch (error) {
     console.error(error);
 
@@ -114,8 +116,9 @@ closeModal();
 await fetchData();
 
 if(id){
-    showMessageModal("Επιτυχία","Τα στοιχεία ενημερώθηκαν","success");
-}else showMessageModal("Επιτυχία","Ο εργαζόμενος προστέθηκε!", "success");
+    showMessageModal("Επιτυχία","Τα στοιχεία ενημερώθηκαν","success", () => window.location.reload());
+
+}else showMessageModal("Επιτυχία","Ο εργαζόμενος προστέθηκε!", "success", () => window.location.reload());
 
   }catch(error){
     console.error(typeof error);

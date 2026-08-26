@@ -446,3 +446,26 @@ select {
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
+
+.message-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 0.75rem;
+    display: block;
+}
+
+.modal-error .message-modal-icon {
+    color: #dc2626;
+}
+
+.modal-info .message-modal-icon{
+  color: #264653;
+}
+
+.modal-warning .message-modal-icon {
+    color: #d97706;
+}
+
+.modal-success .message-modal-icon {
+    color: #16a34a;
+}

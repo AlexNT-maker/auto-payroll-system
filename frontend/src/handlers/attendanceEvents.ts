@@ -105,7 +105,7 @@ export async function handleAttendanceSubmit(e: Event) {
   }
   showMessageModal("Επιτυχία",'Η αποθήκευση ολοκληρώθηκε!', "success");
 
-  window.location.reload();
+  setTimeout(() => window.location.reload(), 10000);
 }
 
 
