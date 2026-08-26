@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto payroll app</title>
+    <link rel="stylesheet" href="./src/materials.css">
+  </head>
+  <body>
+    
+    <!--Navbar-->
+   <nav class="navbar animate-enter">
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Άνοιγμα μενού">
+    ☰
+</button>
+  <img class="logo" src="src/icon/logo.svg"></img>
+  <div class="nav-links">
+    <button id="nav-home" class="active hover-lift click-shrink">Τιμοκατάλογος</button>
+    <button id="nav-employees" class="hover-lift click-shrink">Εργαζόμενοι</button>
+    <button id="nav-boats" class="hover-lift click-shrink">Σκάφη</button>
+    <button id="nav-short-analysis" class="hover-lift click-shrink">Συνοπτική Ανάλυση</button>
+    <button id="nav-expenses" class="hover-lift click-shrink">Έξοδα</button>
+    <button id="nav-payments" class="hover-lift click-shrink">Πληρωμές</button>
+  </div>
+</nav>
+
+<aside id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <h2>Μενού</h2>
+        <button
+            id="sidebar-close"
+            class="sidebar-close"
+            type="button"
+            aria-label="Κλείσιμο μενού">
+            x
+        </button>
+    </div>
+    <div class="sidebar-menu">
+        <button class="sidebar-item" type="button">
+            Αρχική
+        </button>
+        <button class="sidebar-item" id="sidebar-materials" type="button">
+            Υλικά
+        </button>
+        <button class="sidebar-item" type="button">
+            Ρυθμίσεις
+        </button>
+    </div>
+</aside>
+
+    <main id="materials-page">
+
+        <h1>Τιμοκατάλογος Υλικών</h1>
+
+        <!--Here will be added a table-->
+
+    </main>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+ <script type="module" src="/src/materials.ts"></script>
+</body>
+</html>

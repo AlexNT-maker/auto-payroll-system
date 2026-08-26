@@ -577,3 +577,18 @@ select {
     opacity: 1;
     pointer-events: auto;
 }
+
+
+body.page-transition {
+    animation: pageFadeOut 0.6s ease forwards;
+}
+
+@keyframes pageFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

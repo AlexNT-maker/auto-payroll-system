@@ -7,6 +7,19 @@ const sidebarClose = document.querySelector<HTMLButtonElement>("#sidebar-close")
 const sidebarOverlay = document.querySelector<HTMLDivElement>("#sidebar-overlay")!;
 
 
+
+const materialsButton =
+    document.querySelector<HTMLButtonElement>("#sidebar-materials")!;
+
+materialsButton.addEventListener("click", () => {
+    document.body.classList.add("page-transition");
+
+    setTimeout(() => {
+        window.location.href = "materials.html";
+    }, 600);
+});
+
+
 function openSidebar(): void {
     sidebar.classList.add("open");
     sidebarOverlay.classList.add("visible");
@@ -23,3 +36,4 @@ export function initSidebarEvents(): void {
     sidebarClose.addEventListener("click", closeSidebar);
     sidebarOverlay.addEventListener("click", closeSidebar);
 }
+
