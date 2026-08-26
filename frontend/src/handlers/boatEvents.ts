@@ -44,7 +44,7 @@ try {
 
     renderBoatsList();
 
-    showMessageModal("Επιτυχία","Επιτυχής αποθήκευση", "success");
+    showMessageModal("Επιτυχία","Επιτυχής αποθήκευση", "success", () => window.location.reload());
 
 } catch (err) {
 
@@ -99,7 +99,8 @@ export async function handleDeleteBoat(id: number) {
 
     renderBoatsList();
 
-    showMessageModal("Επιτυχία", "Το σκάφος διαγράφηκε", "success");
+    showMessageModal("Επιτυχία", "Το σκάφος διαγράφηκε", "success", () => window.location.reload());
+
 
 } catch (err) {
 

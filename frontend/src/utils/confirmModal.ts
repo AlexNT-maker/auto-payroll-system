@@ -42,25 +42,44 @@ export function showConfirmModal(
         function confirmAction(){
             messageModal.classList.add('hidden');
             resolve(true);
-             btnOk.removeEventListener('click', confirmAction);
+            btnOk.removeEventListener('click', confirmAction);
             btnCancel.removeEventListener('click', cancelAction);
+            document.removeEventListener("keydown", handleKeyDown);
         }
 
         function cancelAction(){
-            messageModal.classList.add('hidden');
+            messageModal.classList.add("hidden");
             resolve(false);
              btnOk.removeEventListener('click', confirmAction);
             btnCancel.removeEventListener('click', cancelAction);
+            document.removeEventListener("keydown", handleKeyDown);
 
     }
+
+        function handleKeyDown(e: KeyboardEvent) {
+    if(e.key === "Enter" || e.code === "NumpadEnter") {
+        e.preventDefault();
+        confirmAction();
+    }
+
+    if (e.key === "Escape") {
+        e.preventDefault();
+        cancelAction();
+    }
+}
 
         btnOk.addEventListener('click', confirmAction);
 
         btnCancel.addEventListener('click', cancelAction);
 
+        document.addEventListener('keydown', handleKeyDown);
+
         messageModal.classList.remove("hidden");
 
 
     });
+
 }
+
+
 
