@@ -181,3 +181,28 @@ def export_short_boat_analysis_pdf(boat_id: int, start: date, end: date, is_capt
         media_type="application/pdf", 
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+
+# -- Materials Routes --
+
+@app.get("/materials/", response_model=List[schemas.Material])
+def read_materials(db: Session = Depends(get_db)):
+    return crud.get_materials(db)
+
+@app.post("/materials/", response_model=schemas.Material)
+def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_db)):
+    return crud.create_material(db, material)
+
+@app.put("/materials/{material_id}", response_model=schemas.Material)
+def update_material(material_id: int, material: schemas.MaterialCreate, db: Session = Depends(get_db)):
+    updated = crud.update_material(db, material_id, material)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return updated
+
+@app.delete("/materials/{material_id}")
+def delete_material(material_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_material(db, material_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return {"ok": True}

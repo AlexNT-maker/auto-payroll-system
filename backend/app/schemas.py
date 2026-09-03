@@ -107,3 +107,20 @@ class PayrollReport (BaseModel):
     start_date: date
     end_date: date 
     payments: List[PaymentItem]
+
+# -- Schemas for materials --
+
+class MaterialBase(BaseModel):
+    name: str
+    category: str
+    unit: str
+    price: float
+
+class MaterialCreate(MaterialBase):
+    pass
+
+class Material(MaterialBase):
+    id: int
+
+    class Config:
+        from_attributes = True

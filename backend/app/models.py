@@ -51,3 +51,13 @@ class Attendance(Base):
     employee = relationship("Employee", back_populates = "attendance_records")
     boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")
     overtime_boat = relationship("Boat", foreign_keys=[overtime_boat_id])
+
+ # -- Board No.4 Materials --
+
+class Material(Base):
+    __tablename__ = "materials"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    category = Column(String, index=True)
+    unit = Column(String)
+    price = Column(Float)

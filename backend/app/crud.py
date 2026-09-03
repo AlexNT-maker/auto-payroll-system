@@ -348,3 +348,41 @@ def calculate_payroll(db: Session, start: date, end: date):
     "end_date": end,
     "payments": results
     }
+
+
+# -- Materials --
+
+def get_materials(db: Session):
+    return db.query(models.Material).all()
+
+def create_material(db: Session, material: schemas.MaterialCreate):
+    db_material = models.Material(
+        name=material.name,
+        category=material.category,
+        unit=material.unit,
+        price=material.price
+    )
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+def update_material(db: Session, material_id: int, material: schemas.MaterialCreate):
+    db_material = db.query(models.Material).filter(models.Material.id == material_id).first()
+    if not db_material:
+        return None
+    db_material.name = material.name
+    db_material.category = material.category
+    db_material.unit = material.unit
+    db_material.price = material.price
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+def delete_material(db: Session, material_id: int):
+    db_material = db.query(models.Material).filter(models.Material.id == material_id).first()
+    if not db_material:
+        return None
+    db.delete(db_material)
+    db.commit()
+    return db_material

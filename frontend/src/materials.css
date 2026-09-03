@@ -1,5 +1,3 @@
-
-
 :root {
     --materials-primary: #1D6F42;
     --materials-primary-dark: #185c37;
@@ -109,13 +107,15 @@ body {
 
     margin: 0 auto;
 
+    justify-content: center;
+    text-align: center;
+
     padding: 2rem;
 }
 
 #materials-page h1 {
     margin-bottom: 1.5rem;
 }
-
 
 .sidebar {
     position: fixed;
@@ -165,7 +165,7 @@ body {
 }
 
 .sidebar-close:hover {
-    color: #dc2626;
+    color: #4b5563;
 }
 
 .sidebar-menu {
@@ -217,4 +217,116 @@ body {
 .sidebar-overlay.visible {
     opacity: 1;
     pointer-events: auto;
+}
+
+.materials-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 1.5rem;
+}
+
+.materials-primary-btn {
+    padding: 0.7rem 1.2rem;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #1D6F42;
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.materials-primary-btn:hover {
+    background: #185c37;
+}
+
+#material-search {
+    width: 280px;
+
+    padding: 0.7rem 0.9rem;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+
+    font-size: 0.95rem;
+}
+
+
+/* ---------------- TABLE ---------------- */
+
+.materials-table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+    border: 1px solid #d1d5db;
+
+    font-size: 0.95rem;
+}
+
+.materials-table th {
+    background: #e2f0e5;
+
+    color: #1f2937;
+
+    font-weight: 700;
+
+    padding: 0.8rem;
+
+    border: 1px solid #cbd5e1;
+
+    text-align: left;
+}
+
+.materials-table td {
+    padding: 0.7rem 0.8rem;
+
+    border: 1px solid #e5e7eb;
+}
+
+.materials-table tbody tr:hover {
+    background: #f7faf8;
+}
+
+.materials-actions {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.material-edit-btn {
+    background: #e8f1ec;
+    color: #1d6f42;
+    border: 1px solid #b7d3c1;
+}
+
+.material-edit-btn:hover {
+    background: #d8e9df;
+    cursor: pointer;
+}
+
+.material-delete-btn {
+    background: #fbeaea;
+    color: #c62828;
+    border: 1px solid #efb5b5;
+}
+
+.material-delete-btn:hover {
+    background: #f5d7d7;
+    cursor: pointer;
+}
+
+.materials-button {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
+    width: 100%;
 }
