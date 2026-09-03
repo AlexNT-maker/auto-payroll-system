@@ -10,6 +10,15 @@ const sidebarOverlay = document.querySelector<HTMLDivElement>("#sidebar-overlay"
 
 const materialsButton = document.querySelector<HTMLButtonElement>("#sidebar-materials")!;
 const pageLoader = document.querySelector<HTMLDivElement>('#page-loader')!;
+const homeButton = document.querySelector<HTMLButtonElement>("#sidebar-home")!;
+
+function openHomePage(): void {
+    pageLoader.classList.remove("hidden");
+
+    setTimeout(() => {
+        window.location.href = "index.html";
+    }, 2500);
+}
 
 function openMaterialsPage(): void {
 pageLoader.classList.remove("hidden");
@@ -29,11 +38,16 @@ function closeSidebar(): void {
     sidebarOverlay.classList.remove("visible");
 }
 
+function hidePageLoader(): void {
+    pageLoader.classList.add("hidden");
+}
 
 export function initSidebarEvents(): void {
     menuToggle.addEventListener("click", openSidebar);
     sidebarClose.addEventListener("click", closeSidebar);
     sidebarOverlay.addEventListener("click", closeSidebar);
     materialsButton.addEventListener('click', openMaterialsPage);
+    homeButton.addEventListener('click', openHomePage);
+    window.addEventListener("load", hidePageLoader);
 }
 
