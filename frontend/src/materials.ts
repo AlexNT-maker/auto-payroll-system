@@ -1,64 +1,20 @@
-interface Material {
-    code: string;
-    name: string;
-    category: string;
-    unit: string;
-    price: number;
+import { fetchData } from "./services/appLoader";
+import { renderMaterialsList } from "./ui/renderMaterialsList";
+import { initMaterialEvents, 
+    attachMaterialListeners
+ } from "./handlers/materialEvents";
+import { initSidebarEvents } from "./handlers/sidebarEvents";
+import { initMessageModal } from "./utils/messageModal";
+
+async function initApp() {
+    await fetchData();
+
+    renderMaterialsList();
+    attachMaterialListeners();
+
+    initSidebarEvents();
+    initMaterialEvents();
+    initMessageModal();
 }
 
-const materials: Material[] = [
-    {
-        code: "MAT001",
-        name: "Primer",
-        category: "Χρώματα",
-        unit: "L",
-        price: 24.50
-    },
-    {
-        code: "MAT002",
-        name: "Paint",
-        category: "Χρώματα",
-        unit: "GAL",
-        price: 80.00
-    },
-    {
-        code: "MAT003",
-        name: "Γυαλόχαρτο",
-        category: "Αναλώσιμα",
-        unit: "PCS",
-        price: 1.20
-    }
-];
-
-const materialsList = document.querySelector<HTMLTableSectionElement>("#materials-list")!;
-
-function renderMaterials(): void {
-    materialsList.innerHTML = "";
-
-    materials.forEach((material) => {
-        const row = document.createElement("tr");
-
-        row.innerHTML = `
-            <td>${material.code}</td>
-            <td>${material.name}</td>
-            <td>${material.category}</td>
-            <td>${material.unit}</td>
-            <td>${material.price.toFixed(2)} €</td>
-            <td>
-                <div class="materials-actions">
-                    <button class="material-edit-btn">
-                        Επεξεργασία
-                    </button>
-
-                    <button class="material-delete-btn">
-                        Διαγραφή
-                    </button>
-                </div>
-            </td>
-        `;
-
-        materialsList.appendChild(row);
-    });
-}
-
-renderMaterials();
+initApp();

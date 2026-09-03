@@ -53,6 +53,7 @@ body {
 
 .logo:hover {
     transform: scale(1.07);
+    cursor: pointer;
 }
 
 
@@ -381,4 +382,177 @@ body {
     width: 420px;
     max-width: 90%;
     box-shadow: 0 12px 30px rgba(0,0,0,.18);
+}
+
+
+
+#message-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 9999;
+}
+
+
+.message-modal-window{
+    width: 420px;
+    max-width: 90%;
+    background: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+}
+
+
+.message-modal-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #d62828;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+#message-modal-text {
+    text-align: center;
+    font-size: 17px;
+    color: #2b2b2b;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+
+.message-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+
+#message-modal-ok {
+    padding: 10px 26px;
+    border: none;
+    border-radius: 8px;
+    background: #d62828;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+#message-modal-ok:hover {
+    background: #b81f1f;
+}
+
+#message-modal-cancel {
+    padding: 10px 26px;
+    border: 1px solid #c7c7c7;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#message-modal-cancel:hover {
+    background: #f3f3f3;
+}
+
+
+.modal-success{
+    border: 3px solid #22c55e;
+}
+
+.modal-error{
+    border: 3px solid #ef4444;
+}
+
+.modal-warning{
+    border: 3px solid #f59e0b;
+}
+
+.modal-info{
+    border: 3px solid var(--button);
+}
+
+#message-modal-title {
+    margin: -1.5rem -1.5rem 1.5rem;
+    padding: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    color: #2b2b2b;
+    border-radius: 12px 12px 0 0;
+}
+
+#message-modal-text{
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.message-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 0.75rem;
+    display: block;
+}
+
+.modal-error .message-modal-icon {
+    color: #dc2626;
+}
+
+.modal-info .message-modal-icon{
+  color: #264653;
+}
+
+.modal-warning .message-modal-icon {
+    color: #d97706;
+}
+
+.modal-success .message-modal-icon {
+    color: #16a34a;
+}
+
+/* Material modal buttons */
+
+#material-form .modal-buttons button {
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
+}
+
+/* Αποθήκευση */
+#material-form .modal-buttons button[type="submit"] {
+    background-color: #ffffff;
+    color: var(--materials-primary);
+    border: 1px solid var(--materials-primary);
+}
+
+#material-form .modal-buttons button[type="submit"]:hover {
+    background-color: var(--materials-primary-dark);
+    color: #ffffff;
+    border-color: var(--materials-primary-dark);
+}
+
+/* Ακύρωση */
+#btn-cancel-material {
+    background-color: #fbeaea;
+    color: #c62828;
+    border: 1px solid #efb5b5;
+}
+
+#btn-cancel-material:hover {
+    background-color: #c62828;
+    color: #ffffff ;
+    border-color: #efb5b5;
 }

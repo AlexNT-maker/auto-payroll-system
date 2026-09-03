@@ -1,3 +1,5 @@
+import warningIcon from "../icon/exclamation-triangle.svg?raw";
+
 const messageModal = document.querySelector<HTMLDivElement>("#message-modal")!;
 
 const messageTitle = document.querySelector<HTMLHeadingElement>("#message-modal-title")!;
@@ -9,6 +11,8 @@ const btnOk = document.querySelector<HTMLButtonElement>("#message-modal-ok")!;
 const btnCancel = document.querySelector<HTMLButtonElement>("#message-modal-cancel")!;
 
 const messageWindow = document.querySelector<HTMLDivElement>(".message-modal-window")!;
+
+const messageIcon = document.querySelector<HTMLDivElement>("#message-modal-icon")!;
 
 type MessageType =
     | "success"
@@ -22,6 +26,8 @@ export function showConfirmModal(
     message: string,
     type: MessageType = "warning"
 ): Promise<boolean> {
+
+    messageIcon.innerHTML = warningIcon;
 
     return new Promise((resolve) => {
 
