@@ -16,11 +16,8 @@
   <img class="logo" src="src/icon/logo.svg"></img>
   <div class="nav-links">
     <button id="nav-home" class="active hover-lift click-shrink">Τιμοκατάλογος</button>
-    <button id="nav-employees" class="hover-lift click-shrink">Εργαζόμενοι</button>
-    <button id="nav-boats" class="hover-lift click-shrink">Σκάφη</button>
-    <button id="nav-short-analysis" class="hover-lift click-shrink">Συνοπτική Ανάλυση</button>
-    <button id="nav-expenses" class="hover-lift click-shrink">Έξοδα</button>
-    <button id="nav-payments" class="hover-lift click-shrink">Πληρωμές</button>
+    <button id="nav-employees" class="hover-lift click-shrink">Καταχώρηση</button>
+    <button id="nav-boats" class="hover-lift click-shrink">Πλήρες Αναφορά</button>
   </div>
 </nav>
 
@@ -71,7 +68,34 @@
 
 </table>
 
-<div class="materials-button">
+<div id="modal-material" class="modal hidden">
+    <div class="modal-content">
+        <h2 id="modal-material-title">Νέο Υλικό</h2>
+
+        <form id="material-form">
+            <input type="hidden" id="material-id" />
+
+            <label>Όνομα Υλικού:</label>
+            <input type="text" id="material-name" required />
+
+            <label>Κατηγορία:</label>
+            <select id="material-category" required></select>
+
+            <label>Μονάδα:</label>
+            <select id="material-unit" required></select>
+
+            <label>Τιμή (€):</label>
+            <input type="number" id="material-price" step="0.01" min="0" required />
+
+            <div class="modal-buttons">
+                <button type="submit">Αποθήκευση</button>
+                <button type="button" id="btn-cancel-material">Ακύρωση</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="materials-footer">
     <button id="btn-add-material" class="materials-primary-btn">
         + Προσθήκη Υλικού
     </button>

@@ -16,3 +16,10 @@ export const MATERIAL_UNITS: string[] = [
     "3L",
     "SET"
 ];
+
+export const MATERIAL_CATEGORIES: string[] = [
+    "Χρώματα",
+    "Αναλώσιμα",
+    "Διαλυτικά είδη",
+    "Γυαλιστικά είδη"
+];
