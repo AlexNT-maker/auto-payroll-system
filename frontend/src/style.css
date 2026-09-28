@@ -557,6 +557,15 @@ select {
     color: #264653;
 }
 
+.sidebar-item-active {
+    background-color: #e2e8f0 !important;
+    font-weight: bold !important;
+}
+
+.sidebar-item-active:hover {
+    background-color: #cbd5e1 !important;
+}
+
 .sidebar-overlay {
     position: fixed;
     inset: 0;
