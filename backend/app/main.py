@@ -208,7 +208,7 @@ def delete_material(material_id: int, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
-app.get("/material-usages/", response_model=List[schemas.MaterialUsage])
+@app.get("/material-usages/", response_model=List[schemas.MaterialUsage])
 def read_material_usages(db: Session = Depends(get_db)):
     return crud.get_material_usages(db)
 

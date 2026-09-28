@@ -21,8 +21,9 @@ body {
     background-color: #264653;
     animation: materialsNavbarIn 2s ease forwards;
     height: 70px;
-    justify-content: space-between;
+    justify-content: flex-start;
     display: flex;
+    gap: 1rem;
     align-items: center;
     padding: 0 2rem;
     background-color: var(--materials-primary);
@@ -60,6 +61,7 @@ body {
 .nav-links {
     display: flex;
     gap: 1rem;
+    margin-left: auto;
 }
 
 .nav-links button {
@@ -555,4 +557,137 @@ body {
     background-color: #c62828;
     color: #ffffff ;
     border-color: #efb5b5;
+}
+
+
+
+.materials-page-section {
+    animation: slideUpFade 0.5s ease-out forwards;
+}
+
+#usage-table {
+    margin-bottom: 1rem;
+}
+
+/* --- Add row (border με "+") --- */
+.add-usage-row td {
+    padding: 0 !important;
+    border: 2px dashed #cbd5e1 !important;
+    background: #f9fafb !important;
+}
+
+.add-usage-btn {
+    width: 100%;
+    padding: 1rem;
+    background: transparent;
+    border: none;
+
+    color: var(--materials-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.3px;
+
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.add-usage-btn:hover {
+    background: #e2f0e5;
+    color: var(--materials-primary-dark);
+}
+
+/* --- Form row (inline <tr> φόρμα) --- */
+.usage-form-row td {
+    padding: 0.5rem !important;
+    background: #f0fdf4 !important;
+    border: 1px solid #d1fae5 !important;
+    vertical-align: middle;
+}
+
+.usage-form-row select,
+.usage-form-row input[type="date"],
+.usage-form-row input[type="number"] {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    background: #ffffff;
+}
+
+.usage-form-row select:focus,
+.usage-form-row input:focus {
+    outline: none;
+    border-color: var(--materials-primary);
+    box-shadow: 0 0 0 2px rgba(29, 111, 66, 0.15);
+}
+
+.usage-form-row .usage-unit,
+.usage-form-row .usage-price,
+.usage-form-row .usage-total {
+    font-weight: 700;
+    color: #374151;
+    font-size: 0.9rem;
+    display: inline-block;
+    padding: 0.3rem 0;
+}
+
+/* --- Buttons --- */
+.usage-save-btn {
+    background: var(--materials-primary);
+    color: white;
+    border: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 4px;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.usage-save-btn:hover {
+    background: var(--materials-primary-dark);
+}
+
+.usage-save-btn:active {
+    transform: scale(0.96);
+}
+
+.usage-cancel-btn {
+    background: #fbeaea;
+    color: #c62828;
+    border: 1px solid #efb5b5;
+    padding: 0.45rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.usage-cancel-btn:hover {
+    background: #c62828;
+    color: #ffffff;
+}
+
+.usage-edit-btn {
+    background: #e8f1ec;
+    color: var(--materials-primary);
+    border: 1px solid #b7d3c1;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.usage-edit-btn:hover {
+    background: #d8e9df;
+}
+
+.usage-edit-btn:active {
+    transform: scale(0.96);
 }
