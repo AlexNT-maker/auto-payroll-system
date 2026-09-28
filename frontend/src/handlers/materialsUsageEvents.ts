@@ -9,14 +9,111 @@ import {
 import { fetchData } from "../services/appLoader";
 import {
     renderMaterialUsagesList,
-    createUsageFormRow
+    createUsageFormRow,
+    usageFilters,
+    setCurrentView,
 } from "../ui/renderMaterialUsageList";
 
 const usageListBody = document.querySelector<HTMLTableSectionElement>("#usage-list")!;
 
+// -- Filter DOM refs --
+const filterStart = document.querySelector<HTMLInputElement>("#usage-filter-start")!;
+const filterEnd = document.querySelector<HTMLInputElement>("#usage-filter-end")!;
+const filterMaterial = document.querySelector<HTMLSelectElement>("#usage-filter-material")!;
+const filterCategory = document.querySelector<HTMLSelectElement>("#usage-filter-category")!;
+const filterBoat = document.querySelector<HTMLSelectElement>("#usage-filter-boat")!;
+const filterClear = document.querySelector<HTMLButtonElement>("#usage-filter-clear")!;
+
+
 export function initMaterialUsageEvents(): void {
     usageListBody.addEventListener("click", handleTableClick);
+
+    filterStart.addEventListener("change", handleFilterChange);
+    filterEnd.addEventListener("change", handleFilterChange);
+    filterMaterial.addEventListener("change", handleFilterChange);
+    filterCategory.addEventListener("change", handleFilterChange);
+    filterBoat.addEventListener("change", handleFilterChange);
+    filterClear.addEventListener("click", handleClearFilters);
+
+    document.querySelectorAll<HTMLButtonElement>(".usage-view-toggle button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const view = btn.dataset.view as "detail" | "aggregate";
+            setCurrentView(view);
+
+            document.querySelectorAll(".usage-view-toggle button").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            renderMaterialUsagesList();
+        });
+    });
 }
+
+
+export function initUsageFilters(): void {
+    if (!filterStart.value) {
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const today = new Date();
+
+        filterStart.value = toISO(firstDay);
+        filterEnd.value = toISO(today);
+    }
+
+    filterMaterial.innerHTML = '<option value="">Όλα</option>';
+    store.materials.forEach((m) => {
+        const opt = document.createElement("option");
+        opt.value = m.id.toString();
+        opt.textContent = m.name;
+        filterMaterial.appendChild(opt);
+    });
+
+    // Populate Category options (unique)
+    const categories = Array.from(new Set(store.materials.map((m) => m.category))).sort((a, b) => a.localeCompare(b, "el"));
+    filterCategory.innerHTML = '<option value="">Όλες</option>';
+    categories.forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        filterCategory.appendChild(opt);
+    });
+
+    // Populate Boat options
+    filterBoat.innerHTML = '<option value="">Όλα</option>';
+    store.boats.forEach((b) => {
+        const opt = document.createElement("option");
+        opt.value = b.id.toString();
+        opt.textContent = b.name;
+        filterBoat.appendChild(opt);
+    });
+
+    // Sync στο state
+    syncFiltersToState();
+}
+
+function handleFilterChange(): void {
+    syncFiltersToState();
+    renderMaterialUsagesList();
+}
+
+function handleClearFilters(): void {
+    filterStart.value = "";
+    filterEnd.value = "";
+    filterMaterial.value = "";
+    filterCategory.value = "";
+    filterBoat.value = "";
+
+    syncFiltersToState();
+    renderMaterialUsagesList();
+}
+
+function syncFiltersToState(): void {
+    usageFilters.start = filterStart.value;
+    usageFilters.end = filterEnd.value;
+    usageFilters.materialId = filterMaterial.value;
+    usageFilters.category = filterCategory.value;
+    usageFilters.boatId = filterBoat.value;
+}
+
 
 async function handleTableClick(e: Event): Promise<void> {
     const target = e.target as HTMLElement;
@@ -63,7 +160,6 @@ function handleEditUsage(id: number): void {
     lockedRow.replaceWith(formRow);
 }
 
-
 async function handleSaveUsage(row: HTMLTableRowElement): Promise<void> {
     const id = row.dataset.id ? parseInt(row.dataset.id) : null;
 
@@ -72,7 +168,6 @@ async function handleSaveUsage(row: HTMLTableRowElement): Promise<void> {
     const boatId = (row.querySelector(".usage-boat") as HTMLSelectElement).value;
     const quantity = parseFloat((row.querySelector(".usage-quantity") as HTMLInputElement).value) || 0;
 
-    
     if (!date) {
         showMessageModal("Σφάλμα", "Παρακαλώ επιλέξτε ημερομηνία.", "error");
         return;
@@ -86,8 +181,7 @@ async function handleSaveUsage(row: HTMLTableRowElement): Promise<void> {
         return;
     }
 
-
-    if (id && quantity <= 0) {
+    if (id && quantity === 0) {
         const ok = await showConfirmModal(
             "Προειδοποίηση",
             "Η ποσότητα είναι 0. Θέλετε να διαγραφεί η καταχώρηση;",
@@ -107,8 +201,8 @@ async function handleSaveUsage(row: HTMLTableRowElement): Promise<void> {
         return;
     }
 
-    if (!id && quantity <= 0) {
-        showMessageModal("Σφάλμα", "Η ποσότητα πρέπει να είναι μεγαλύτερη από 0.", "error");
+    if (!id && quantity === 0) {
+        showMessageModal("Σφάλμα", "Η ποσότητα δεν μπορεί να είναι 0.", "error");
         return;
     }
 
@@ -149,4 +243,12 @@ async function handleSaveUsage(row: HTMLTableRowElement): Promise<void> {
         console.error(err);
         showMessageModal("Σφάλμα", "Πρόβλημα κατά την αποθήκευση.", "error");
     }
+}
+
+
+function toISO(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
 }
