@@ -348,3 +348,157 @@ def calculate_payroll(db: Session, start: date, end: date):
     "end_date": end,
     "payments": results
     }
+
+
+# -- Materials --
+
+def get_materials(db: Session):
+    return db.query(models.Material).all()
+
+def create_material(db: Session, material: schemas.MaterialCreate):
+    db_material = models.Material(
+        name = material.name,
+        category = material.category,
+        unit = material.unit,
+        price = material.price
+    )
+    db.add(db_material)
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+def update_material(db: Session, material_id: int, material: schemas.MaterialCreate):
+    db_material = db.query(models.Material).filter(models.Material.id == material_id).first()
+    if not db_material:
+        return None
+    db_material.name = material.name
+    db_material.category = material.category
+    db_material.unit = material.unit
+    db_material.price = material.price
+    db.commit()
+    db.refresh(db_material)
+    return db_material
+
+def delete_material(db: Session, material_id: int):
+    db_material = db.query(models.Material).filter(models.Material.id == material_id).first()
+    if not db_material:
+        return None
+    db.delete(db_material)
+    db.commit()
+    return db_material
+
+
+# -- Material Usage --
+
+def get_material_usages(db: Session):
+    return db.query(models.MaterialUsage).order_by(
+        models.MaterialUsage.date.desc(),
+        models.MaterialUsage.id.desc()
+    ).all()
+
+def create_material_usage(db: Session, usage: schemas.MaterialUsageCreate):
+    db_usage = models.MaterialUsage(
+        date=usage.date,
+        material_id=usage.material_id,
+        boat_id=usage.boat_id,
+        quantity=usage.quantity,
+        unit_price=usage.unit_price,
+        total_price=usage.total_price
+    )
+    db.add(db_usage)
+    db.commit()
+    db.refresh(db_usage)
+    return db_usage
+
+def update_material_usage(db: Session, usage_id: int, usage_data: schemas.MaterialUsageCreate):
+    db_usage = db.query(models.MaterialUsage).filter(models.MaterialUsage.id == usage_id).first()
+    if not db_usage:
+        return None
+    db_usage.date = usage_data.date
+    db_usage.material_id = usage_data.material_id
+    db_usage.boat_id = usage_data.boat_id
+    db_usage.quantity = usage_data.quantity
+    db_usage.unit_price = usage_data.unit_price
+    db_usage.total_price = usage_data.total_price
+    db.commit()
+    db.refresh(db_usage)
+    return db_usage
+
+def delete_material_usage(db: Session, usage_id: int):
+    db_usage = db.query(models.MaterialUsage).filter(models.MaterialUsage.id == usage_id).first()
+    if not db_usage:
+        return None
+    db.delete(db_usage)
+    db.commit()
+    return db_usage
+
+
+# -- Suppliers --
+
+def get_suppliers(db: Session):
+    return db.query(models.Supplier).order_by(models.Supplier.name).all()
+
+def create_supplier(db: Session, supplier: schemas.SupplierCreate):
+    db_supplier = models.Supplier(
+        name=supplier.name,
+        afm=supplier.afm,
+        phone=supplier.phone,
+        email=supplier.email,
+        notes=supplier.notes
+    )
+    db.add(db_supplier)
+    db.commit()
+    db.refresh(db_supplier)
+    return db_supplier
+
+def update_supplier(db: Session, supplier_id: int, supplier_data: schemas.SupplierCreate):
+    db_supplier = db.query(models.Supplier).filter(models.Supplier.id == supplier_id).first()
+    if not db_supplier:
+        return None
+    db_supplier.name = supplier_data.name
+    db_supplier.afm = supplier_data.afm
+    db_supplier.phone = supplier_data.phone
+    db_supplier.email = supplier_data.email
+    db_supplier.notes = supplier_data.notes
+    db.commit()
+    db.refresh(db_supplier)
+    return db_supplier
+
+def delete_supplier(db: Session, supplier_id: int):
+    db_supplier = db.query(models.Supplier).filter(models.Supplier.id == supplier_id).first()
+    if not db_supplier:
+        return None
+    db.delete(db_supplier)
+    db.commit()
+    return db_supplier
+
+
+# -- Generic NamedItem helpers (InvoiceCategory / MaterialUnit / MaterialCategory) --
+
+def get_named_items(db: Session, model):
+    return db.query(model).order_by(model.name).all()
+
+def create_named_item(db: Session, model, name: str):
+    item = model(name=name)
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+    return item
+
+def update_named_item(db: Session, model, item_id: int, name: str):
+    item = db.query(model).filter(model.id == item_id).first()
+    if not item:
+        return None
+    item.name = name
+    db.commit()
+    db.refresh(item)
+    return item
+
+def delete_named_item(db: Session, model, item_id: int):
+    item = db.query(models.MaterialUnit).filter(models.MaterialUnit.id == item_id).first() if model is models.MaterialUnit else \
+               db.query(model).filter(model.id == item_id).first()
+    if not item:
+        return None
+    db.delete(item)
+    db.commit()
+    return item

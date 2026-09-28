@@ -16,6 +16,10 @@ import {
 import { fetchData } from "./services/appLoader";
 import { initMessageModal } from "./utils/messageModal";
 import { initAttendanceEvents } from "./handlers/attendanceEvents";
+import { initSidebarEvents } from "./handlers/sidebarEvents";
+import { loadDayData } from "./handlers/attendanceEvents";
+
+
 
 
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -67,9 +71,10 @@ navButtons.shortAnalysis.addEventListener('click', () => navigateTo('shortAnalys
 async function initApp(): Promise<void>{
   
 await fetchData();
-
+await loadDayData();
 renderEmployeesList();
 
+initSidebarEvents();
 initAttendanceEvents();
 initEmployeeEvents();
 initBoatEvents();

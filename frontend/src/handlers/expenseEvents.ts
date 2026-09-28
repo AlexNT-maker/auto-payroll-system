@@ -47,7 +47,7 @@ export async function handleExpensesCalculation() {
     const empId = expEmpSelect.value;
 
     if (!start || !end) {
-        showMessageModal("Προειδοποίηση", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
+        showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
         return;
     }
 

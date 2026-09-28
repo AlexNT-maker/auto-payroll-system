@@ -51,3 +51,69 @@ class Attendance(Base):
     employee = relationship("Employee", back_populates = "attendance_records")
     boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")
     overtime_boat = relationship("Boat", foreign_keys=[overtime_boat_id])
+
+ # -- Board No.4 Materials --
+
+class Material(Base):
+    __tablename__ = "materials"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    category = Column(String, index=True)
+    unit = Column(String)
+    price = Column(Float)
+
+
+class MaterialUsage(Base):
+    __tablename__ = "material_usages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True)
+    material_id = Column(Integer, ForeignKey("materials.id"))
+    boat_id = Column(Integer, ForeignKey("boats.id"))
+
+    quantity = Column(Float, default=0.0)
+    unit_price = Column(Float, default=0.0)   
+    total_price = Column(Float, default=0.0)
+
+    material = relationship("Material")
+    boat = relationship("Boat")
+
+
+# -- Board No.6 Suppliers --
+
+class Supplier(Base):
+    __tablename__ = "suppliers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    afm = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+
+
+# -- Board No.7 Invoice Categories --
+
+class InvoiceCategory(Base):
+    __tablename__ = "invoice_categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)
+
+
+# -- Board No.8 Material Units --
+
+class MaterialUnit(Base):
+    __tablename__ = "material_units"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)
+
+
+# -- Board No.9 Material Categories --
+
+class MaterialCategory(Base):
+    __tablename__ = "material_categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)

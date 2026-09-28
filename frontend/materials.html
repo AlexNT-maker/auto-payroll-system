@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto payroll app</title>
+      <link rel="stylesheet" href="./src/common.css">
+    <link rel="stylesheet" href="./src/materials.css">
+  </head>
+  <body>
+
+        <div id="page-loader" class="page-loader hidden" style="background-color: #1D6F42">
+    <img
+        src="src/icon/logo.svg"
+        alt="Company logo"
+        class="page-loader-logo"
+    >
+</div>
+
+   <nav class="navbar animate-enter">
+    <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Άνοιγμα μενού">
+    ☰
+</button>
+  <img class="logo" src="src/icon/logo.svg"></img>
+  <div class="nav-links">
+    <button id="nav-home" class="active hover-lift click-shrink">Τιμοκατάλογος</button>
+    <button id="nav-employees" class="hover-lift click-shrink">Καταχώρηση</button>
+    <button id="nav-expenses" class="hover-lift click-shrink">Τιμολόγια</button>
+    <button id="nav-boats" class="hover-lift click-shrink">Πλήρες Αναφορά</button>
+  </div>
+</nav>
+
+<aside id="sidebar" class="sidebar">
+
+    <div class="sidebar-header">
+        <h2>Μενού</h2>
+        <button
+            id="sidebar-close"
+            class="sidebar-close"
+            type="button"
+            aria-label="Κλείσιμο μενού">
+            x
+        </button>
+    </div>
+    <div class="sidebar-menu">
+        <button class="sidebar-item" id="sidebar-home" type="button">
+            Αρχική
+        </button>
+        <button class="sidebar-item sidebar-item-active" id="sidebar-materials" type="button">
+            Υλικά
+        </button>
+        <button class="sidebar-item" id="sidebar-settings" type="button">
+            Ρυθμίσεις
+        </button>
+    </div>
+</aside>
+
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <main id="materials-page">
+
+        <div id ="page-price-list" class="materials-page-section">
+        <h1>Τιμοκατάλογος Υλικών</h1>
+
+      <table class="materials-table">
+
+    <thead>
+        <tr>
+            <th>Κωδικός</th>
+            <th>Υλικό</th>
+            <th>Κατηγορία</th>
+            <th>Μονάδα</th>
+            <th>Τιμή</th>
+            <th>Ενέργειες</th>
+        </tr>
+    </thead>
+
+    <tbody id="materials-list">
+    </tbody>
+
+</table>
+
+<div class="materials-footer">
+    <button id="btn-add-material" class="materials-primary-btn">
+        + Προσθήκη Υλικού
+    </button>
+</div>
+
+</div>
+
+<div id="modal-material" class="modal hidden">
+    <div class="modal-content">
+        <h2 id="modal-material-title">Νέο Υλικό</h2>
+
+        <form id="material-form">
+            <input type="hidden" id="material-id" />
+
+            <label>Όνομα Υλικού:</label>
+            <input type="text" id="material-name" required />
+
+            <label>Κατηγορία:</label>
+            <select id="material-category" required></select>
+
+            <label>Μονάδα:</label>
+            <select id="material-unit" required></select>
+
+            <label>Τιμή (€):</label>
+            <input type="number" id="material-price" step="0.01" min="0" required />
+
+            <div class="modal-buttons">
+                <button type="submit">Αποθήκευση</button>
+                <button type="button" id="btn-cancel-material">Ακύρωση</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+      <!--Modal box to replace alerts and cofirm APIs-->
+<div id="message-modal" class="modal hidden">
+    <div class="message-modal-window">
+
+   <div id="message-modal-icon" class="message-modal-icon"></div>
+
+        <h2 id="message-modal-title">
+            Προσοχή
+        </h2>
+
+        <div id="message-modal-text">
+
+        </div>
+
+        <div class="message-modal-buttons">
+
+            <button id="message-modal-ok">
+                Επιβεβαίωση
+            </button>
+
+            <button
+                id="message-modal-cancel"
+                class="hidden">
+                Άκυρο
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!--Page two materials submit form -->
+  <div id="page-usage" class="materials-page-section hidden">
+        <h1>Καταχώρηση Υλικών</h1>
+
+        <table class="materials-table" id="usage-table">
+            <thead>
+                <tr>
+                    <th>Ημερομηνία</th>
+                    <th>Υλικό</th>
+                    <th>Μονάδα</th>
+                    <th>Τιμή</th>
+                    <th>Ποσότητα</th>
+                    <th>Παραχωρήθηκε</th>
+                    <th>Σύνολο</th>
+                    <th>Ενέργειες</th>
+                </tr>
+            </thead>
+            <tbody id="usage-list"></tbody>
+        </table>
+    </div>
+
+    <!--Page 3: Πλήρες Αναφορά (placeholder)-->
+    <div id="page-report" class="materials-page-section hidden">
+        <h1>Πλήρες Αναφορά</h1>
+        <p style="color: #6b7280; text-align: center; margin-top: 2rem;">
+            Σε στάδιο ανάπτυξης...
+        </p>
+    </div>
+
+    </main>
+
+
+ <script type="module" src="/src/materials.ts"></script>
+</body>
+</html>

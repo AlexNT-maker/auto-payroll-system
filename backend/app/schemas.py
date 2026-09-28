@@ -107,3 +107,72 @@ class PayrollReport (BaseModel):
     start_date: date
     end_date: date 
     payments: List[PaymentItem]
+
+# -- Schemas for materials --
+
+class MaterialBase(BaseModel):
+    name: str
+    category: str
+    unit: str
+    price: float
+
+class MaterialCreate(MaterialBase):
+    pass
+
+class Material(MaterialBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class MaterialUsageBase(BaseModel):
+    date: date
+    material_id: int
+    boat_id: int
+    quantity: float
+    unit_price: float
+    total_price: float
+
+class MaterialUsageCreate(MaterialUsageBase):
+    pass
+
+class MaterialUsage(MaterialUsageBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -- Schemas for suppliers --
+
+class SupplierBase(BaseModel):
+    name: str
+    afm: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    notes: Optional[str] = None
+
+class SupplierCreate(SupplierBase):
+    pass
+
+class Supplier(SupplierBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -- Schemas for simple named items (κατηγορίες / μονάδες) --
+
+class NamedItemBase(BaseModel):
+    name: str
+
+class NamedItemCreate(NamedItemBase):
+    pass
+
+class NamedItem(NamedItemBase):
+    id: int
+
+    class Config:
+        from_attributes = True

@@ -1,0 +1,236 @@
+:root {
+    --materials-primary: #05407a;
+    --materials-primary-dark: #03305c;
+}
+
+/* Navbar: animation από teal → navy blue */
+.navbar {
+    animation: settingsNavbarIn 2s ease forwards;
+}
+
+@keyframes settingsNavbarIn {
+    from { background-color: #264653; }
+    to   { background-color: #05407a; }
+}
+
+/* Κουμπιά που είχαν hardcoded green */
+.materials-primary-btn {
+    background: var(--materials-primary);
+}
+.materials-primary-btn:hover {
+    background: var(--materials-primary-dark);
+}
+
+.material-edit-btn {
+    background: #e0f2fe;
+    color: #05407a;
+    border: 1px solid #7dd3fc;
+}
+.material-edit-btn:hover {
+    background: #bae6fd;
+}
+
+/* Modal submit buttons */
+#supplier-form .modal-buttons button[type="submit"],
+#named-item-form .modal-buttons button[type="submit"] {
+    background-color: #ffffff;
+    color: var(--materials-primary);
+    border: 1px solid var(--materials-primary);
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#supplier-form .modal-buttons button[type="submit"]:hover,
+#named-item-form .modal-buttons button[type="submit"]:hover {
+    background-color: var(--materials-primary-dark);
+    color: #ffffff;
+    border-color: var(--materials-primary-dark);
+}
+
+/* Cancel buttons */
+#btn-cancel-supplier,
+#btn-cancel-named-item {
+    background-color: #fbeaea;
+    color: #c62828;
+    border: 1px solid #efb5b5;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#btn-cancel-supplier:hover,
+#btn-cancel-named-item:hover {
+    background-color: #c62828;
+    color: #ffffff;
+}
+
+.sidebar-item-active {
+    background-color: #e2e8f0 !important;
+    font-weight: bold !important;
+}
+
+.sidebar-item-active:hover {
+    background-color: #cbd5e1 !important;
+    color: #05407a !important;
+}
+
+#settings-page .materials-table th {
+    background: #E2E8F0;
+    color: #1f2937;
+}
+
+#settings-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+#settings-page h1 {
+    margin-bottom: 2rem;
+    color: #1f2937;
+}
+
+
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.settings-tab {
+    background: transparent;
+    border: none;
+
+    padding: 0.75rem 1.4rem;
+
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6b7280;
+
+    cursor: pointer;
+    position: relative;
+
+    border-radius: 8px 8px 0 0;
+
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.settings-tab:hover {
+    color: var(--materials-primary);
+    background-color: #f0fdf4;
+}
+
+.settings-tab.active {
+    color: var(--materials-primary);
+}
+
+.settings-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+
+    height: 3px;
+    background-color: var(--materials-primary);
+    border-radius: 3px 3px 0 0;
+}
+
+
+.settings-panel {
+    animation: settingsFadeIn 0.35s ease-out;
+}
+
+@keyframes settingsFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+#supplier-form textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--text);
+
+    resize: vertical;
+    min-height: 70px;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#supplier-form textarea:focus {
+    outline: none;
+    border-color: var(--materials-primary);
+    box-shadow: 0 0 0 2px rgba(29, 111, 66, 0.15);
+}
+
+#supplier-form label,
+#named-item-form label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+
+    margin-top: 1rem;
+    margin-bottom: 0.35rem;
+}
+
+#supplier-form input,
+#named-item-form input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#supplier-form input:focus,
+#named-item-form input:focus {
+    outline: none;
+    border-color: var(--materials-primary);
+    box-shadow: 0 0 0 2px rgba(29, 111, 66, 0.15);
+}
+
+#settings-page .materials-table td {
+    font-size: 0.9rem;
+}
+
+
+@media (max-width: 720px) {
+    .settings-tabs {
+        gap: 0.25rem;
+    }
+
+    .settings-tab {
+        padding: 0.6rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    #settings-page {
+        padding: 1rem;
+    }
+}

@@ -10,13 +10,8 @@
 
 ![Payroll Tab](./images/payroll_tab.png)
 
-![Analysis PDF Export](./images/analysis_to_pdf.png)
-
-![Form Lock](./images/lock_form.png)
-
 ![Information Modal](./images/infoModal.png)
 
-![Danger Warning Modal](./images/danger_Modal.png)
 
 
 A full-stack web application designed to manage daily attendance, calculate complex payrolls, and track operational costs for maritime personnel and boats.

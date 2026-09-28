@@ -24,6 +24,31 @@ app.add_middleware(
     allow_headers = ["*"] , # We allow all kind of headers
 )
 
+
+# -- Seed default values on first run --
+
+@app.on_event("startup")
+def seed_defaults():
+    db = SessionLocal()
+    try:
+        if db.query(models.MaterialUnit).count() == 0:
+            for unit in ["GAL", "KG", "PCS", "M", "5L", "1L", "3L", "SET"]:
+                db.add(models.MaterialUnit(name=unit))
+
+        if db.query(models.MaterialCategory).count() == 0:
+            for cat in ["Χρώματα", "Αναλώσιμα", "Διαλυτικά είδη", "Γυαλιστικά είδη"]:
+                db.add(models.MaterialCategory(name=cat))
+
+        if db.query(models.InvoiceCategory).count() == 0:
+            for cat in ["Καύσιμα", "Τρόφιμα & Προμήθειες",
+                        "Συντήρηση & Ανταλλακτικά", "Εξοπλισμός",
+                        "Υπηρεσίες", "Άλλο"]:
+                db.add(models.InvoiceCategory(name=cat))
+
+        db.commit()
+    finally:
+        db.close()
+
 # -- Dependency --
 
 # Creates a connection at base for every request. Also close the base when request has finish.
@@ -181,3 +206,151 @@ def export_short_boat_analysis_pdf(boat_id: int, start: date, end: date, is_capt
         media_type="application/pdf", 
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+
+# -- Materials Routes --
+
+@app.get("/materials/", response_model=List[schemas.Material])
+def read_materials(db: Session = Depends(get_db)):
+    return crud.get_materials(db)
+
+@app.post("/materials/", response_model=schemas.Material)
+def create_material(material: schemas.MaterialCreate, db: Session = Depends(get_db)):
+    return crud.create_material(db, material)
+
+@app.put("/materials/{material_id}", response_model=schemas.Material)
+def update_material(material_id: int, material: schemas.MaterialCreate, db: Session = Depends(get_db)):
+    updated = crud.update_material(db, material_id, material)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return updated
+
+@app.delete("/materials/{material_id}")
+def delete_material(material_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_material(db, material_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Material not found")
+    return {"ok": True}
+
+
+@app.get("/material-usages/", response_model=List[schemas.MaterialUsage])
+def read_material_usages(db: Session = Depends(get_db)):
+    return crud.get_material_usages(db)
+
+@app.post("/material-usages/", response_model=schemas.MaterialUsage)
+def create_material_usage(usage: schemas.MaterialUsageCreate, db: Session = Depends(get_db)):
+    return crud.create_material_usage(db, usage)
+
+@app.put("/material-usages/{usage_id}", response_model=schemas.MaterialUsage)
+def update_material_usage(usage_id: int, usage: schemas.MaterialUsageCreate, db: Session = Depends(get_db)):
+    updated = crud.update_material_usage(db, usage_id, usage)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Η καταχώρηση δεν βρέθηκε")
+    return updated
+
+@app.delete("/material-usages/{usage_id}")
+def delete_material_usage(usage_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_material_usage(db, usage_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Η καταχώρηση δεν βρέθηκε")
+    return {"ok": True}
+
+
+# -- Supplier Routes --
+
+@app.get("/suppliers/", response_model=List[schemas.Supplier])
+def read_suppliers(db: Session = Depends(get_db)):
+    return crud.get_suppliers(db)
+
+@app.post("/suppliers/", response_model=schemas.Supplier)
+def create_supplier(supplier: schemas.SupplierCreate, db: Session = Depends(get_db)):
+    return crud.create_supplier(db, supplier)
+
+@app.put("/suppliers/{supplier_id}", response_model=schemas.Supplier)
+def update_supplier(supplier_id: int, supplier: schemas.SupplierCreate, db: Session = Depends(get_db)):
+    updated = crud.update_supplier(db, supplier_id, supplier)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Ο προμηθευτής δεν βρέθηκε")
+    return updated
+
+@app.delete("/suppliers/{supplier_id}")
+def delete_supplier(supplier_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_supplier(db, supplier_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Ο προμηθευτής δεν βρέθηκε")
+    return {"ok": True}
+
+
+# -- Invoice Categories --
+
+@app.get("/invoice-categories/", response_model=List[schemas.NamedItem])
+def read_invoice_categories(db: Session = Depends(get_db)):
+    return crud.get_named_items(db, models.InvoiceCategory)
+
+@app.post("/invoice-categories/", response_model=schemas.NamedItem)
+def create_invoice_category(item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    return crud.create_named_item(db, models.InvoiceCategory, item.name)
+
+@app.put("/invoice-categories/{item_id}", response_model=schemas.NamedItem)
+def update_invoice_category(item_id: int, item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    updated = crud.update_named_item(db, models.InvoiceCategory, item_id, item.name)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
+    return updated
+
+@app.delete("/invoice-categories/{item_id}")
+def delete_invoice_category(item_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_named_item(db, models.InvoiceCategory, item_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
+    return {"ok": True}
+
+
+# -- Material Units --
+
+@app.get("/material-units/", response_model=List[schemas.NamedItem])
+def read_material_units(db: Session = Depends(get_db)):
+    return crud.get_named_items(db, models.MaterialUnit)
+
+@app.post("/material-units/", response_model=schemas.NamedItem)
+def create_material_unit(item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    return crud.create_named_item(db, models.MaterialUnit, item.name)
+
+@app.put("/material-units/{item_id}", response_model=schemas.NamedItem)
+def update_material_unit(item_id: int, item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    updated = crud.update_named_item(db, models.MaterialUnit, item_id, item.name)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Η μονάδα δεν βρέθηκε")
+    return updated
+
+@app.delete("/material-units/{item_id}")
+def delete_material_unit(item_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_named_item(db, models.MaterialUnit, item_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Η μονάδα δεν βρέθηκε")
+    return {"ok": True}
+
+
+# -- Material Categories --
+
+@app.get("/material-categories/", response_model=List[schemas.NamedItem])
+def read_material_categories(db: Session = Depends(get_db)):
+    return crud.get_named_items(db, models.MaterialCategory)
+
+@app.post("/material-categories/", response_model=schemas.NamedItem)
+def create_material_category(item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    return crud.create_named_item(db, models.MaterialCategory, item.name)
+
+@app.put("/material-categories/{item_id}", response_model=schemas.NamedItem)
+def update_material_category(item_id: int, item: schemas.NamedItemCreate, db: Session = Depends(get_db)):
+    updated = crud.update_named_item(db, models.MaterialCategory, item_id, item.name)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
+    return updated
+
+@app.delete("/material-categories/{item_id}")
+def delete_material_category(item_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_named_item(db, models.MaterialCategory, item_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
+    return {"ok": True}

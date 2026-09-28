@@ -4,6 +4,7 @@ import successIcon from "../icon/check-circle.svg?raw";
 import errorIcon from "../icon/x-circle.svg?raw";
 
 let autoActionTimer: ReturnType<typeof setTimeout> | null = null;
+let currentOnConfirm: (() => void) | null = null;
 
 const messageModal = document.querySelector<HTMLDivElement>("#message-modal")!;
 const messageTitle = document.querySelector<HTMLHeadingElement>('#message-modal-title')!;
@@ -63,6 +64,7 @@ export function showMessageModal(
     "modal-error",
     "modal-warning",
     "modal-info"
+    
 );
 
 messageWindow.classList.add(`modal-${type}`);
@@ -73,6 +75,8 @@ if (onConfirm) {
         autoActionTimer = null;
     }, 10000);
 }
+
+currentOnConfirm = onConfirm ?? null;
 
     messageModal.classList.remove("hidden");
 }
@@ -85,6 +89,8 @@ export function hideMessageModal(): void {
         autoActionTimer = null;
     }
     messageModal.classList.add("hidden");
+        currentOnConfirm?.();
+        currentOnConfirm = null;
 }
 
 export function initMessageModal() {

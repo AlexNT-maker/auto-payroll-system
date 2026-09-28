@@ -1,7 +1,3 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
 :root {
   --primary-color: #2563eb; 
   --bg-color: #f3f4f6;      
@@ -9,6 +5,17 @@
   --white: #ffffff;
   --black: #000 ;
   --button: #264653
+}
+
+/* Hamburger button */
+.menu-toggle {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0.4rem;
+    line-height: 1;
 }
 
 body {
@@ -26,7 +33,8 @@ body {
   height: 70px;    
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
   display: flex;
-  justify-content: space-between; 
+  justify-content: flex-start; 
+  gap: 1rem;
   align-items: center;
   position: sticky; 
   top: 0;
@@ -37,15 +45,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  
   height: 95px; 
   width: 120px;
-  
-  background-color: transparent; 
-    
+  background-color: transparent;  
   overflow: hidden; 
-  
-  
   padding-top: 5px;
   transition: transform 0.3s ease;
 }
@@ -64,6 +67,7 @@ body {
 .nav-links {
   display: flex;
   gap: 1rem; 
+  margin-left: auto;
 }
 
 .nav-links button {
@@ -469,3 +473,116 @@ select {
 .modal-success .message-modal-icon {
     color: #16a34a;
 }
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -20%;
+    width: 20%;
+    height: 100vh;
+
+    background: #ffffff;
+
+    z-index: 2000;
+
+    box-shadow: 8px 0 25px rgba(0, 0, 0, 0.15);
+
+    transition: left 0.3s ease;
+
+    padding: 1.5rem;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 2rem;
+}
+
+.sidebar-header h2 {
+    margin: 0;
+    color: #264653;
+}
+
+.sidebar-close {
+    border: none;
+    background: transparent;
+
+    font-size: 2rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    color: #4b5563;
+}
+
+.sidebar-close:hover {
+    color: #4b5563;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-item {
+    width: 100%;
+
+    padding: 1rem;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    text-align: left;
+
+    font-size: 1rem;
+    color: #374151;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease,
+                color 0.2s ease;
+}
+
+.sidebar-item:hover {
+    background-color: #f1f5f9;
+    color: #264653;
+}
+
+.sidebar-item-active {
+    background-color: #e2e8f0 !important;
+    font-weight: bold !important;
+}
+
+.sidebar-item-active:hover {
+    background-color: #cbd5e1 !important;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.35);
+
+    z-index: 1900;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
