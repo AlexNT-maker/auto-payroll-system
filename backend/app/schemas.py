@@ -142,3 +142,37 @@ class MaterialUsage(MaterialUsageBase):
 
     class Config:
         from_attributes = True
+
+
+# -- Schemas for suppliers --
+
+class SupplierBase(BaseModel):
+    name: str
+    afm: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    notes: Optional[str] = None
+
+class SupplierCreate(SupplierBase):
+    pass
+
+class Supplier(SupplierBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -- Schemas for simple named items (κατηγορίες / μονάδες) --
+
+class NamedItemBase(BaseModel):
+    name: str
+
+class NamedItemCreate(NamedItemBase):
+    pass
+
+class NamedItem(NamedItemBase):
+    id: int
+
+    class Config:
+        from_attributes = True

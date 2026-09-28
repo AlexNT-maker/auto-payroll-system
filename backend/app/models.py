@@ -77,3 +77,43 @@ class MaterialUsage(Base):
 
     material = relationship("Material")
     boat = relationship("Boat")
+
+
+# -- Board No.6 Suppliers --
+
+class Supplier(Base):
+    __tablename__ = "suppliers"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True, nullable=False)
+    afm = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    email = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+
+
+# -- Board No.7 Invoice Categories --
+
+class InvoiceCategory(Base):
+    __tablename__ = "invoice_categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)
+
+
+# -- Board No.8 Material Units --
+
+class MaterialUnit(Base):
+    __tablename__ = "material_units"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)
+
+
+# -- Board No.9 Material Categories --
+
+class MaterialCategory(Base):
+    __tablename__ = "material_categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True, nullable=False)

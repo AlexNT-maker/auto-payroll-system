@@ -431,3 +431,74 @@ def delete_material_usage(db: Session, usage_id: int):
     db.delete(db_usage)
     db.commit()
     return db_usage
+
+
+# -- Suppliers --
+
+def get_suppliers(db: Session):
+    return db.query(models.Supplier).order_by(models.Supplier.name).all()
+
+def create_supplier(db: Session, supplier: schemas.SupplierCreate):
+    db_supplier = models.Supplier(
+        name=supplier.name,
+        afm=supplier.afm,
+        phone=supplier.phone,
+        email=supplier.email,
+        notes=supplier.notes
+    )
+    db.add(db_supplier)
+    db.commit()
+    db.refresh(db_supplier)
+    return db_supplier
+
+def update_supplier(db: Session, supplier_id: int, supplier_data: schemas.SupplierCreate):
+    db_supplier = db.query(models.Supplier).filter(models.Supplier.id == supplier_id).first()
+    if not db_supplier:
+        return None
+    db_supplier.name = supplier_data.name
+    db_supplier.afm = supplier_data.afm
+    db_supplier.phone = supplier_data.phone
+    db_supplier.email = supplier_data.email
+    db_supplier.notes = supplier_data.notes
+    db.commit()
+    db.refresh(db_supplier)
+    return db_supplier
+
+def delete_supplier(db: Session, supplier_id: int):
+    db_supplier = db.query(models.Supplier).filter(models.Supplier.id == supplier_id).first()
+    if not db_supplier:
+        return None
+    db.delete(db_supplier)
+    db.commit()
+    return db_supplier
+
+
+# -- Generic NamedItem helpers (InvoiceCategory / MaterialUnit / MaterialCategory) --
+
+def get_named_items(db: Session, model):
+    return db.query(model).order_by(model.name).all()
+
+def create_named_item(db: Session, model, name: str):
+    item = model(name=name)
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+    return item
+
+def update_named_item(db: Session, model, item_id: int, name: str):
+    item = db.query(model).filter(model.id == item_id).first()
+    if not item:
+        return None
+    item.name = name
+    db.commit()
+    db.refresh(item)
+    return item
+
+def delete_named_item(db: Session, model, item_id: int):
+    item = db.query(models.MaterialUnit).filter(models.MaterialUnit.id == item_id).first() if model is models.MaterialUnit else \
+               db.query(model).filter(model.id == item_id).first()
+    if not item:
+        return None
+    db.delete(item)
+    db.commit()
+    return item
