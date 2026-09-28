@@ -357,10 +357,10 @@ def get_materials(db: Session):
 
 def create_material(db: Session, material: schemas.MaterialCreate):
     db_material = models.Material(
-        name=material.name,
-        category=material.category,
-        unit=material.unit,
-        price=material.price
+        name = material.name,
+        category = material.category,
+        unit = material.unit,
+        price = material.price
     )
     db.add(db_material)
     db.commit()
@@ -386,3 +386,48 @@ def delete_material(db: Session, material_id: int):
     db.delete(db_material)
     db.commit()
     return db_material
+
+
+# -- Material Usage --
+
+def get_material_usages(db: Session):
+    return db.query(models.MaterialUsage).order_by(
+        models.MaterialUsage.date.desc(),
+        models.MaterialUsage.id.desc()
+    ).all()
+
+def create_material_usage(db: Session, usage: schemas.MaterialUsageCreate):
+    db_usage = models.MaterialUsage(
+        date=usage.date,
+        material_id=usage.material_id,
+        boat_id=usage.boat_id,
+        quantity=usage.quantity,
+        unit_price=usage.unit_price,
+        total_price=usage.total_price
+    )
+    db.add(db_usage)
+    db.commit()
+    db.refresh(db_usage)
+    return db_usage
+
+def update_material_usage(db: Session, usage_id: int, usage_data: schemas.MaterialUsageCreate):
+    db_usage = db.query(models.MaterialUsage).filter(models.MaterialUsage.id == usage_id).first()
+    if not db_usage:
+        return None
+    db_usage.date = usage_data.date
+    db_usage.material_id = usage_data.material_id
+    db_usage.boat_id = usage_data.boat_id
+    db_usage.quantity = usage_data.quantity
+    db_usage.unit_price = usage_data.unit_price
+    db_usage.total_price = usage_data.total_price
+    db.commit()
+    db.refresh(db_usage)
+    return db_usage
+
+def delete_material_usage(db: Session, usage_id: int):
+    db_usage = db.query(models.MaterialUsage).filter(models.MaterialUsage.id == usage_id).first()
+    if not db_usage:
+        return None
+    db.delete(db_usage)
+    db.commit()
+    return db_usage

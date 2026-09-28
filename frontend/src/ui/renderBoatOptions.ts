@@ -1,4 +1,5 @@
 import { store } from "../state/store";
+import { attachBoatListeners } from "../handlers/boatEvents";
 
 const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
 

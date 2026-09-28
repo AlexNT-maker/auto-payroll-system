@@ -61,3 +61,19 @@ class Material(Base):
     category = Column(String, index=True)
     unit = Column(String)
     price = Column(Float)
+
+
+class MaterialUsage(Base):
+    __tablename__ = "material_usages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True)
+    material_id = Column(Integer, ForeignKey("materials.id"))
+    boat_id = Column(Integer, ForeignKey("boats.id"))
+
+    quantity = Column(Float, default=0.0)
+    unit_price = Column(Float, default=0.0)   
+    total_price = Column(Float, default=0.0)
+
+    material = relationship("Material")
+    boat = relationship("Boat")

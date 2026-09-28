@@ -206,3 +206,26 @@ def delete_material(material_id: int, db: Session = Depends(get_db)):
     if deleted is None:
         raise HTTPException(status_code=404, detail="Material not found")
     return {"ok": True}
+
+
+app.get("/material-usages/", response_model=List[schemas.MaterialUsage])
+def read_material_usages(db: Session = Depends(get_db)):
+    return crud.get_material_usages(db)
+
+@app.post("/material-usages/", response_model=schemas.MaterialUsage)
+def create_material_usage(usage: schemas.MaterialUsageCreate, db: Session = Depends(get_db)):
+    return crud.create_material_usage(db, usage)
+
+@app.put("/material-usages/{usage_id}", response_model=schemas.MaterialUsage)
+def update_material_usage(usage_id: int, usage: schemas.MaterialUsageCreate, db: Session = Depends(get_db)):
+    updated = crud.update_material_usage(db, usage_id, usage)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Η καταχώρηση δεν βρέθηκε")
+    return updated
+
+@app.delete("/material-usages/{usage_id}")
+def delete_material_usage(usage_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_material_usage(db, usage_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Η καταχώρηση δεν βρέθηκε")
+    return {"ok": True}

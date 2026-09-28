@@ -124,3 +124,21 @@ class Material(MaterialBase):
 
     class Config:
         from_attributes = True
+
+
+class MaterialUsageBase(BaseModel):
+    date: date
+    material_id: int
+    boat_id: int
+    quantity: float
+    unit_price: float
+    total_price: float
+
+class MaterialUsageCreate(MaterialUsageBase):
+    pass
+
+class MaterialUsage(MaterialUsageBase):
+    id: int
+
+    class Config:
+        from_attributes = True
