@@ -148,33 +148,63 @@
 
 
 <!--Page two materials submit form -->
-  <div id="page-usage" class="materials-page-section hidden">
-        <h1>Καταχώρηση Υλικών</h1>
+<div id="page-usage" class="materials-page-section hidden">
+    <h1>Καταχώρηση Υλικών</h1>
 
-        <table class="materials-table" id="usage-table">
-            <thead>
-                <tr>
-                    <th>Ημερομηνία</th>
-                    <th>Υλικό</th>
-                    <th>Μονάδα</th>
-                    <th>Τιμή</th>
-                    <th>Ποσότητα</th>
-                    <th>Παραχωρήθηκε</th>
-                    <th>Σύνολο</th>
-                    <th>Ενέργειες</th>
-                </tr>
-            </thead>
-            <tbody id="usage-list"></tbody>
-        </table>
+        <!-- VIEW TOGGLE -->
+    <div class="usage-view-toggle">
+        <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
+        <button type="button" data-view="aggregate">Σύνοψη</button>
     </div>
 
-    <!--Page 3: Πλήρες Αναφορά (placeholder)-->
-    <div id="page-report" class="materials-page-section hidden">
-        <h1>Πλήρες Αναφορά</h1>
-        <p style="color: #6b7280; text-align: center; margin-top: 2rem;">
-            Σε στάδιο ανάπτυξης...
-        </p>
+    <div class="usage-filters">
+        <div class="filter-group">
+            <label>Από:</label>
+            <input type="date" id="usage-filter-start">
+        </div>
+        <div class="filter-group">
+            <label>Έως:</label>
+            <input type="date" id="usage-filter-end">
+        </div>
+        <div class="filter-group">
+            <label>Υλικό:</label>
+            <select id="usage-filter-material">
+                <option value="">Όλα</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Κατηγορία:</label>
+            <select id="usage-filter-category">
+                <option value="">Όλες</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Παραχωρήθηκε:</label>
+            <select id="usage-filter-boat">
+                <option value="">Όλα</option>
+            </select>
+        </div>
+        <button id="usage-filter-clear" type="button" class="usage-filter-clear">
+            Καθαρισμός
+        </button>
     </div>
+
+
+    <!-- TABLE -->
+    <table class="materials-table" id="usage-table">
+        <thead id="usage-thead">
+
+        </thead>
+        <tbody id="usage-list"></tbody>
+    </table>
+</div>
+
+<div id="page-report" class="materials-page-section hidden">
+    <h1>Πλήρες Αναφορά</h1>
+    <p style="color: #6b7280; text-align: center; margin-top: 2rem;">
+        Σε στάδιο ανάπτυξης...
+    </p>
+</div>
 
     </main>
 

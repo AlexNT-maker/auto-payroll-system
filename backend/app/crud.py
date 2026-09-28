@@ -397,6 +397,21 @@ def get_material_usages(db: Session):
     ).all()
 
 def create_material_usage(db: Session, usage: schemas.MaterialUsageCreate):
+
+    existing = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.date == usage.date,
+        models.MaterialUsage.material_id == usage.material_id,
+        models.MaterialUsage.boat_id == usage.boat_id
+    ).first()
+
+    if existing:
+        existing.quantity += usage.quantity
+        existing.unit_price = usage.unit_price         
+        existing.total_price = existing.quantity * existing.unit_price
+        db.commit()
+        db.refresh(existing)
+        return existing
+
     db_usage = models.MaterialUsage(
         date=usage.date,
         material_id=usage.material_id,

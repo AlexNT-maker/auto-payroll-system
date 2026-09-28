@@ -5,7 +5,9 @@ import { initMaterialEvents,
  } from "./handlers/materialEvents";
 import { initSidebarEvents } from "./handlers/sidebarEvents";
 import { initMessageModal } from "./utils/messageModal";
-import { initMaterialUsageEvents } from "./handlers/materialsUsageEvents";
+import { initMaterialUsageEvents,
+    initUsageFilters
+ } from "./handlers/materialsUsageEvents";
 import { renderMaterialUsagesList } from "./ui/renderMaterialUsageList";
 
 
@@ -22,13 +24,17 @@ const navBtns = {
 };
 
 function navigateTo(page: "priceList" | "usage" | "report"): void {
-    Object.values(pages).forEach((p) => p.classList.add("hidden"));
+    Object.values(pages).filter((p): p is HTMLDivElement => p !== null)
+    .forEach((p) => p.classList.add("hidden"));
     pages[page].classList.remove("hidden");
 
     Object.values(navBtns).forEach((b) => b.classList.remove("active"));
     navBtns[page].classList.add("active");
 
-    if (page === "usage") renderMaterialUsagesList();
+    if (page === "usage") {
+        initUsageFilters(); 
+        renderMaterialUsagesList();
+    }   
 }
 
 navBtns.priceList.addEventListener("click", () => navigateTo("priceList"));

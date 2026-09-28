@@ -115,7 +115,6 @@ body {
     margin: 0 auto;
 
     justify-content: center;
-    text-align: center;
 
     padding: 2rem;
 }
@@ -699,4 +698,125 @@ body {
 
 .usage-edit-btn:active {
     transform: scale(0.96);
+}
+
+.usage-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+
+    background: #ffffff;
+    padding: 1rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+}
+
+.usage-filters .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 140px;
+}
+
+.usage-filters .filter-group label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #4b5563;
+}
+
+.usage-filters .filter-group input,
+.usage-filters .filter-group select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.usage-filters .filter-group input:focus,
+.usage-filters .filter-group select:focus {
+    outline: none;
+    border-color: var(--materials-primary);
+    box-shadow: 0 0 0 2px rgba(29, 111, 66, 0.15);
+}
+
+.usage-filter-clear {
+    padding: 0.5rem 1rem;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #4b5563;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    height: 38px;
+    align-self: flex-end;
+}
+
+.usage-filter-clear:hover {
+    background: #f1f5f9;
+    color: #1f2937;
+}
+
+
+.usage-view-toggle {
+    display: inline-flex;
+    gap: 0;
+    margin-bottom: 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.usage-view-toggle button {
+    padding: 0.55rem 1.2rem;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.usage-view-toggle button:hover {
+    background: #e2e8f0;
+    color: #374151;
+}
+
+.usage-view-toggle button.active {
+    background: var(--materials-primary);
+    color: #ffffff;
+}
+
+
+.usage-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+
+.usage-locked-row.aggregate-row td {
+    font-weight: 500;
+}
+
+
+.usage-form-row td:last-child {
+    white-space: nowrap;
+    width: 1%;                   
+    min-width: max-content;       
+}
+
+.usage-locked-row td:last-child {
+    white-space: nowrap;
+    width: 1%;
+    min-width: max-content;
 }
