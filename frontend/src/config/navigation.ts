@@ -16,10 +16,6 @@ export interface PageMeta {
     title: string;
 }
 
-// ============================================================
-// SIDEBAR CONFIG
-// ============================================================
-
 export const SIDEBAR_CONFIG: NavEntry[] = [
     { id: "nav-home", label: "Αρχική", href: "index.html" },
 
@@ -36,6 +32,7 @@ export const SIDEBAR_CONFIG: NavEntry[] = [
         label: "Αναφορές",
         items: [
             { id: "nav-rep-employees", label: "Αναφορά εργαζομένων", href: "index.html#short-analysis" },
+            {id: "nav-edit-boats", label: "Σκαφών", href: "index.html#boats"},
             { id: "nav-rep-materials", label: "Αναφορά υλικών",      href: "materials.html#report" },
             { id: "nav-rep-full",      label: "Πλήρες αναφορά",      href: "materials.html#full-report" },
         ],
@@ -58,17 +55,13 @@ export const SIDEBAR_CONFIG: NavEntry[] = [
     },
 ];
 
-// ============================================================
-// ROUTE META — map: path + hash → { activeId, title }
-// ============================================================
-
 export const ROUTE_META: Record<string, PageMeta> = {
     // ---------- index.html ----------
     "/index.html":                { activeId: "nav-home",           title: "Αρχική" },
     "/index.html#dashboard":      { activeId: "nav-home",           title: "Αρχική" },
     "/index.html#home":           { activeId: "nav-attendance",     title: "Ημερήσια εργαζομένων" },
     "/index.html#employees":      { activeId: "nav-edit-employees", title: "Διαχείριση εργαζομένων" },
-    "/index.html#boats":          { activeId: "nav-edit-employees", title: "Διαχείριση Σκαφών" },
+    "/index.html#boats":          { activeId: "nav-edit-boats", title: "Διαχείριση Σκαφών" },
     "/index.html#short-analysis": { activeId: "nav-rep-employees",  title: "Αναφορά εργαζομένων" },
     "/index.html#payments":       { activeId: "nav-payroll",        title: "Μισθοδοσία & Πληρωμές" },
 
@@ -80,7 +73,6 @@ export const ROUTE_META: Record<string, PageMeta> = {
     "/materials.html#report":        { activeId: "nav-rep-materials",  title: "Αναφορά Υλικών" },
     "/materials.html#full-report":   { activeId: "nav-rep-full",       title: "Πλήρης Αναφορά" },
 
-    // ---------- settings.html ----------
     "/settings.html": { activeId: "nav-settings", title: "Σταθερές" },
 };
 
