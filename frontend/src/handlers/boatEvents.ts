@@ -12,7 +12,6 @@ import { showConfirmModal } from "../utils/confirmModal.ts";
 
 const modalBoat = document.querySelector<HTMLDivElement>('#modal-boat')!;
 const boatForm = document.querySelector<HTMLFormElement>('#boat-form')!;
-const boatsListBody = document.querySelector<HTMLTableSectionElement>('#boats-list')!;
 const inputBoatName = document.querySelector<HTMLInputElement>('#boat-name')!;
 const inputBoatId = document.querySelector<HTMLInputElement>('#boat-id')!;
 const btnAddBoat = document.querySelector<HTMLButtonElement>('#btn-add-boat')!;
@@ -56,17 +55,22 @@ try {
 };
 
 export function attachBoatListeners() {
-    boatsListBody.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
+    const list = document.getElementById("boats-list");
+    if (!list) return;
+
+    list.querySelectorAll<HTMLButtonElement>(".material-edit-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
             openBoatModal(id);
         });
     });
 
-    boatsListBody.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) handleDeleteBoat(id);
+    list.querySelectorAll<HTMLButtonElement>(".material-delete-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
+            if (await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
+                handleDeleteBoat(id);
+            }
         });
     });
 }

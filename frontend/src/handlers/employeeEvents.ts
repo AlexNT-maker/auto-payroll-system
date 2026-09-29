@@ -75,17 +75,20 @@ try {
 }
 
 export function attachActionListeners() {
-    document.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
+    const list = document.getElementById("employees-list");
+    if (!list) return;
+
+    list.querySelectorAll<HTMLButtonElement>(".material-edit-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
             openEditModal(id);
         });
     });
 
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
-            if(await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
+    list.querySelectorAll<HTMLButtonElement>(".material-delete-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
+            if (await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
                 handleDeleteEmployee(id);
             }
         });

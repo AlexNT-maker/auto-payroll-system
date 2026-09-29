@@ -1,7 +1,3 @@
-/* ============================================================
-   MATERIALS — Price list + Usage + Report specific
-   ============================================================ */
-
 #materials-page {
     max-width: 1200px;
     margin: 0 auto;
@@ -236,25 +232,3 @@
     min-width: max-content;
 }
 
-/* -------- Material modal buttons -------- */
-#material-form .modal-buttons button[type="submit"] {
-    background-color: #ffffff;
-    color: var(--theme-primary);
-    border: 1px solid var(--theme-primary);
-}
-
-#material-form .modal-buttons button[type="submit"]:hover {
-    background-color: var(--theme-primary);
-    color: #ffffff;
-}
-
-#btn-cancel-material {
-    background-color: #fbeaea;
-    color: #c62828;
-    border: 1px solid #efb5b5;
-}
-
-#btn-cancel-material:hover {
-    background-color: #c62828;
-    color: #ffffff;
-}
