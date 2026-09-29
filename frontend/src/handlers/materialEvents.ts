@@ -117,16 +117,19 @@ export async function handleDeleteMaterial(id: number): Promise<void> {
 }
 
 export function attachMaterialListeners(): void {
-    document.querySelectorAll(".material-edit-btn").forEach((btn) => {
+    const list = document.getElementById("materials-list");
+    if (!list) return;
+
+    list.querySelectorAll<HTMLButtonElement>(".material-edit-btn").forEach((btn) => {
         btn.addEventListener("click", (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
             openEditModal(id);
         });
     });
 
-    document.querySelectorAll(".material-delete-btn").forEach((btn) => {
+    list.querySelectorAll<HTMLButtonElement>(".material-delete-btn").forEach((btn) => {
         btn.addEventListener("click", async (e) => {
-            const id = parseInt((e.target as HTMLElement).dataset.id!);
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
             if (await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
                 handleDeleteMaterial(id);
             }

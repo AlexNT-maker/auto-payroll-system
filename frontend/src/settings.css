@@ -82,31 +82,42 @@
     box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.15);
 }
 
-#supplier-form .modal-buttons button[type="submit"],
-#named-item-form .modal-buttons button[type="submit"] {
-    background-color: #ffffff;
+
+
+.modal-content form button {
+    padding: 0.6rem 1.3rem;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.modal-content form button[type="submit"] {
+    background: #ffffff;
     color: var(--theme-primary);
     border: 1px solid var(--theme-primary);
 }
 
-#supplier-form .modal-buttons button[type="submit"]:hover,
-#named-item-form .modal-buttons button[type="submit"]:hover {
-    background-color: var(--theme-primary);
+.modal-content form button[type="submit"]:hover {
+    background: var(--theme-primary);
     color: #ffffff;
+    border-color: var(--theme-primary);
 }
 
-#btn-cancel-supplier,
-#btn-cancel-named-item {
-    background-color: #fbeaea;
+/* Cancel / secondary (Ακύρωση / Καθαρισμός) */
+.modal-content form button[type="button"] {
+    background: #fbeaea;
     color: #c62828;
     border: 1px solid #efb5b5;
 }
 
-#btn-cancel-supplier:hover,
-#btn-cancel-named-item:hover {
-    background-color: #c62828;
+.modal-content form button[type="button"]:hover {
+    background: #c62828;
     color: #ffffff;
+    border-color: #c62828;
 }
+
 
 /* -------- Responsive -------- */
 @media (max-width: 720px) {
