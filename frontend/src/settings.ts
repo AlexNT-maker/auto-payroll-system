@@ -1,12 +1,9 @@
 import { fetchData } from "./services/appLoader";
-import {
-    renderSuppliersList,
-    renderNamedItemsList
-} from "./ui/renderSettingsList";
+import { renderSuppliersList, renderNamedItemsList } from "./ui/renderSettingsList";
 import { initSettingsEvents } from "./handlers/settingsEvents";
-import { initSidebarEvents } from "./handlers/sidebarEvents";
 import { initMessageModal } from "./utils/messageModal";
-
+import { renderShell } from "./ui/renderShell";
+import { initShellEvents } from "./handlers/shellEvents";
 
 type TabId = "suppliers" | "invoice-categories" | "material-units" | "material-categories";
 
@@ -23,13 +20,14 @@ function showSettingsTab(tabId: TabId, btn: HTMLButtonElement): void {
 
 (window as any).showSettingsTab = showSettingsTab;
 
-
 async function initApp(): Promise<void> {
+    renderShell();
+    initShellEvents();
+
     await fetchData();
 
     renderSuppliersList();
 
-    initSidebarEvents();
     initSettingsEvents();
     initMessageModal();
 }

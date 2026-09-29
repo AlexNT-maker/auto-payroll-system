@@ -1,0 +1,53 @@
+/* ============================================================
+   THEME — Variables (Navy + Glassmorphism)
+   Loaded LAST after common.css + module.css
+   ============================================================ */
+
+:root {
+    /* -------- Brand (Navy) -------- */
+    --brand:           #05407a;
+    --brand-hover:     #03305c;
+    --brand-light:     #e0f2fe;
+    --brand-rgb:       5, 64, 122;
+
+    /* -------- Theme aliases -------- */
+    --theme-primary:       var(--brand);
+    --theme-primary-hover: var(--brand-hover);
+    --theme-primary-light: var(--brand-light);
+    --theme-loader-bg:     var(--brand);
+
+    /* -------- Page background -------- */
+    --bg-page: linear-gradient(135deg, #eef2f7 0%, #dbe5ee 100%);
+
+    /* -------- Neutrals -------- */
+    --bg:            #f3f4f6;
+    --white:         #ffffff;
+    --text:          #1f2937;
+    --text-muted:    #6b7280;
+    --text-soft:     #9ca3af;
+    --border:        #e5e7eb;
+    --border-strong: #cbd5e1;
+
+    --glass-1:      rgba(255, 255, 255, 0.35);
+    --glass-2:      rgba(255, 255, 255, 0.48);   
+    --glass-3:      rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.55);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+    --glass-blur:   20px;
+
+    --sidebar-w: 230px;
+    --topbar-h:  60px;
+
+    --materials-primary:      var(--theme-primary);
+    --materials-primary-dark: var(--theme-primary-hover);
+    --primary-color:          var(--theme-primary);
+    --button:                 var(--theme-primary);
+    --bg-color:               var(--bg);
+    --text-color:             var(--text);
+}
+
+body {
+    background: var(--bg-page);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
