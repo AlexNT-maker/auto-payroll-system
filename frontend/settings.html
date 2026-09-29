@@ -7,310 +7,182 @@
     <link rel="stylesheet" href="./src/common.css">
     <link rel="stylesheet" href="./src/materials.css">
     <link rel="stylesheet" href="./src/settings.css">
+    <link rel="stylesheet" href="./src/theme.css">
   </head>
-  <body>
+  <body data-theme="navy">
 
-    <div id="page-loader" class="page-loader hidden" style="background-color: #05407a">
+    <!-- Loader -->
+    <div id="page-loader" class="page-loader hidden">
       <img src="src/icon/logo.svg" alt="Company logo" class="page-loader-logo">
     </div>
 
-    <!-- Navbar -->
-    <nav class="navbar animate-enter">
-      <button id="menu-toggle" class="menu-toggle" type="button" aria-label="Άνοιγμα μενού">☰</button>
-      <img class="logo" src="src/icon/logo.svg" alt="Logo">
-      <div class="nav-links">
-        <button onclick="window.location.href='materials.html'" class="hover-lift click-shrink">
-          ← Πίσω στα Υλικά
-        </button>
-      </div>
-    </nav>
+    <div class="app-layout">
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-      <div class="sidebar-header">
-        <h2>Μενού</h2>
-        <button id="sidebar-close" class="sidebar-close" type="button" aria-label="Κλείσιμο μενού">x</button>
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+          <img src="src/icon/logo.svg" alt="Logo" class="sidebar-logo">
+          <button id="sidebar-close" class="sidebar-close" type="button" aria-label="Κλείσιμο μενού">×</button>
+        </div>
+        <nav class="sidebar-menu"><!-- auto-injected --></nav>
+      </aside>
+
+      <div class="app-body">
+
+        <header class="topbar"><!-- auto-injected --></header>
+
+        <main class="app-main" id="settings-page">
+
+          <div class="settings-tabs">
+            <button class="settings-tab active" type="button" onclick="showSettingsTab('suppliers', this)">
+              Προμηθευτές
+            </button>
+            <button class="settings-tab" type="button" onclick="showSettingsTab('invoice-categories', this)">
+              Κατηγορίες Τιμολογίων
+            </button>
+            <button class="settings-tab" type="button" onclick="showSettingsTab('material-units', this)">
+              Μονάδες Μέτρησης
+            </button>
+            <button class="settings-tab" type="button" onclick="showSettingsTab('material-categories', this)">
+              Κατηγορίες Υλικών
+            </button>
+          </div>
+
+          <div id="tab-suppliers" class="settings-panel">
+            <table class="materials-table">
+              <thead>
+                <tr>
+                  <th>Όνομα</th>
+                  <th>ΑΦΜ</th>
+                  <th>Τηλέφωνο</th>
+                  <th>Email</th>
+                  <th>Σημειώσεις</th>
+                  <th>Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody id="suppliers-list"></tbody>
+            </table>
+
+            <div class="materials-footer">
+              <button class="materials-primary-btn">+ Προσθήκη Προμηθευτή</button>
+            </div>
+          </div>
+
+          <div id="tab-invoice-categories" class="settings-panel hidden">
+            <table class="materials-table">
+              <thead>
+                <tr>
+                  <th>Όνομα</th>
+                  <th>Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody id="invoice-categories-list"></tbody>
+            </table>
+
+            <div class="materials-footer">
+              <button class="materials-primary-btn">+ Προσθήκη Κατηγορίας</button>
+            </div>
+          </div>
+
+          <div id="tab-material-units" class="settings-panel hidden">
+            <table class="materials-table">
+              <thead>
+                <tr>
+                  <th>Όνομα</th>
+                  <th>Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody id="material-units-list"></tbody>
+            </table>
+
+            <div class="materials-footer">
+              <button class="materials-primary-btn">+ Προσθήκη Μονάδας</button>
+            </div>
+          </div>
+
+          <div id="tab-material-categories" class="settings-panel hidden">
+            <table class="materials-table">
+              <thead>
+                <tr>
+                  <th>Όνομα</th>
+                  <th>Ενέργειες</th>
+                </tr>
+              </thead>
+              <tbody id="material-categories-list"></tbody>
+            </table>
+
+            <div class="materials-footer">
+              <button class="materials-primary-btn">+ Προσθήκη Κατηγορίας</button>
+            </div>
+          </div>
+
+          <!-- Modals -->
+          <div id="modal-supplier" class="modal hidden">
+            <div class="modal-content">
+              <h2 id="modal-supplier-title">Νέος Προμηθευτής</h2>
+
+              <form id="supplier-form">
+                <input type="hidden" id="supplier-id" />
+
+                <label>Όνομα: *</label>
+                <input type="text" id="supplier-name" required />
+
+                <label>ΑΦΜ:</label>
+                <input type="text" id="supplier-afm" />
+
+                <label>Τηλέφωνο:</label>
+                <input type="text" id="supplier-phone" />
+
+                <label>Email:</label>
+                <input type="email" id="supplier-email" />
+
+                <label>Σημειώσεις:</label>
+                <textarea id="supplier-notes" rows="3"></textarea>
+
+                <div class="modal-buttons">
+                  <button type="submit">Αποθήκευση</button>
+                  <button type="button" id="btn-cancel-supplier">Ακύρωση</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div id="modal-named-item" class="modal hidden">
+            <div class="modal-content">
+              <h2 id="modal-named-item-title">Νέα Εγγραφή</h2>
+
+              <form id="named-item-form">
+                <input type="hidden" id="named-item-id" />
+                <input type="hidden" id="named-item-type" />
+
+                <label>Όνομα: *</label>
+                <input type="text" id="named-item-name" required />
+
+                <div class="modal-buttons">
+                  <button type="submit">Αποθήκευση</button>
+                  <button type="button" id="btn-cancel-named-item">Ακύρωση</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div id="message-modal" class="modal hidden">
+            <div class="message-modal-window">
+              <div id="message-modal-icon" class="message-modal-icon"></div>
+              <h2 id="message-modal-title">Προσοχή</h2>
+              <div id="message-modal-text"></div>
+              <div class="message-modal-buttons">
+                <button id="message-modal-ok">Επιβεβαίωση</button>
+                <button id="message-modal-cancel" class="hidden">Άκυρο</button>
+              </div>
+            </div>
+          </div>
+
+        </main>
       </div>
-      <div class="sidebar-menu">
-        <button class="sidebar-item" id="sidebar-home" type="button">Αρχική</button>
-        <button class="sidebar-item" id="sidebar-materials" type="button">Υλικά</button>
-        <button class="sidebar-item sidebar-item-active" id="sidebar-settings" type="button">Ρυθμίσεις</button>
-      </div>
-    </aside>
+    </div>
 
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-    <!-- Main -->
-    <main id="settings-page">
-
-
-      <!-- Tabs -->
-      <div class="settings-tabs">
-        <button class="settings-tab active" type="button" onclick="showSettingsTab('suppliers', this)">
-          Προμηθευτές
-        </button>
-        <button class="settings-tab" type="button" onclick="showSettingsTab('invoice-categories', this)">
-          Κατηγορίες Τιμολογίων
-        </button>
-        <button class="settings-tab" type="button" onclick="showSettingsTab('material-units', this)">
-          Μονάδες Μέτρησης
-        </button>
-        <button class="settings-tab" type="button" onclick="showSettingsTab('material-categories', this)">
-          Κατηγορίες Υλικών
-        </button>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════ -->
-      <!-- TAB 1: Προμηθευτές                              -->
-      <!-- ═══════════════════════════════════════════════ -->
-      <div id="tab-suppliers" class="settings-panel">
-        <table class="materials-table">
-          <thead>
-            <tr>
-              <th>Όνομα</th>
-              <th>ΑΦΜ</th>
-              <th>Τηλέφωνο</th>
-              <th>Email</th>
-              <th>Σημειώσεις</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="suppliers-list">
-            <tr>
-              <td>ΠΑΠΑΔΟΠΟΥΛΟΣ Α.Ε.</td>
-              <td>123456789</td>
-              <td>2101234567</td>
-              <td>info@papadopoulos.gr</td>
-              <td>Τιμολόγια 30 ημερών</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>ΒΕΝΖΙΝΑΔΙΚΟ Κ. ΝΙΚΟΛΑΟΥ</td>
-              <td>987654321</td>
-              <td>6971234567</td>
-              <td>—</td>
-              <td>—</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>MARINE SUPPLIES LTD</td>
-              <td>—</td>
-              <td>—</td>
-              <td>sales@marinesup.com</td>
-              <td>Αγγλικά προϊόντα</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="materials-footer">
-          <button class="materials-primary-btn">+ Προσθήκη Προμηθευτή</button>
-        </div>
-      </div>
-
-      <!-- ═══════════════════════════════════════════════ -->
-      <!-- TAB 2: Κατηγορίες Τιμολογίων                    -->
-      <!-- ═══════════════════════════════════════════════ -->
-      <div id="tab-invoice-categories" class="settings-panel hidden">
-        <table class="materials-table">
-          <thead>
-            <tr>
-              <th>Όνομα</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="invoice-categories-list">
-            <tr>
-              <td>Καύσιμα</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Τρόφιμα &amp; Προμήθειες</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Συντήρηση &amp; Ανταλλακτικά</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Εξοπλισμός</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Υπηρεσίες</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Άλλο</td>
-              <td>
-                <div class="materials-actions">
-                  <button class="material-edit-btn">Επεξεργασία</button>
-                  <button class="material-delete-btn">Διαγραφή</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="materials-footer">
-          <button class="materials-primary-btn">+ Προσθήκη Κατηγορίας</button>
-        </div>
-      </div>
-
-
-      <div id="tab-material-units" class="settings-panel hidden">
-        <table class="materials-table">
-          <thead>
-            <tr>
-              <th>Όνομα</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="material-units-list">
-            <tr><td>GAL</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>KG</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>PCS</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>M</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>5L</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>1L</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>3L</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>SET</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-          </tbody>
-        </table>
-
-        <div class="materials-footer">
-          <button class="materials-primary-btn">+ Προσθήκη Μονάδας</button>
-        </div>
-      </div>
-
-      <div id="tab-material-categories" class="settings-panel hidden">
-        <table class="materials-table">
-          <thead>
-            <tr>
-              <th>Όνομα</th>
-              <th>Ενέργειες</th>
-            </tr>
-          </thead>
-          <tbody id="material-categories-list">
-            <tr><td>Χρώματα</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>Αναλώσιμα</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>Διαλυτικά είδη</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-            <tr><td>Γυαλιστικά είδη</td><td><div class="materials-actions"><button class="material-edit-btn">Επεξεργασία</button><button class="material-delete-btn">Διαγραφή</button></div></td></tr>
-          </tbody>
-        </table>
-
-        <div class="materials-footer">
-          <button class="materials-primary-btn">+ Προσθήκη Κατηγορίας</button>
-        </div>
-      </div>
-
-      <!-- Supplier Modal -->
-      <div id="modal-supplier" class="modal hidden">
-        <div class="modal-content">
-          <h2 id="modal-supplier-title">Νέος Προμηθευτής</h2>
-
-          <form id="supplier-form">
-            <input type="hidden" id="supplier-id" />
-
-            <label>Όνομα: *</label>
-            <input type="text" id="supplier-name" required />
-
-            <label>ΑΦΜ:</label>
-            <input type="text" id="supplier-afm" />
-
-            <label>Τηλέφωνο:</label>
-            <input type="text" id="supplier-phone" />
-
-            <label>Email:</label>
-            <input type="email" id="supplier-email" />
-
-            <label>Σημειώσεις:</label>
-            <textarea id="supplier-notes" rows="3"></textarea>
-
-            <div class="modal-buttons">
-              <button type="submit">Αποθήκευση</button>
-              <button type="button" id="btn-cancel-supplier">Ακύρωση</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Named Item Modal (used for the 3 simple tabs) -->
-      <div id="modal-named-item" class="modal hidden">
-        <div class="modal-content">
-          <h2 id="modal-named-item-title">Νέα Εγγραφή</h2>
-
-          <form id="named-item-form">
-            <input type="hidden" id="named-item-id" />
-            <input type="hidden" id="named-item-type" />
-
-            <label>Όνομα: *</label>
-            <input type="text" id="named-item-name" required />
-
-            <div class="modal-buttons">
-              <button type="submit">Αποθήκευση</button>
-              <button type="button" id="btn-cancel-named-item">Ακύρωση</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Message Modal -->
-      <div id="message-modal" class="modal hidden">
-        <div class="message-modal-window">
-          <div id="message-modal-icon" class="message-modal-icon"></div>
-          <h2 id="message-modal-title">Προσοχή</h2>
-          <div id="message-modal-text"></div>
-          <div class="message-modal-buttons">
-            <button id="message-modal-ok">Επιβεβαίωση</button>
-            <button id="message-modal-cancel" class="hidden">Άκυρο</button>
-          </div>
-        </div>
-      </div>
-
-    </main>
-
-<script type="module" src="/src/settings.ts"></script>  
-
+    <script type="module" src="/src/settings.ts"></script>
   </body>
 </html>

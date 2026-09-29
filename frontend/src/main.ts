@@ -2,86 +2,84 @@ import { renderBoatsList } from "./ui/renderBoatList";
 import { renderEmployeesList } from "./ui/renderEmployeesList";
 import { initEmployeeEvents } from "./handlers/employeeEvents";
 import { initBoatEvents } from "./handlers/boatEvents";
-import {
-    initExpensesEvents,
-    initExpensesPage,
-} from "./handlers/expenseEvents"
-import { 
-    initPayrollEvents,
-    initPayrollPage
- } from "./handlers/payrollEvents";
-import { 
-    initShortAnalysisEvents,
-    initShortAnalysisPage } from "./handlers/shortAnalysisEvents";
+import { initPayrollEvents, initPayrollPage } from "./handlers/payrollEvents";
+import { initShortAnalysisEvents, initShortAnalysisPage } from "./handlers/shortAnalysisEvents";
 import { fetchData } from "./services/appLoader";
 import { initMessageModal } from "./utils/messageModal";
-import { initAttendanceEvents } from "./handlers/attendanceEvents";
-import { initSidebarEvents } from "./handlers/sidebarEvents";
-import { loadDayData } from "./handlers/attendanceEvents";
+import { initAttendanceEvents, loadDayData } from "./handlers/attendanceEvents";
+import { renderShell } from "./ui/renderShell";
+import { initShellEvents } from "./handlers/shellEvents";
 
+// -- Date picker default --
+const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
+if (datePicker) datePicker.valueAsDate = new Date();
 
+// -- Internal pages --
+type PageName = 'dashboard' | 'home' | 'employees' | 'boats' | 'shortAnalysis' | 'payments';
 
-
-const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
-datePicker.valueAsDate = new Date();
-
-const pages={
-  home: document.getElementById('page-home')!,
-  employees: document.getElementById('page-employees')!,
-  boats: document.getElementById('page-boats')!,
-  shortAnalysis: document.getElementById('page-short-analysis')!,
-  expenses: document.getElementById('page-expenses')!,
-  payments: document.getElementById('page-payments')!,
+const pages: Record<PageName, HTMLElement> = {
+    dashboard:     document.getElementById('page-dashboard')!,
+    home:          document.getElementById('page-home')!,
+    employees:     document.getElementById('page-employees')!,
+    boats:         document.getElementById('page-boats')!,
+    shortAnalysis: document.getElementById('page-short-analysis')!,
+    payments:      document.getElementById('page-payments')!,
 };
 
-const navButtons = {
-  home: document.getElementById('nav-home')!,
-  employees: document.getElementById('nav-employees')!,
-  boats: document.getElementById('nav-boats')!,
-  shortAnalysis: document.getElementById('nav-short-analysis')!,
-  expenses: document.getElementById('nav-expenses')!,
-  payments: document.getElementById('nav-payments')!,
+const HASH_MAP: Record<string, PageName> = {
+    "":               "dashboard",
+    "dashboard":      "dashboard",
+    "home":           "home",
+    "employees":      "employees",
+    "boats":          "boats",
+    "short-analysis": "shortAnalysis",
+    "payments":       "payments",
 };
 
-function navigateTo(pageName: 'home' | 'employees' | 'boats'| 'expenses'| 'payments'| 'shortAnalysis') {
-  Object.values(pages).forEach(page => {
-    if (page) page.classList.add('hidden');
-  });
-  pages[pageName].classList.remove('hidden');
+// -- Navigation --
+function navigateTo(pageName: PageName): void {
+    Object.values(pages).forEach(page => page.classList.add('hidden'));
+    pages[pageName].classList.remove('hidden');
 
-  Object.values(navButtons).forEach(btn => btn.classList.remove('active'));
-  navButtons[pageName].classList.add('active');
+    const hash = pageName === 'dashboard'
+        ? ''
+        : `#${pageName === 'shortAnalysis' ? 'short-analysis' : pageName}`;
 
-  if (pageName === 'employees') renderEmployeesList();
-  if (pageName === 'boats') renderBoatsList() ;
-  if (pageName === 'expenses') initExpensesPage();
-  if (pageName === 'payments') initPayrollPage();
-  if (pageName === 'shortAnalysis') initShortAnalysisPage();
+    if (window.location.hash !== hash) {
+        history.replaceState(null, '', hash || window.location.pathname);
+    }
+
+    if (pageName === 'employees')     renderEmployeesList();
+    if (pageName === 'boats')         renderBoatsList();
+    if (pageName === 'payments')      initPayrollPage();
+    if (pageName === 'shortAnalysis') initShortAnalysisPage();
 }
 
-navButtons.home.addEventListener('click',() => navigateTo('home'));
-navButtons.employees.addEventListener('click',() => navigateTo('employees'));
-navButtons.boats.addEventListener('click',() => navigateTo('boats'));
-navButtons.expenses.addEventListener('click',() => navigateTo('expenses'));
-navButtons.payments.addEventListener('click', () => navigateTo('payments'));
-navButtons.shortAnalysis.addEventListener('click', () => navigateTo('shortAnalysis'));
+function handleHashChange(): void {
+    const hash = window.location.hash.replace('#', '');
+    const pageName = HASH_MAP[hash] ?? 'dashboard';
+    navigateTo(pageName);
+}
 
+window.addEventListener('hashchange', handleHashChange);
 
+// -- Init --
+async function initApp(): Promise<void> {
+    renderShell();
+    initShellEvents();
 
-async function initApp(): Promise<void>{
-  
-await fetchData();
-await loadDayData();
-renderEmployeesList();
+    await fetchData();
+    await loadDayData();
+    renderEmployeesList();
 
-initSidebarEvents();
-initAttendanceEvents();
-initEmployeeEvents();
-initBoatEvents();
-initExpensesEvents();
-initPayrollEvents();
-initShortAnalysisEvents();
-initMessageModal();
+    initAttendanceEvents();
+    initEmployeeEvents();
+    initBoatEvents();
+    initPayrollEvents();
+    initShortAnalysisEvents();
+    initMessageModal();
+
+    handleHashChange();
 }
 
 initApp();
