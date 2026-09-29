@@ -99,12 +99,11 @@ async function handlePayrollCalculation() {
                     </td>
                     
                     <td>
-                        <button class="action-btn btn-add-extra" data-id="${item.employee_id}" 
-                                style="background-color: #dd780b; color: white; cursor: pointer;">
+                        <button class="action-btn btn-add-extra" data-id="${item.employee_id}">
                             Πρόσθετα
                         </button>
                     </td>
-                    <td style="font-weight: 700; color: #dd780b;">
+                    <td style="font-weight: 700; color: #d97706;">
     ${(item.total_extra ?? 0).toFixed(2)} €
 </td>
                 `;
