@@ -4,7 +4,7 @@
 
 ### Inventory/ Pricelist
 ![InventoryUI](images/inventoryUI.png)
-![Pricelist UI](images/PriceListUI.png)
+![Pricelist UI](images/PricelistUI.png)
 
 ### Payroll
 ![PayrollUI](images/PaydayUI.png)
