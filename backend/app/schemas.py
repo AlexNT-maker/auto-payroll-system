@@ -194,3 +194,38 @@ class Invoice(InvoiceBase):
 
     class Config:
         from_attributes = True
+
+# -- Schemas for dashboard --
+
+class DashboardBreakdown(BaseModel):
+    employees: float
+    materials: float
+    invoices: float
+
+
+class DashboardDailyPoint(BaseModel):
+    date: date
+    payroll: float
+    materials: float
+    invoices: float
+
+
+class DashboardTodayStatus(BaseModel):
+    date: date
+    attendance_recorded: bool
+
+
+class BoatRankingItem(BaseModel):
+    boat_id: int
+    boat_name: str
+    total: float
+
+
+class DashboardResponse(BaseModel):
+    month: str
+    total: float
+    prev_month_total: float
+    breakdown: DashboardBreakdown
+    daily_trend: List[DashboardDailyPoint]
+    today_status: DashboardTodayStatus
+    boats_ranking: List[BoatRankingItem]

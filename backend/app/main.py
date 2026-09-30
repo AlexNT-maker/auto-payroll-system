@@ -378,3 +378,19 @@ def delete_material_category(item_id: int, db: Session = Depends(get_db)):
     if deleted is None:
         raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
     return {"ok": True}
+
+# -- Dashboard --
+
+@app.get("/dashboard/", response_model=schemas.DashboardResponse)
+def read_dashboard(target_month: Optional[str] = None, db: Session = Depends(get_db)):
+    from datetime import date as d
+    if not target_month:
+        today = d.today()
+        target_month = f"{today.year}-{today.month:02d}"
+
+    try:
+        year, month = map(int, target_month.split("-"))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Λάθος format μήνα (YYYY-MM)")
+
+    return crud.get_dashboard_data(db, year, month)
