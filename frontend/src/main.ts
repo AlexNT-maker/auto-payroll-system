@@ -9,6 +9,7 @@ import { initMessageModal } from "./utils/messageModal";
 import { initAttendanceEvents, loadDayData } from "./handlers/attendanceEvents";
 import { renderShell } from "./ui/renderShell";
 import { initShellEvents } from "./handlers/shellEvents";
+import { initDashboard } from "./handlers/dashboardEvents";
 
 // -- Date picker default --
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
@@ -53,6 +54,7 @@ function navigateTo(pageName: PageName): void {
     if (pageName === 'boats')         renderBoatsList();
     if (pageName === 'payments')      initPayrollPage();
     if (pageName === 'shortAnalysis') initShortAnalysisPage();
+    if (pageName === 'dashboard') initDashboard();
 }
 
 function handleHashChange(): void {
