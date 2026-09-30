@@ -2,7 +2,9 @@
 
 ## App screenshots
 
-### Inventory/ Pricelist
+### Inventory/ Pricelist **Data are mocked just to visualize the UI, brand logo is real
+
+![Home-page](images/homePage.png)
 ![InventoryUI](images/inventoryUI.png)
 ![Inventorylist UI](images/Inv&PriceUI.png)
 
