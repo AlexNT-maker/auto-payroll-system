@@ -2,28 +2,30 @@ import { fetchData } from "./services/appLoader";
 import { renderMaterialsList } from "./ui/renderMaterialsList";
 import { initMaterialEvents, attachMaterialListeners } from "./handlers/materialEvents";
 import { initMessageModal } from "./utils/messageModal";
-import { initMaterialUsageEvents, initUsageFilters } from "./handlers/materialsUsageEvents";
+import { initMaterialUsageEvents, 
+    initUsageFilters } from "./handlers/materialsUsageEvents";
 import { renderMaterialUsagesList } from "./ui/renderMaterialUsageList";
 import { renderShell } from "./ui/renderShell";
 import { initShellEvents } from "./handlers/shellEvents";
+import { initInvoiceEvents, 
+    initInvoiceFilters } from "./handlers/invoiceEvents";
+import { renderInvoicesList } from "./ui/renderInvoiceList";
 
-// -- Internal pages --
-type PageKey = "usage" | "priceList" | "invoices" | "report" | "fullReport";
+
+type PageKey = "usage" | "priceList" | "invoices" | "fullReport";
 
 const pages: Record<PageKey, HTMLElement> = {
     usage:      document.getElementById("page-usage")!,
     priceList:  document.getElementById("page-price-list")!,
     invoices:   document.getElementById("page-invoices")!,
-    report:     document.getElementById("page-report")!,
     fullReport: document.getElementById("page-full-report")!,
 };
 
 const HASH_MAP: Record<string, PageKey> = {
-    "":             "usage",        // ← default = Καταχώρηση
+    "":             "usage",        
     "usage":        "usage",
     "price-list":   "priceList",
     "invoices":     "invoices",
-    "report":       "report",
     "full-report":  "fullReport",
 };
 
@@ -41,6 +43,11 @@ function navigateTo(pageKey: PageKey): void {
         initUsageFilters();
         renderMaterialUsagesList();
     }
+
+    if (pageKey === "invoices") {
+    initInvoiceFilters();
+    renderInvoicesList();
+}
 }
 
 function handleHashChange(): void {
@@ -51,7 +58,7 @@ function handleHashChange(): void {
 
 window.addEventListener("hashchange", handleHashChange);
 
-// -- Init --
+
 async function initApp(): Promise<void> {
     renderShell();
     initShellEvents();
@@ -66,6 +73,8 @@ async function initApp(): Promise<void> {
     initMessageModal();
 
     handleHashChange();
+
+    initInvoiceEvents();
 }
 
 initApp();

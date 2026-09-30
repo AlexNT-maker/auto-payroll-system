@@ -117,3 +117,18 @@ class MaterialCategory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True, nullable=False)
+
+
+# -- Board No.10 Invoices --
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True, nullable=False)
+    amount = Column(Float, nullable=False)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=False)
+    boat_id = Column(Integer, ForeignKey("boats.id"), nullable=False)
+
+    supplier = relationship("Supplier")
+    boat = relationship("Boat")

@@ -176,3 +176,56 @@ class NamedItem(NamedItemBase):
 
     class Config:
         from_attributes = True
+
+
+# -- Schemas for invoices --
+
+class InvoiceBase(BaseModel):
+    date: date
+    amount: float
+    supplier_id: int
+    boat_id: int
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class Invoice(InvoiceBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+# -- Schemas for dashboard --
+
+class DashboardBreakdown(BaseModel):
+    employees: float
+    materials: float
+    invoices: float
+
+
+class DashboardDailyPoint(BaseModel):
+    date: date
+    payroll: float
+    materials: float
+    invoices: float
+
+
+class DashboardTodayStatus(BaseModel):
+    date: date
+    attendance_recorded: bool
+
+
+class BoatRankingItem(BaseModel):
+    boat_id: int
+    boat_name: str
+    total: float
+
+
+class DashboardResponse(BaseModel):
+    month: str
+    total: float
+    prev_month_total: float
+    breakdown: DashboardBreakdown
+    daily_trend: List[DashboardDailyPoint]
+    today_status: DashboardTodayStatus
+    boats_ranking: List[BoatRankingItem]

@@ -3,6 +3,7 @@ import type { Boat } from "../models/boat";
 import type { Material } from "../models/material";
 import type { MaterialUsage } from "../models/materialsUsage";
 import type { Supplier, NamedItem } from "../models/settings";
+import type { Invoice } from "../models/invoice";
 
 export const store = {
     employees: [] as Employee[],
@@ -13,5 +14,6 @@ export const store = {
     invoiceCategories: [] as NamedItem[],
     materialUnits: [] as NamedItem[],
     materialCategories: [] as NamedItem[],
+    invoices: [] as Invoice[],
 };
 

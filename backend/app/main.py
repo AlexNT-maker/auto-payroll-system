@@ -280,6 +280,30 @@ def delete_supplier(supplier_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Ο προμηθευτής δεν βρέθηκε")
     return {"ok": True}
 
+# -- Invoice Routes --
+
+@app.get("/invoices/", response_model=List[schemas.Invoice])
+def read_invoices(db: Session = Depends(get_db)):
+    return crud.get_invoices(db)
+
+@app.post("/invoices/", response_model=schemas.Invoice)
+def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
+    return crud.create_invoice(db, invoice)
+
+@app.put("/invoices/{invoice_id}", response_model=schemas.Invoice)
+def update_invoice(invoice_id: int, invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
+    updated = crud.update_invoice(db, invoice_id, invoice)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Το τιμολόγιο δεν βρέθηκε")
+    return updated
+
+@app.delete("/invoices/{invoice_id}")
+def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_invoice(db, invoice_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Το τιμολόγιο δεν βρέθηκε")
+    return {"ok": True}
+
 
 # -- Invoice Categories --
 
@@ -354,3 +378,19 @@ def delete_material_category(item_id: int, db: Session = Depends(get_db)):
     if deleted is None:
         raise HTTPException(status_code=404, detail="Η κατηγορία δεν βρέθηκε")
     return {"ok": True}
+
+# -- Dashboard --
+
+@app.get("/dashboard/", response_model=schemas.DashboardResponse)
+def read_dashboard(target_month: Optional[str] = None, db: Session = Depends(get_db)):
+    from datetime import date as d
+    if not target_month:
+        today = d.today()
+        target_month = f"{today.year}-{today.month:02d}"
+
+    try:
+        year, month = map(int, target_month.split("-"))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Λάθος format μήνα (YYYY-MM)")
+
+    return crud.get_dashboard_data(db, year, month)

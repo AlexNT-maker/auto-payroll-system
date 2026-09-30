@@ -36,20 +36,77 @@
         <!-- Page content -->
         <main class="app-main" id="app">
 
-          <!-- Dashboard (default landing, "Αρχική") -->
+          <!-- Dashboard (home) -->
 <div id="page-dashboard" class="animate-enter">
-  <div class="glass-card" style="padding: 3rem 2rem; text-align: center; margin-top: 2rem;">
-    <p style="font-size: 1.1rem; color: #6b7280; margin: 0;">
-      🚧 Σε στάδιο ανάπτυξης...
-    </p>
-    <p style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.75rem;">
-      Τα διαγράμματα εξόδων και οι αναλύσεις θα εμφανιστούν εδώ σύντομα.
-    </p>
-  </div>
+
+    <div class="dashboard-header">
+        <h1 class="dashboard-greeting" id="dashboard-greeting">Γεια σου 👋</h1>
+        <div class="dashboard-date" id="dashboard-date"></div>
+    </div>
+
+    <!-- Hero: Monthly expenses + chart -->
+    <div class="glass-card dashboard-hero">
+        <div class="hero-left">
+            <div class="hero-label">ΕΞΟΔΑ <span id="hero-month-label"></span></div>
+            <div class="hero-amount" id="hero-total">— €</div>
+            <div class="hero-delta" id="hero-delta"></div>
+
+            <div class="hero-breakdown">
+                <div class="breakdown-item">
+                    <span class="breakdown-dot" style="background:#05407a"></span>
+                    <span>Μισθοδοσία</span>
+                    <strong id="hero-payroll">— €</strong>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-dot" style="background:rgba(5,64,122,0.55)"></span>
+                    <span>Υλικά</span>
+                    <strong id="hero-materials">— €</strong>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-dot" style="background:rgba(5,64,122,0.30)"></span>
+                    <span>Τιμολόγια</span>
+                    <strong id="hero-invoices">— €</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-chart">
+            <canvas id="dashboard-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Row: status + boats -->
+    <div class="dashboard-row">
+
+        <div class="glass-card dashboard-status" id="status-card">
+            <!-- injected by JS -->
+        </div>
+
+        <div class="glass-card dashboard-boats">
+            <div class="widget-header">
+                <h3>Top 5 Σκάφη</h3>
+                <select id="boats-period">
+                    <option value="year">Φέτος</option>
+                </select>
+            </div>
+            <div id="boats-ranking" class="boats-ranking"></div>
+        </div>
+
+    </div>
+
+    <!-- Export full report -->
+    <div class="glass-card dashboard-export">
+        <div>
+            <strong>📄 Πλήρης Αναφορά</strong>
+            <p>Κατέβασε την πλήρη αναφορά εξόδων ανά σκάφος.</p>
+        </div>
+        <button class="btn-submit" id="btn-export-full">Εξαγωγή PDF</button>
+    </div>
+
 </div>
 
           <!--Home page-->
-          <div id="page-home" class="animate-enter">
+          <div id="page-home" class="animate-enter hidden">
 
             <div class="date-selector" style="display: flex; align-items: center; gap: 1rem;">
               <label for="date-picker" style="margin: 0; font-weight: bold;">Ημερομηνία:</label>

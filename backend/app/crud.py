@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
-from datetime import date
+from datetime import date, timedelta
 
 # -- Employee --
 
@@ -517,3 +517,230 @@ def delete_named_item(db: Session, model, item_id: int):
     db.delete(item)
     db.commit()
     return item
+
+# -- Invoices --
+
+def get_invoices(db: Session):
+    return db.query(models.Invoice).order_by(
+        models.Invoice.date.desc(),
+        models.Invoice.id.desc()
+    ).all()
+
+def create_invoice(db: Session, invoice: schemas.InvoiceCreate):
+    db_invoice = models.Invoice(
+        date=invoice.date,
+        amount=invoice.amount,
+        supplier_id=invoice.supplier_id,
+        boat_id=invoice.boat_id
+    )
+    db.add(db_invoice)
+    db.commit()
+    db.refresh(db_invoice)
+    return db_invoice
+
+def update_invoice(db: Session, invoice_id: int, invoice_data: schemas.InvoiceCreate):
+    db_invoice = db.query(models.Invoice).filter(models.Invoice.id == invoice_id).first()
+    if not db_invoice:
+        return None
+    db_invoice.date = invoice_data.date
+    db_invoice.amount = invoice_data.amount
+    db_invoice.supplier_id = invoice_data.supplier_id
+    db_invoice.boat_id = invoice_data.boat_id
+    db.commit()
+    db.refresh(db_invoice)
+    return db_invoice
+
+def delete_invoice(db: Session, invoice_id: int):
+    db_invoice = db.query(models.Invoice).filter(models.Invoice.id == invoice_id).first()
+    if not db_invoice:
+        return None
+    db.delete(db_invoice)
+    db.commit()
+    return db_invoice
+
+# -- Helpers --
+
+def _attendance_cost(rec) -> float:
+    """Υπολογισμός κόστους για μία εγγραφή attendance."""
+    if not rec.employee:
+        return 0.0
+
+    cost = 0.0
+    if rec.present or rec.is_half_day:
+        mult = 0.5 if rec.is_half_day else 1.0
+        cost += (rec.employee.daily_wage or 0.0) * mult
+    if rec.overtime_hours and rec.overtime_hours > 0:
+        cost += rec.overtime_hours * (rec.employee.overtime_rate or 0.0)
+    if rec.extra_amount and rec.extra_amount > 0:
+        cost += rec.extra_amount
+    return cost
+
+
+# -- Dashboard --
+
+def get_dashboard_data(db: Session, year: int, month: int):
+    # ---------- Ranges ----------
+    start = date(year, month, 1)
+    if month == 12:
+        end = date(year, 12, 31)
+    else:
+        end = date(year, month + 1, 1) - timedelta(days=1)
+
+    if month == 1:
+        prev_start = date(year - 1, 12, 1)
+        prev_end = date(year - 1, 12, 31)
+    else:
+        prev_start = date(year, month - 1, 1)
+        prev_end = start - timedelta(days=1)
+
+    # ---------- Current month records ----------
+    month_att = db.query(models.Attendance).filter(
+        models.Attendance.date >= start,
+        models.Attendance.date <= end,
+    ).all()
+
+    month_usages = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.date >= start,
+        models.MaterialUsage.date <= end,
+    ).all()
+
+    month_invoices = db.query(models.Invoice).filter(
+        models.Invoice.date >= start,
+        models.Invoice.date <= end,
+    ).all()
+
+    # ---------- Current month totals ----------
+    payroll_total = sum(_attendance_cost(r) for r in month_att)
+    materials_total = sum(u.total_price for u in month_usages)
+    invoices_total = sum(i.amount for i in month_invoices)
+    grand_total = payroll_total + materials_total + invoices_total
+
+    # ---------- Previous month totals ----------
+    prev_att = db.query(models.Attendance).filter(
+        models.Attendance.date >= prev_start,
+        models.Attendance.date <= prev_end,
+    ).all()
+    prev_usages = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.date >= prev_start,
+        models.MaterialUsage.date <= prev_end,
+    ).all()
+    prev_invoices = db.query(models.Invoice).filter(
+        models.Invoice.date >= prev_start,
+        models.Invoice.date <= prev_end,
+    ).all()
+
+    prev_total = (
+        sum(_attendance_cost(r) for r in prev_att)
+        + sum(u.total_price for u in prev_usages)
+        + sum(i.amount for i in prev_invoices)
+    )
+
+    # ---------- Daily trend ----------
+    daily: dict = {}
+    d = start
+    while d <= end:
+        daily[d] = {"payroll": 0.0, "materials": 0.0, "invoices": 0.0}
+        d += timedelta(days=1)
+
+    for rec in month_att:
+        cost = _attendance_cost(rec)
+        if cost > 0 and rec.date in daily:
+            daily[rec.date]["payroll"] += cost
+
+    for u in month_usages:
+        if u.date in daily:
+            daily[u.date]["materials"] += u.total_price
+
+    for inv in month_invoices:
+        if inv.date in daily:
+            daily[inv.date]["invoices"] += inv.amount
+
+    daily_trend = [
+        {"date": day.isoformat(), **vals}
+        for day, vals in sorted(daily.items())
+    ]
+
+    # ---------- Today status ----------
+    today = date.today()
+    today_count = db.query(models.Attendance).filter(
+        models.Attendance.date == today,
+        models.Attendance.employee_id.isnot(None),
+    ).count()
+
+    today_status = {
+        "date": today,
+        "attendance_recorded": today_count > 0,
+    }
+
+    # ---------- Boats ranking YTD ----------
+    ytd_start = date(year, 1, 1)
+    ytd_end = today
+
+    boat_totals = {
+        b.id: {"boat_id": b.id, "boat_name": b.name, "total": 0.0}
+        for b in db.query(models.Boat).all()
+    }
+
+    # Payroll costs (split between main boat + overtime boat)
+    ytd_att = db.query(models.Attendance).filter(
+        models.Attendance.date >= ytd_start,
+        models.Attendance.date <= ytd_end,
+    ).all()
+
+    for rec in ytd_att:
+        if not rec.employee:
+            continue
+
+        # Main boat: wage + extra
+        if rec.boat_id and rec.boat_id in boat_totals:
+            daily_cost = 0.0
+            if rec.present or rec.is_half_day:
+                mult = 0.5 if rec.is_half_day else 1.0
+                daily_cost += (rec.employee.daily_wage or 0.0) * mult
+            daily_cost += rec.extra_amount or 0.0
+            boat_totals[rec.boat_id]["total"] += daily_cost
+
+        # Overtime boat
+        if rec.overtime_boat_id and rec.overtime_boat_id in boat_totals:
+            if rec.overtime_hours and rec.overtime_hours > 0:
+                boat_totals[rec.overtime_boat_id]["total"] += (
+                    rec.overtime_hours * (rec.employee.overtime_rate or 0.0)
+                )
+
+    # Materials YTD
+    ytd_usages = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.date >= ytd_start,
+        models.MaterialUsage.date <= ytd_end,
+    ).all()
+    for u in ytd_usages:
+        if u.boat_id in boat_totals:
+            boat_totals[u.boat_id]["total"] += u.total_price
+
+    # Invoices YTD
+    ytd_invoices = db.query(models.Invoice).filter(
+        models.Invoice.date >= ytd_start,
+        models.Invoice.date <= ytd_end,
+    ).all()
+    for inv in ytd_invoices:
+        if inv.boat_id in boat_totals:
+            boat_totals[inv.boat_id]["total"] += inv.amount
+
+    boats_ranking = sorted(
+        boat_totals.values(),
+        key=lambda x: x["total"],
+        reverse=True,
+    )[:5]
+
+    return {
+        "month": f"{year}-{month:02d}",
+        "total": grand_total,
+        "prev_month_total": prev_total,
+        "breakdown": {
+            "employees": payroll_total,
+            "materials": materials_total,
+            "invoices": invoices_total,
+        },
+        "daily_trend": daily_trend,
+        "today_status": today_status,
+        "boats_ranking": boats_ranking,
+    }
