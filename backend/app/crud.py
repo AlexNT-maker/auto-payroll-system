@@ -517,3 +517,43 @@ def delete_named_item(db: Session, model, item_id: int):
     db.delete(item)
     db.commit()
     return item
+
+# -- Invoices --
+
+def get_invoices(db: Session):
+    return db.query(models.Invoice).order_by(
+        models.Invoice.date.desc(),
+        models.Invoice.id.desc()
+    ).all()
+
+def create_invoice(db: Session, invoice: schemas.InvoiceCreate):
+    db_invoice = models.Invoice(
+        date=invoice.date,
+        amount=invoice.amount,
+        supplier_id=invoice.supplier_id,
+        boat_id=invoice.boat_id
+    )
+    db.add(db_invoice)
+    db.commit()
+    db.refresh(db_invoice)
+    return db_invoice
+
+def update_invoice(db: Session, invoice_id: int, invoice_data: schemas.InvoiceCreate):
+    db_invoice = db.query(models.Invoice).filter(models.Invoice.id == invoice_id).first()
+    if not db_invoice:
+        return None
+    db_invoice.date = invoice_data.date
+    db_invoice.amount = invoice_data.amount
+    db_invoice.supplier_id = invoice_data.supplier_id
+    db_invoice.boat_id = invoice_data.boat_id
+    db.commit()
+    db.refresh(db_invoice)
+    return db_invoice
+
+def delete_invoice(db: Session, invoice_id: int):
+    db_invoice = db.query(models.Invoice).filter(models.Invoice.id == invoice_id).first()
+    if not db_invoice:
+        return None
+    db.delete(db_invoice)
+    db.commit()
+    return db_invoice

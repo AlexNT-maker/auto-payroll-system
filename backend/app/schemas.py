@@ -176,3 +176,21 @@ class NamedItem(NamedItemBase):
 
     class Config:
         from_attributes = True
+
+
+# -- Schemas for invoices --
+
+class InvoiceBase(BaseModel):
+    date: date
+    amount: float
+    supplier_id: int
+    boat_id: int
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class Invoice(InvoiceBase):
+    id: int
+
+    class Config:
+        from_attributes = True

@@ -280,6 +280,30 @@ def delete_supplier(supplier_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Ο προμηθευτής δεν βρέθηκε")
     return {"ok": True}
 
+# -- Invoice Routes --
+
+@app.get("/invoices/", response_model=List[schemas.Invoice])
+def read_invoices(db: Session = Depends(get_db)):
+    return crud.get_invoices(db)
+
+@app.post("/invoices/", response_model=schemas.Invoice)
+def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
+    return crud.create_invoice(db, invoice)
+
+@app.put("/invoices/{invoice_id}", response_model=schemas.Invoice)
+def update_invoice(invoice_id: int, invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
+    updated = crud.update_invoice(db, invoice_id, invoice)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Το τιμολόγιο δεν βρέθηκε")
+    return updated
+
+@app.delete("/invoices/{invoice_id}")
+def delete_invoice(invoice_id: int, db: Session = Depends(get_db)):
+    deleted = crud.delete_invoice(db, invoice_id)
+    if deleted is None:
+        raise HTTPException(status_code=404, detail="Το τιμολόγιο δεν βρέθηκε")
+    return {"ok": True}
+
 
 # -- Invoice Categories --
 
