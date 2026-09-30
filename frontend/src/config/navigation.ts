@@ -32,7 +32,6 @@ export const SIDEBAR_CONFIG: NavEntry[] = [
         label: "Αναφορές",
         items: [
             { id: "nav-rep-employees", label: "Αναφορά εργαζομένων", href: "index.html#short-analysis" },
-            {id: "nav-edit-boats", label: "Σκαφών", href: "index.html#boats"},
             { id: "nav-rep-materials", label: "Αναφορά υλικών",      href: "materials.html#report" },
             { id: "nav-rep-full",      label: "Πλήρες αναφορά",      href: "materials.html#full-report" },
         ],
@@ -42,6 +41,7 @@ export const SIDEBAR_CONFIG: NavEntry[] = [
         label: "Επεξεργασία δεδομένων",
         items: [
             { id: "nav-edit-employees", label: "Εργαζομένων", href: "index.html#employees" },
+             {id: "nav-edit-boats", label: "Σκαφών", href: "index.html#boats"},
             { id: "nav-edit-materials", label: "Υλικών",       href: "materials.html#price-list" },
             { id: "nav-settings",       label: "Σταθερές",     href: "settings.html" },
         ],

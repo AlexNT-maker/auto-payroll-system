@@ -7,7 +7,7 @@ import { renderMaterialUsagesList } from "./ui/renderMaterialUsageList";
 import { renderShell } from "./ui/renderShell";
 import { initShellEvents } from "./handlers/shellEvents";
 
-// -- Internal pages --
+
 type PageKey = "usage" | "priceList" | "invoices" | "report" | "fullReport";
 
 const pages: Record<PageKey, HTMLElement> = {
@@ -51,7 +51,7 @@ function handleHashChange(): void {
 
 window.addEventListener("hashchange", handleHashChange);
 
-// -- Init --
+
 async function initApp(): Promise<void> {
     renderShell();
     initShellEvents();
