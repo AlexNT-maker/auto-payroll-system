@@ -4,6 +4,7 @@ import { getEmployees } from "../api/employeesApi";
 import { getMaterials } from "../api/materialsApi";
 import { getMaterialUsages } from "../api/materialsUsageApi";
 import { getSuppliers, getNamedItems } from "../api/settingsApi";
+import { getInvoices } from "../api/invoiceApi";
 
 export async function fetchData() {
     try {
@@ -19,6 +20,8 @@ export async function fetchData() {
         store.invoiceCategories = await getNamedItems("invoice-categories");
         store.materialUnits = await getNamedItems("material-units");
         store.materialCategories = await getNamedItems("material-categories");
+
+        store.invoices = await getInvoices();
 
     } catch (error) {
         console.error(error);

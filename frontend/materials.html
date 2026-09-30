@@ -101,31 +101,50 @@
             </table>
           </div>
 
-          <!-- Page: Τιμολόγια (placeholder) -->
+          <!-- Page: Τιμολόγια -->
 <div id="page-invoices" class="materials-page-section hidden">
-  <div class="glass-card" style="padding: 3rem 2rem; text-align: center; margin-top: 2rem;">
-    <p style="font-size: 1.1rem; color: #6b7280; margin: 0;">
-      🚧 Σε στάδιο ανάπτυξης...
-    </p>
-    <p style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.75rem;">
-      Η καταχώρηση τιμολογίων θα είναι διαθέσιμη σύντομα.
-    </p>
-  </div>
+
+    <div class="usage-view-toggle">
+        <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
+        <button type="button" data-view="aggregate">Σύνοψη</button>
+    </div>
+
+    <div class="usage-filters">
+        <div class="filter-group">
+            <label>Από:</label>
+            <input type="date" id="inv-filter-start">
+        </div>
+        <div class="filter-group">
+            <label>Έως:</label>
+            <input type="date" id="inv-filter-end">
+        </div>
+        <div class="filter-group">
+            <label>Προμηθευτής:</label>
+            <select id="inv-filter-supplier">
+                <option value="">Όλοι</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Χρεώνεται σε:</label>
+            <select id="inv-filter-boat">
+                <option value="">Όλα</option>
+            </select>
+        </div>
+        <button id="inv-filter-clear" type="button" class="usage-filter-clear">
+            Καθαρισμός
+        </button>
+    </div>
+
+    <table class="materials-table" id="invoices-table">
+        <thead id="invoices-thead"></thead>
+        <tbody id="invoices-list"></tbody>
+    </table>
+
 </div>
 
-          <!-- Page 3: Πλήρες Αναφορά (placeholder) -->
-          <div id="page-report" class="materials-page-section hidden">
-  <div class="glass-card" style="padding: 3rem 2rem; text-align: center; margin-top: 2rem;">
-    <p style="font-size: 1.1rem; color: #6b7280; margin: 0;">
-      🚧 Σε στάδιο ανάπτυξης...
-    </p>
-    <p style="font-size: 0.9rem; color: #9ca3af; margin-top: 0.75rem;">
-      Η αναφορά υλικών/αναλωσίμων θα είναι διαθέσιμη σύντομα.
-    </p>
-  </div>
-</div>
 
-          <!-- Page: Πλήρες Αναφορά (placeholder) -->
+
+  <!-- Page: Πλήρες Αναφορά (placeholder) -->
 <div id="page-full-report" class="materials-page-section hidden">
   <div class="glass-card" style="padding: 3rem 2rem; text-align: center; margin-top: 2rem;">
     <p style="font-size: 1.1rem; color: #6b7280; margin: 0;">
