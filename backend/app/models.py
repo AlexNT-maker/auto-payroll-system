@@ -52,6 +52,15 @@ class Attendance(Base):
     boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")
     overtime_boat = relationship("Boat", foreign_keys=[overtime_boat_id])
 
+#Snapshots for stable history
+    daily_wage_snapshot = Column(Float, nullable=True)
+    overtime_rate_snapshot = Column(Float, nullable=True)
+    bank_daily_amount_snapshot = Column(Float, nullable=True)
+
+    employee = relationship("Employee", back_populates = "attendance_records")
+    boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")
+    overtime_boat = relationship("Boat", foreign_keys=[overtime_boat_id])
+
  # -- Board No.4 Materials --
 
 class Material(Base):

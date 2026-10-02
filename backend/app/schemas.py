@@ -46,6 +46,9 @@ class AttendanceBase(BaseModel):
     overtime_hours: float = 0.0
     extra_amount: float = 0.0
     extra_reason: Optional[str] = None
+    daily_wage_snapshot: Optional[float] = None
+    overtime_rate_snapshot: Optional[float] = None
+    bank_daily_amount_snapshot: Optional[float] = None
 
 class AttendanceCreate(AttendanceBase):
     boat_id: Optional[int] = None
