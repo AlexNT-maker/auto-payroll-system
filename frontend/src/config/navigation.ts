@@ -49,6 +49,7 @@ export const SIDEBAR_CONFIG: NavEntry[] = [
     {
         label: "Πληρωμές",
         items: [
+            {id: "nav-work-history", label: "Ιστορικό εργασίας", href: "index.html#work-history"},
             { id: "nav-payroll", label: "Υπολογισμός μισθοδοσίας", href: "index.html#payments" },
         ],
     },
@@ -63,6 +64,7 @@ export const ROUTE_META: Record<string, PageMeta> = {
     "/index.html#boats":          { activeId: "nav-edit-boats", title: "Διαχείριση Σκαφών" },
     "/index.html#short-analysis": { activeId: "nav-rep-employees",  title: "Αναφορά εργαζομένων" },
     "/index.html#payments":       { activeId: "nav-payroll",        title: "Μισθοδοσία & Πληρωμές" },
+    "/index.html#work-history":   { activeId: "nav-work-history",   title: "Ιστορικό Εργασίας" },
 
     // ---------- materials.html ----------
     "/materials.html":               { activeId: "nav-materials",      title: "Υλικά και αποθήκη" },

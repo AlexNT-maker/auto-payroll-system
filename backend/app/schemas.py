@@ -229,3 +229,28 @@ class DashboardResponse(BaseModel):
     daily_trend: List[DashboardDailyPoint]
     today_status: DashboardTodayStatus
     boats_ranking: List[BoatRankingItem]
+
+
+# -- Schemas for attendance report (per employee) --
+
+class AttendanceReportItem(BaseModel):
+    id: int
+    date: date
+    employee_id: int
+    employee_name: str
+    boat_id: Optional[int] = None
+    boat_name: Optional[str] = None
+    is_half_day: bool = False
+    overtime_hours: float = 0.0
+    daily_wage: float = 0.0
+    overtime_cost: float = 0.0
+    extra_amount: float = 0.0
+    extra_reason: Optional[str] = None
+    total_cost: float = 0.0
+
+
+class AttendanceReportResponse(BaseModel):
+    start: date
+    end: date
+    total: float
+    records: List[AttendanceReportItem]

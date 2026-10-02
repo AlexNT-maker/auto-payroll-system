@@ -136,7 +136,8 @@
                 <tbody id="attendance-list"></tbody>
               </table>
 
-              <button type="submit" id="btn-submit-daily" class="btn-submit hover-lift click-shrink">Αποθήκευση</button>
+              <button type="submit" id="btn-submit-daily" class="btn-submit hover-lift click-shrink">
+                Αποθήκευση</button>
             </form>
           </div>
 
@@ -267,8 +268,42 @@
             </table>
           </div>
 
-          <!-- ==== MODALS (ίδια) ==== -->
+                    <!--Page No.7: Workday history analysis-->
+          <div id="page-work-history" class="animate-enter hidden">
 
+            <div class="usage-filters">
+                <div class="filter-group">
+                    <label>Από:</label>
+                    <input type="date" id="emp-rep-filter-start">
+                </div>
+                <div class="filter-group">
+                    <label>Έως:</label>
+                    <input type="date" id="emp-rep-filter-end">
+                </div>
+                <div class="filter-group">
+                    <label>Εργαζόμενος:</label>
+                    <select id="emp-rep-filter-employee">
+                        <option value="">Όλοι</option>
+                    </select>
+                </div>
+                <button id="emp-rep-filter-clear" type="button" class="usage-filter-clear">
+                    Καθαρισμός
+                </button>
+            </div>
+
+            <div class="usage-view-toggle" id="emp-rep-view-toggle">
+                <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
+                <button type="button" data-view="aggregate">Σύνοψη</button>
+            </div>
+
+            <table class="attendance-table" id="emp-rep-table">
+                <thead id="emp-rep-thead"></thead>
+                <tbody id="emp-rep-list"></tbody>
+            </table>
+
+          </div>
+
+        <!--Modals-->
           <div id="modal-employee" class="modal-overlay hidden">
             <div class="modal-content animate-enter">
               <h2 id="modal-title">Νέος εργαζόμενος</h2>
@@ -346,7 +381,11 @@
 </div>
         </form>
     </div>
+                </form>
+          </div>
 </div>
+
+
 
           <div id="message-modal" class="modal hidden">
             <div class="message-modal-window">

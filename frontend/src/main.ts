@@ -10,13 +10,14 @@ import { initAttendanceEvents, loadDayData } from "./handlers/attendanceEvents";
 import { renderShell } from "./ui/renderShell";
 import { initShellEvents } from "./handlers/shellEvents";
 import { initDashboard } from "./handlers/dashboardEvents";
+import { initEmployeeReportEvents } from "./handlers/employeeReportEvents";
 
 // -- Date picker default --
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker');
 if (datePicker) datePicker.valueAsDate = new Date();
 
 // -- Internal pages --
-type PageName = 'dashboard' | 'home' | 'employees' | 'boats' | 'shortAnalysis' | 'payments';
+type PageName = 'dashboard' | 'home' | 'employees' | 'boats' | 'shortAnalysis' | 'payments' | 'workHistory';
 
 const pages: Record<PageName, HTMLElement> = {
     dashboard:     document.getElementById('page-dashboard')!,
@@ -25,6 +26,7 @@ const pages: Record<PageName, HTMLElement> = {
     boats:         document.getElementById('page-boats')!,
     shortAnalysis: document.getElementById('page-short-analysis')!,
     payments:      document.getElementById('page-payments')!,
+    workHistory:   document.getElementById('page-work-history')!,
 };
 
 const HASH_MAP: Record<string, PageName> = {
@@ -35,16 +37,24 @@ const HASH_MAP: Record<string, PageName> = {
     "boats":          "boats",
     "short-analysis": "shortAnalysis",
     "payments":       "payments",
+    "work-history":   "workHistory",
 };
 
-// -- Navigation --
+const PAGE_HASH: Record<PageName, string> = {
+    dashboard:     "",
+    home:          "home",
+    employees:     "employees",
+    boats:         "boats",
+    shortAnalysis: "short-analysis",
+    payments:      "payments",
+    workHistory:   "work-history",
+};
+
 function navigateTo(pageName: PageName): void {
     Object.values(pages).forEach(page => page.classList.add('hidden'));
     pages[pageName].classList.remove('hidden');
 
-    const hash = pageName === 'dashboard'
-        ? ''
-        : `#${pageName === 'shortAnalysis' ? 'short-analysis' : pageName}`;
+    const hash = PAGE_HASH[pageName] ? `#${PAGE_HASH[pageName]}` : "";
 
     if (window.location.hash !== hash) {
         history.replaceState(null, '', hash || window.location.pathname);
@@ -54,7 +64,8 @@ function navigateTo(pageName: PageName): void {
     if (pageName === 'boats')         renderBoatsList();
     if (pageName === 'payments')      initPayrollPage();
     if (pageName === 'shortAnalysis') initShortAnalysisPage();
-    if (pageName === 'dashboard') initDashboard();
+    if (pageName === 'dashboard')     initDashboard();
+    if (pageName === 'workHistory')   initEmployeeReportEvents();
 }
 
 function handleHashChange(): void {
