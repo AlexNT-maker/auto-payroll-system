@@ -394,3 +394,14 @@ def read_dashboard(target_month: Optional[str] = None, db: Session = Depends(get
         raise HTTPException(status_code=400, detail="Λάθος format μήνα (YYYY-MM)")
 
     return crud.get_dashboard_data(db, year, month)
+
+# -- Attendance Report --
+
+@app.get("/attendance-report/", response_model=schemas.AttendanceReportResponse)
+def read_attendance_report(
+    start: date,
+    end: date,
+    employee_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    return crud.get_attendance_report(db, start, end, employee_id)

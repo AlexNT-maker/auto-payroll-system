@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 from datetime import date, timedelta
+from typing import Optional
 
 # -- Employee --
 
@@ -743,4 +744,72 @@ def get_dashboard_data(db: Session, year: int, month: int):
         "daily_trend": daily_trend,
         "today_status": today_status,
         "boats_ranking": boats_ranking,
+    }
+
+# -- Attendance Report --
+
+def get_attendance_report(
+    db: Session,
+    start: date,
+    end: date,
+    employee_id: Optional[int] = None,
+):
+    query = db.query(models.Attendance).filter(
+        models.Attendance.date >= start,
+        models.Attendance.date <= end,
+    )
+
+    if employee_id:
+        query = query.filter(models.Attendance.employee_id == employee_id)
+
+    records = query.order_by(models.Attendance.date).all()
+
+    results = []
+    total = 0.0
+
+    for rec in records:
+        if not rec.employee:
+            continue
+
+        # Μισθός ημέρας
+        if rec.is_half_day:
+            mult = 0.5
+        elif rec.present:
+            mult = 1.0
+        else:
+            mult = 0.0
+
+        daily_wage = (rec.employee.daily_wage or 0.0) * mult
+        overtime_cost = (rec.overtime_hours or 0.0) * (rec.employee.overtime_rate or 0.0)
+        extra = rec.extra_amount or 0.0
+        total_cost = daily_wage + overtime_cost + extra
+
+        # Skip records που δεν έχουν τίποτα
+        if total_cost == 0 and not rec.is_half_day and not rec.present:
+            continue
+
+        boat_name = rec.boat.name if rec.boat else None
+
+        results.append({
+            "id": rec.id,
+            "date": rec.date,
+            "employee_id": rec.employee_id,
+            "employee_name": rec.employee.name,
+            "boat_id": rec.boat_id,
+            "boat_name": boat_name,
+            "is_half_day": bool(rec.is_half_day),
+            "overtime_hours": rec.overtime_hours or 0.0,
+            "daily_wage": daily_wage,
+            "overtime_cost": overtime_cost,
+            "extra_amount": extra,
+            "extra_reason": rec.extra_reason,
+            "total_cost": total_cost,
+        })
+        total += total_cost
+
+    return {
+        "start": start,
+        "end": end,
+        "total": total,
+        "records": results,
     }
