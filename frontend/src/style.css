@@ -162,8 +162,16 @@ input[type="number"] {
 }
 
 .status-icon {
-    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    color: var(--text);   /* ← μαύρο */
+}
+
+.status-icon svg {
+    display: block;
+    color: var(--text);
 }
 
 .status-text strong {

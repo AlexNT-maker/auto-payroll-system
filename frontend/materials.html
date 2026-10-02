@@ -58,10 +58,18 @@
           <!-- Page 2: Καταχώρηση -->
           <div id="page-usage" class="materials-page-section hidden">
 
-            <div class="usage-view-toggle">
-              <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
-              <button type="button" data-view="aggregate">Σύνοψη</button>
-            </div>
+           <div class="usage-toolbar">
+  <div class="usage-view-toggle">
+    <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
+    <button type="button" data-view="aggregate">Σύνοψη</button>
+  </div>
+  <button id="btn-export-usage-pdf" class="btn-export-min" type="button">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+    </svg>
+    Εξαγωγή
+  </button>
+</div>
 
             <div class="usage-filters">
               <div class="filter-group">
@@ -104,10 +112,18 @@
           <!-- Page: Τιμολόγια -->
 <div id="page-invoices" class="materials-page-section hidden">
 
+  <div class="usage-toolbar">
     <div class="usage-view-toggle">
         <button type="button" data-view="detail" class="active">Λεπτομέρειες</button>
         <button type="button" data-view="aggregate">Σύνοψη</button>
     </div>
+    <button id="btn-export-invoices-pdf" class="btn-export-min" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+        Εξαγωγή
+    </button>
+</div>
 
     <div class="usage-filters">
         <div class="filter-group">

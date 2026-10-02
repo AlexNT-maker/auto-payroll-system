@@ -405,3 +405,44 @@ def read_attendance_report(
     db: Session = Depends(get_db),
 ):
     return crud.get_attendance_report(db, start, end, employee_id)
+
+
+# -- Export PDF: Material Usages --
+
+@app.get("/material-usages/pdf")
+def export_material_usages_pdf(
+    start: date,
+    end: date,
+    material_id: Optional[int] = None,
+    category: Optional[str] = None,
+    boat_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    data = crud.get_material_usages_aggregate(db, start, end, material_id, category, boat_id)
+    pdf_buffer = pdf_utils.generate_material_usage_pdf(data)
+    filename = f"materials_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+# -- Export PDF: Invoices --
+
+@app.get("/invoices/pdf")
+def export_invoices_pdf(
+    start: date,
+    end: date,
+    supplier_id: Optional[int] = None,
+    boat_id: Optional[int] = None,
+    db: Session = Depends(get_db),
+):
+    data = crud.get_invoices_aggregate(db, start, end, supplier_id, boat_id)
+    pdf_buffer = pdf_utils.generate_invoice_analysis_pdf(data)
+    filename = f"invoices_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
