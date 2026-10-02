@@ -14,6 +14,8 @@ import {
     setInvoiceView,
 } from "../ui/renderInvoiceList";
 
+const btnExportInvoices = document.querySelector<HTMLButtonElement>("#btn-export-invoices-pdf")!;
+
 const invoiceListBody = document.querySelector<HTMLTableSectionElement>("#invoices-list")!;
 
 const filterStart = document.querySelector<HTMLInputElement>("#inv-filter-start")!;
@@ -23,6 +25,22 @@ const filterBoat = document.querySelector<HTMLSelectElement>("#inv-filter-boat")
 const filterClear = document.querySelector<HTMLButtonElement>("#inv-filter-clear")!;
 
 
+function handleExportInvoicesPdf(): void {
+    const start = filterStart.value;
+    const end = filterEnd.value;
+
+    if (!start || !end) {
+        showMessageModal("Σφάλμα", "Παρακαλώ επιλέξτε ημερομηνίες.", "error");
+        return;
+    }
+
+    let url = `http://127.0.0.1:8000/invoices/pdf?start=${start}&end=${end}`;
+    if (filterSupplier.value) url += `&supplier_id=${filterSupplier.value}`;
+    if (filterBoat.value)     url += `&boat_id=${filterBoat.value}`;
+
+    window.open(url, "_blank");
+}
+
 export function initInvoiceEvents(): void {
     invoiceListBody.addEventListener("click", handleTableClick);
 
@@ -31,6 +49,7 @@ export function initInvoiceEvents(): void {
     filterSupplier.addEventListener("change", handleFilterChange);
     filterBoat.addEventListener("change", handleFilterChange);
     filterClear.addEventListener("click", handleClearFilters);
+    btnExportInvoices.addEventListener("click", handleExportInvoicesPdf);
 
     document.querySelectorAll<HTMLButtonElement>("#page-invoices .usage-view-toggle button").forEach((btn) => {
         btn.addEventListener("click", () => {

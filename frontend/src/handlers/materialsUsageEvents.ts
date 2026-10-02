@@ -24,6 +24,25 @@ const filterCategory = document.querySelector<HTMLSelectElement>("#usage-filter-
 const filterBoat = document.querySelector<HTMLSelectElement>("#usage-filter-boat")!;
 const filterClear = document.querySelector<HTMLButtonElement>("#usage-filter-clear")!;
 
+const btnExportPdf = document.querySelector<HTMLButtonElement>("#btn-export-usage-pdf")!;
+
+function handleExportPdf(): void {
+    const start = filterStart.value;
+    const end = filterEnd.value;
+
+    if (!start || !end) {
+        showMessageModal("Σφάλμα", "Παρακαλώ επιλέξτε ημερομηνίες.", "error");
+        return;
+    }
+
+    let url = `http://127.0.0.1:8000/material-usages/pdf?start=${start}&end=${end}`;
+    if (filterMaterial.value) url += `&material_id=${filterMaterial.value}`;
+    if (filterCategory.value) url += `&category=${encodeURIComponent(filterCategory.value)}`;
+    if (filterBoat.value)     url += `&boat_id=${filterBoat.value}`;
+
+    window.open(url, "_blank");
+}
+
 
 export function initMaterialUsageEvents(): void {
     usageListBody.addEventListener("click", handleTableClick);
@@ -34,6 +53,7 @@ export function initMaterialUsageEvents(): void {
     filterCategory.addEventListener("change", handleFilterChange);
     filterBoat.addEventListener("change", handleFilterChange);
     filterClear.addEventListener("click", handleClearFilters);
+    btnExportPdf.addEventListener("click", handleExportPdf);
 
     document.querySelectorAll<HTMLButtonElement>(".usage-view-toggle button").forEach((btn) => {
         btn.addEventListener("click", () => {
