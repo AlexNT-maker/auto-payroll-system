@@ -223,3 +223,100 @@ def generate_short_boat_analysis_pdf(data, is_captain=False):
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
+
+def _base_table_style(font_name):
+    style = TableStyle([
+        ('FONT', (0, 0), (-1, -1), font_name),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+    ])
+    try:
+        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
+        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold')
+        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold')
+    except Exception:
+        pass
+    return style
+
+
+def generate_material_usage_pdf(data):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+
+    font_name = register_greek_font()
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontName=font_name, alignment=1)
+    sub_style = ParagraphStyle('Sub', fontName=font_name, alignment=1, fontSize=10, textColor=colors.grey, spaceAfter=12)
+    filter_style = ParagraphStyle('Filter', fontName=font_name, alignment=1, fontSize=9, textColor=colors.HexColor('#05407a'))
+
+    elements.append(Paragraph("Ανάλυση Κατανάλωσης Υλικών", title_style))
+    elements.append(Paragraph(f"Διάστημα: {data['start']} έως {data['end']}", sub_style))
+    if data.get("filter_text"):
+        elements.append(Paragraph(f"Φίλτρα: {data['filter_text']}", filter_style))
+    elements.append(Spacer(1, 16))
+
+    table_data = [["Υλικό", "Μονάδα", "Κατηγορία", "Ποσότητα", "Παραχωρήθηκε", "Σύνολο"]]
+
+    for item in data["items"]:
+        table_data.append([
+            item["material_name"],
+            item["unit"],
+            item["category"],
+            f"{item['quantity']:g}",
+            item["boat_name"],
+            f"{item['total']:.2f} €",
+        ])
+
+    table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", "", "", "", f"{data['total']:.2f} €"])
+
+    table = Table(table_data, colWidths=[110, 55, 95, 60, 95, 80])
+    table.setStyle(_base_table_style(font_name))
+    elements.append(table)
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+
+def generate_invoice_analysis_pdf(data):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+
+    font_name = register_greek_font()
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontName=font_name, alignment=1)
+    sub_style = ParagraphStyle('Sub', fontName=font_name, alignment=1, fontSize=10, textColor=colors.grey, spaceAfter=12)
+    filter_style = ParagraphStyle('Filter', fontName=font_name, alignment=1, fontSize=9, textColor=colors.HexColor('#05407a'))
+
+    elements.append(Paragraph("Ανάλυση Τιμολογίων", title_style))
+    elements.append(Paragraph(f"Διάστημα: {data['start']} έως {data['end']}", sub_style))
+    if data.get("filter_text"):
+        elements.append(Paragraph(f"Φίλτρα: {data['filter_text']}", filter_style))
+    elements.append(Spacer(1, 16))
+
+    table_data = [["Προμηθευτής", "Χρεώνεται σε", "Σύνολο", "Πλήθος"]]
+
+    for item in data["items"]:
+        table_data.append([
+            item["supplier_name"],
+            item["boat_name"],
+            f"{item['total']:.2f} €",
+            str(item["count"]),
+        ])
+
+    table_data.append(["ΓΕΝΙΚΟ ΣΥΝΟΛΟ", "", f"{data['total']:.2f} €", ""])
+
+    table = Table(table_data, colWidths=[180, 140, 100, 75])
+    table.setStyle(_base_table_style(font_name))
+    elements.append(table)
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer

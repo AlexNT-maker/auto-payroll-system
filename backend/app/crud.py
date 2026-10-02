@@ -813,3 +813,129 @@ def get_attendance_report(
         "total": total,
         "records": results,
     }
+
+
+# -- Aggregations for PDF export --
+
+def _build_usage_filter_text(db: Session, material_id, category, boat_id) -> str:
+    parts = []
+    if material_id:
+        mat = db.query(models.Material).filter(models.Material.id == material_id).first()
+        if mat:
+            parts.append(f"Υλικό: {mat.name}")
+    if category:
+        parts.append(f"Κατηγορία: {category}")
+    if boat_id:
+        boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+        if boat:
+            parts.append(f"Σκάφος: {boat.name}")
+    return " | ".join(parts)
+
+
+def get_material_usages_aggregate(
+    db: Session,
+    start: date,
+    end: date,
+    material_id: Optional[int] = None,
+    category: Optional[str] = None,
+    boat_id: Optional[int] = None,
+):
+    query = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.date >= start,
+        models.MaterialUsage.date <= end,
+    )
+
+    if material_id:
+        query = query.filter(models.MaterialUsage.material_id == material_id)
+    if boat_id:
+        query = query.filter(models.MaterialUsage.boat_id == boat_id)
+
+    records = query.all()
+
+    agg: dict = {}
+    for rec in records:
+        if not rec.material:
+            continue
+        if category and rec.material.category != category:
+            continue
+
+        key = (rec.material_id, rec.boat_id)
+        if key not in agg:
+            agg[key] = {
+                "material_name": rec.material.name,
+                "unit": rec.material.unit,
+                "category": rec.material.category,
+                "boat_name": rec.boat.name if rec.boat else "-",
+                "quantity": 0.0,
+                "total": 0.0,
+            }
+        agg[key]["quantity"] += rec.quantity or 0.0
+        agg[key]["total"] += rec.total_price or 0.0
+
+    items = list(agg.values())
+    items.sort(key=lambda x: (x["material_name"], x["boat_name"]))
+
+    return {
+        "start": start,
+        "end": end,
+        "total": sum(i["total"] for i in items),
+        "filter_text": _build_usage_filter_text(db, material_id, category, boat_id),
+        "items": items,
+    }
+
+
+def _build_invoice_filter_text(db: Session, supplier_id, boat_id) -> str:
+    parts = []
+    if supplier_id:
+        s = db.query(models.Supplier).filter(models.Supplier.id == supplier_id).first()
+        if s:
+            parts.append(f"Προμηθευτής: {s.name}")
+    if boat_id:
+        b = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+        if b:
+            parts.append(f"Σκάφος: {b.name}")
+    return " | ".join(parts)
+
+
+def get_invoices_aggregate(
+    db: Session,
+    start: date,
+    end: date,
+    supplier_id: Optional[int] = None,
+    boat_id: Optional[int] = None,
+):
+    query = db.query(models.Invoice).filter(
+        models.Invoice.date >= start,
+        models.Invoice.date <= end,
+    )
+
+    if supplier_id:
+        query = query.filter(models.Invoice.supplier_id == supplier_id)
+    if boat_id:
+        query = query.filter(models.Invoice.boat_id == boat_id)
+
+    records = query.all()
+
+    agg: dict = {}
+    for rec in records:
+        key = (rec.supplier_id, rec.boat_id)
+        if key not in agg:
+            agg[key] = {
+                "supplier_name": rec.supplier.name if rec.supplier else "-",
+                "boat_name": rec.boat.name if rec.boat else "-",
+                "total": 0.0,
+                "count": 0,
+            }
+        agg[key]["total"] += rec.amount or 0.0
+        agg[key]["count"] += 1
+
+    items = list(agg.values())
+    items.sort(key=lambda x: (x["supplier_name"], x["boat_name"]))
+
+    return {
+        "start": start,
+        "end": end,
+        "total": sum(i["total"] for i in items),
+        "filter_text": _build_invoice_filter_text(db, supplier_id, boat_id),
+        "items": items,
+    }
