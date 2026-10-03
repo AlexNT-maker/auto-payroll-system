@@ -49,6 +49,7 @@ class AttendanceBase(BaseModel):
     daily_wage_snapshot: Optional[float] = None
     overtime_rate_snapshot: Optional[float] = None
     bank_daily_amount_snapshot: Optional[float] = None
+    employee_name_snapshot: Optional[str] = None
 
 class AttendanceCreate(AttendanceBase):
     boat_id: Optional[int] = None
@@ -239,7 +240,7 @@ class DashboardResponse(BaseModel):
 class AttendanceReportItem(BaseModel):
     id: int
     date: date
-    employee_id: int
+    employee_id: Optional[int] = None
     employee_name: str
     boat_id: Optional[int] = None
     boat_name: Optional[str] = None
@@ -257,3 +258,15 @@ class AttendanceReportResponse(BaseModel):
     end: date
     total: float
     records: List[AttendanceReportItem]
+
+
+class LastAttendanceItem(BaseModel):
+    employee_id: int
+    boat_id: Optional[int] = None
+    present: bool = False
+    is_half_day: bool = False
+
+
+class LastAttendanceResponse(BaseModel):
+    date: date
+    records: List[LastAttendanceItem]

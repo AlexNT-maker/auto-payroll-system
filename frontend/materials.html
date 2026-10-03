@@ -160,13 +160,37 @@
 
 
 
-  <!-- Page: Πλήρες Αναφορά (placeholder) -->
 <div id="page-full-report" class="materials-page-section hidden">
-  <div class="glass-card" style="padding: 3rem 2rem; text-align: center; margin-top: 2rem;">
-    <p style="font-size: 1.1rem; color: #6b7280; margin: 0;">
-      🚧 Σε στάδιο ανάπτυξης...
-    </p>
-  </div>
+
+    <div class="usage-filters">
+        <div class="filter-group">
+            <label>Σκάφος:</label>
+            <select id="full-rep-boat">
+                <option value="">-- Επιλογή --</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Από:</label>
+            <input type="date" id="full-rep-start">
+        </div>
+        <div class="filter-group">
+            <label>Έως:</label>
+            <input type="date" id="full-rep-end">
+        </div>
+        <button id="btn-export-full-report" type="button" class="btn-export-min">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+            </svg>
+            Εξαγωγή PDF
+        </button>
+    </div>
+
+    <div class="glass-card" style="padding: 2rem 2.5rem; margin-top: 1rem;">
+        <p style="text-align: center; color: #6b7280;">
+            Επιλέξτε σκάφος και διάστημα, μετά πατήστε <strong>Εξαγωγή PDF</strong>.
+        </p>
+    </div>
+
 </div>
 
           <!-- Modals -->

@@ -48,14 +48,11 @@ class Attendance(Base):
     extra_amount = Column(Float, default = 0.0)
     extra_reason = Column(String, nullable = True)
 
-    employee = relationship("Employee", back_populates = "attendance_records")
-    boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")
-    overtime_boat = relationship("Boat", foreign_keys=[overtime_boat_id])
-
 #Snapshots for stable history
     daily_wage_snapshot = Column(Float, nullable=True)
     overtime_rate_snapshot = Column(Float, nullable=True)
     bank_daily_amount_snapshot = Column(Float, nullable=True)
+    employee_name_snapshot = Column(String, nullable=True)
 
     employee = relationship("Employee", back_populates = "attendance_records")
     boat = relationship("Boat", foreign_keys=[boat_id], back_populates = "attendance_records")

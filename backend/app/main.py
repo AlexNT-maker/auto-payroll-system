@@ -85,10 +85,18 @@ def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Sess
 
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int, db: Session = Depends(get_db)):
-    deleted_employee = crud.delete_employee(db, employee_id)
-    if deleted_employee is None:
+    result = crud.delete_employee(db, employee_id)
+
+    if result == "NOT_FOUND":
         raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
-    return {"message": "Επιτυχής διαγραφή", "name": deleted_employee.name}
+
+    if result == "BLOCKED":
+        raise HTTPException(
+            status_code=400,
+            detail="Δεν μπορεί να διαγραφεί: έχει καταχωρήσεις εργασίας. Τα δεδομένα είναι ιστορικά."
+        )
+
+    return {"message": "Επιτυχής διαγραφή", "name": result["name"]}
 
 # 2. -- Boats --
 @app.post("/boats/", response_model= schemas.Boat)
@@ -441,6 +449,33 @@ def export_invoices_pdf(
     data = crud.get_invoices_aggregate(db, start, end, supplier_id, boat_id)
     pdf_buffer = pdf_utils.generate_invoice_analysis_pdf(data)
     filename = f"invoices_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+@app.get("/attendance/last-before/{target_date}", response_model=schemas.LastAttendanceResponse)
+def read_last_attendance_before(target_date: date, db: Session = Depends(get_db)):
+    result = crud.get_last_attendance_before(db, target_date)
+    if not result:
+        raise HTTPException(status_code=404, detail="Δεν βρέθηκε προηγούμενη καταχώρηση")
+    return result
+
+@app.get("/boats/{boat_id}/full-report/pdf")
+def export_full_boat_report_pdf(
+    boat_id: int,
+    start: date,
+    end: date,
+    db: Session = Depends(get_db),
+):
+    data = crud.get_full_boat_report_data(db, boat_id, start, end)
+    if not data:
+        raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
+
+    pdf_buffer = pdf_utils.generate_full_boat_report_pdf(data)
+    filename = f"full_report_{data['boat_name']}_{start}_{end}.pdf"
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
