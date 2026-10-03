@@ -328,10 +328,6 @@ def generate_invoice_analysis_pdf(data):
 
 LOGO_PATH = r"C:\Users\alexn\OneDrive\Desktop\auto-payroll-system\frontend\src\icon\logo.png"
 
-
-LOGO_PATH = r"C:\Users\alexn\OneDrive\Desktop\auto-payroll-system\frontend\src\icon\logo.png"
-
-
 def _load_logo_flowable(width: float = 180):
     """Load the logo image for PDF reports."""
     try:
