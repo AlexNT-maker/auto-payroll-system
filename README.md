@@ -14,6 +14,12 @@
 ### Manipulate standard data
 ![Standard info manipulation](images/StandardInfo.png)
 
+## Data organized
+![Suppliers data](images/Data_manipulation.png)
+
+## PDF Report 
+![Pdf report visualization](images/Full_Report.png)
+
 Work in progress... Photos are just a sample of the new UI and new features.
 
 

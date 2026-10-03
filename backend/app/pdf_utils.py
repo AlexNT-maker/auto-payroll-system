@@ -447,7 +447,7 @@ def generate_full_boat_report_pdf(data):
 
     # ---------- ΠΡΟΜΗΘΕΥΤΕΣ ----------
     if data["suppliers"]:
-        elements.append(Paragraph("ΕΞΟΔΑ ΠΡΟΜΗΘΕΥΤΗ", section_style))
+        elements.append(Paragraph("ΤΙΜΟΛΟΓΙΑΚΑ ΕΞΟΔΑ", section_style))
 
         s_data = [["Προμηθευτής", "Τιμολόγια", "Σύνολο"]]
         for s in data["suppliers"]:
