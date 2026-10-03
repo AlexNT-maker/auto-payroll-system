@@ -85,10 +85,18 @@ def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Sess
 
 @app.delete("/employees/{employee_id}")
 def delete_employee(employee_id: int, db: Session = Depends(get_db)):
-    deleted_employee = crud.delete_employee(db, employee_id)
-    if deleted_employee is None:
+    result = crud.delete_employee(db, employee_id)
+
+    if result == "NOT_FOUND":
         raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
-    return {"message": "Επιτυχής διαγραφή", "name": deleted_employee.name}
+
+    if result == "BLOCKED":
+        raise HTTPException(
+            status_code=400,
+            detail="Δεν μπορεί να διαγραφεί: έχει καταχωρήσεις εργασίας. Τα δεδομένα είναι ιστορικά."
+        )
+
+    return {"message": "Επιτυχής διαγραφή", "name": result["name"]}
 
 # 2. -- Boats --
 @app.post("/boats/", response_model= schemas.Boat)
@@ -446,3 +454,11 @@ def export_invoices_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename={filename}"},
     )
+
+
+@app.get("/attendance/last-before/{target_date}", response_model=schemas.LastAttendanceResponse)
+def read_last_attendance_before(target_date: date, db: Session = Depends(get_db)):
+    result = crud.get_last_attendance_before(db, target_date)
+    if not result:
+        raise HTTPException(status_code=404, detail="Δεν βρέθηκε προηγούμενη καταχώρηση")
+    return result

@@ -23,6 +23,12 @@ def _get_bank_daily(rec) -> float:
         return rec.bank_daily_amount_snapshot
     return (rec.employee.bank_daily_amount or 0.0) if rec.employee else 0.0
 
+def _get_employee_name(rec) -> str:
+    """Snapshot name or fallback for employee."""
+    if rec.employee_name_snapshot:
+        return rec.employee_name_snapshot
+    return rec.employee.name if rec.employee else "—"
+
 # -- Employee --
 
 # Fetch all the workers
@@ -60,10 +66,21 @@ def update_employee(db: Session, employee_id: int, employee_data: schemas.Employ
 # Delete employee
 def delete_employee(db: Session, employee_id: int):
     db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
-    if db_employee:
-        db.delete(db_employee)
-        db.commit()
-        return db_employee
+    if not db_employee:
+        return "NOT_FOUND"
+
+    has_records = db.query(models.Attendance).filter(
+        models.Attendance.employee_id == employee_id
+    ).count()
+
+    if has_records > 0:
+        return "BLOCKED"   
+    
+    name = db_employee.name
+    db.delete(db_employee)
+    db.commit()
+    return {"status" : "ok", 
+            "name" : name }
 
 # -- Boats --
 
@@ -103,7 +120,7 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
     if not boat:
         return None
 
-    records = db.query(models.Attendance).join(models.Employee).filter(
+    records = db.query(models.Attendance).filter(
         (models.Attendance.boat_id == boat_id) | (models.Attendance.overtime_boat_id == boat_id),
         models.Attendance.date >= start_date,
         models.Attendance.date <= end_date,
@@ -132,7 +149,7 @@ def get_boat_analysis(db: Session, boat_id: int, start_date: date, end_date: dat
             total_sum += daily_total
             analysis_data.append({
                 "date": rec.date,
-                "employee_name": rec.employee.name,
+                "employee_name": _get_employee_name(rec),
                 "daily_cost": wage + extra,
                 "overtime_cost": ot_cost,
                 "total_cost": daily_total
@@ -145,7 +162,7 @@ def get_short_boat_analysis_data(db: Session, boat_id: int, start_date: date, en
     boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
     if not boat: return None
 
-    records = db.query(models.Attendance).join(models.Employee).filter(
+    records = db.query(models.Attendance).filter(
         (models.Attendance.boat_id == boat_id) | (models.Attendance.overtime_boat_id == boat_id),
         models.Attendance.date >= start_date,
         models.Attendance.date <= end_date,
@@ -155,25 +172,25 @@ def get_short_boat_analysis_data(db: Session, boat_id: int, start_date: date, en
     grand_total = 0.0
 
     for rec in records:
-        emp_id = rec.employee.id
-        if emp_id not in emp_totals:
-            emp_totals[emp_id] = {"name": rec.employee.name, "days": 0.0, "ot_hours": 0.0, "cost": 0.0}
+        emp_key = rec.employee_id if rec.employee_id is not None else -1
+        if emp_key not in emp_totals:
+            emp_totals[emp_key] = {"name": _get_employee_name(rec), "days": 0.0, "ot_hours": 0.0, "cost": 0.0}
 
         daily_cost = 0.0
 
         if rec.boat_id == boat_id:
             multiplier = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
-            emp_totals[emp_id]["days"] += multiplier
+            emp_totals[emp_key]["days"] += multiplier                    # ✅
             wage = _get_daily_wage(rec) * multiplier
             extra = rec.extra_amount or 0.0
             daily_cost += (wage + extra)
 
         if rec.overtime_boat_id == boat_id:
-            emp_totals[emp_id]["ot_hours"] += rec.overtime_hours or 0.0
+            emp_totals[emp_key]["ot_hours"] += rec.overtime_hours or 0.0 # ✅
             ot_cost = (rec.overtime_hours or 0.0) * _get_overtime_rate(rec)
             daily_cost += ot_cost
 
-        emp_totals[emp_id]["cost"] += daily_cost
+        emp_totals[emp_key]["cost"] += daily_cost                        # ✅
         grand_total += daily_cost
 
     valid_employees = [e for e in emp_totals.values() if e["cost"] > 0 or e["days"] > 0 or e["ot_hours"] > 0]
@@ -203,8 +220,7 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
     total_sum = 0.0
 
     for rec in records:
-        if not rec.employee:
-            continue
+
 
         multiplier = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
         wage = _get_daily_wage(rec) * multiplier
@@ -214,7 +230,7 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
         if (wage > 0 or extra > 0) and (not boat_id or rec.boat_id == boat_id):
             total_sum += (wage + extra)
             report_data.append({
-                "date": rec.date, "employee_name": rec.employee.name,
+                "date": rec.date, "employee_name": _get_employee_name(rec),
                 "boat_name": rec.boat.name if rec.boat else "-",
                 "daily_cost": wage + extra, "overtime_cost": 0.0, "total_cost": wage + extra
             })
@@ -222,7 +238,7 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
         if ot_cost > 0 and (not boat_id or rec.overtime_boat_id == boat_id):
             total_sum += ot_cost
             report_data.append({
-                "date": rec.date, "employee_name": rec.employee.name,
+                "date": rec.date, "employee_name": _get_employee_name(rec),
                 "boat_name": (rec.overtime_boat.name + " (Υπερ)") if rec.overtime_boat else "-",
                 "daily_cost": 0.0, "overtime_cost": ot_cost, "total_cost": ot_cost
             })
@@ -267,6 +283,7 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
         daily_wage_snapshot = employee.daily_wage if employee else None,
         overtime_rate_snapshot = employee.overtime_rate if employee else None,
         bank_daily_amount_snapshot = employee.bank_daily_amount if employee else None,
+        employee_name_snapshot = employee.name if employee else None,
     )
     db.add(db_attendance)
     db.commit()
@@ -579,10 +596,7 @@ def delete_invoice(db: Session, invoice_id: int):
 
 
 def _attendance_cost(rec) -> float:
-    """Υπολογισμός κόστους για μία εγγραφή attendance (χρησιμοποιεί snapshots)."""
-    if not rec.employee:
-        return 0.0
-
+    """Calculate cost for attendance using snapshots."""
     cost = 0.0
     if rec.present or rec.is_half_day:
         mult = 0.5 if rec.is_half_day else 1.0
@@ -706,8 +720,7 @@ def get_dashboard_data(db: Session, year: int, month: int):
     ).all()
 
     for rec in ytd_att:
-        if not rec.employee:
-            continue
+
 
         if rec.boat_id and rec.boat_id in boat_totals:
             daily_cost = 0.0
@@ -776,8 +789,7 @@ def get_attendance_report(db: Session, start: date, end: date, employee_id: Opti
     total = 0.0
 
     for rec in records:
-        if not rec.employee:
-            continue
+
 
         if rec.is_half_day:
             mult = 0.5
@@ -800,7 +812,7 @@ def get_attendance_report(db: Session, start: date, end: date, employee_id: Opti
             "id": rec.id,
             "date": rec.date,
             "employee_id": rec.employee_id,
-            "employee_name": rec.employee.name,
+            "employee_name": _get_employee_name(rec),
             "boat_id": rec.boat_id,
             "boat_name": boat_name,
             "is_half_day": bool(rec.is_half_day),
@@ -940,3 +952,32 @@ def get_invoices_aggregate(
         "filter_text": _build_invoice_filter_text(db, supplier_id, boat_id),
         "items": items,
     }   
+
+def get_last_attendance_before(db: Session, target_date: date):
+    """Επιστρέφει την τελευταία μέρα με attendance πριν την target_date."""
+    last_date_row = db.query(models.Attendance.date).filter(
+        models.Attendance.date < target_date,
+        models.Attendance.employee_id.isnot(None),
+    ).order_by(models.Attendance.date.desc()).first()
+
+    if not last_date_row:
+        return None
+
+    last_date = last_date_row[0]
+    records = db.query(models.Attendance).filter(
+        models.Attendance.date == last_date,
+        models.Attendance.employee_id.isnot(None),
+    ).all()
+
+    return {
+        "date": last_date,
+        "records": [
+            {
+                "employee_id": r.employee_id,
+                "boat_id": r.boat_id,
+                "present": bool(r.present),
+                "is_half_day": bool(r.is_half_day),
+            }
+            for r in records
+        ]
+    }

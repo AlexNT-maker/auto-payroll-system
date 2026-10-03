@@ -1,7 +1,9 @@
 import { store } from "../state/store";
-import { loadAttendance } from "../api/attendanceApi";
-import { renderTable } from "../ui/renderTable";   
-import { showMessageModal,  } from "../utils/messageModal"; 
+import { loadAttendance, getLastAttendanceBefore } from "../api/attendanceApi";
+import type { LastAttendanceItem } from "../api/attendanceApi";
+import { renderTable } from "../ui/renderTable";
+import { showMessageModal } from "../utils/messageModal";
+import { showConfirmModal } from "../utils/confirmModal";
 
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -9,6 +11,7 @@ const form = document.querySelector<HTMLFormElement>('#attendance-form')!;
 const tableBody = document.querySelector<HTMLTableSectionElement>("#attendance-list")!;
 const btnSubmitDaily = document.querySelector<HTMLButtonElement>('#btn-submit-daily')!;
 const sortSelect = document.getElementById('sort-select') as HTMLSelectElement | null;
+const btnRepeatLast = document.querySelector<HTMLButtonElement>('#btn-repeat-last')!;
 
 
 
@@ -35,6 +38,8 @@ export function initAttendanceEvents() {
  sortSelect?.addEventListener(
     'change', handleSortChange
 );
+
+btnRepeatLast.addEventListener("click", handleRepeatLast);
 }
 
 
@@ -194,3 +199,88 @@ export function handleSortChange(event: Event): void{
   isLocked ? lockFormInputs() : null; 
 };
 
+async function handleRepeatLast(): Promise<void> {
+    const date = datePicker.value;
+    if (!date) {
+        showMessageModal("Σφάλμα", "Παρακαλώ επιλέξτε ημερομηνία.", "error");
+        return;
+    }
+
+    let data;
+    try {
+        data = await getLastAttendanceBefore(date);
+    } catch (err) {
+        console.error(err);
+        showMessageModal(
+            "Σφάλμα",
+            "Δεν βρέθηκε προηγούμενη καταχώρηση.",
+            "error"
+        );
+        return;
+    }
+
+    const currentHasData =
+        document.querySelector('#attendance-list .presence-checkbox:checked') !== null;
+
+    if (currentHasData) {
+        const ok = await showConfirmModal(
+            "Προειδοποίηση",
+            "Υπάρχει ήδη καταχώρηση για τη συγκεκριμένη μέρα. Να αντικατασταθεί με τα δεδομένα της " +
+                formatDate(data.date) +
+                ";",
+            "warning"
+        );
+        if (!ok) return;
+    }
+
+    applyLastAttendance(data.records);
+
+    showMessageModal(
+        "Επιτυχία",
+        `Φορτώθηκαν τα δεδομένα από ${formatDate(data.date)}. Ελέγξτε και πατήστε Αποθήκευση.`,
+        "success"
+    );
+}
+
+
+function applyLastAttendance(records: LastAttendanceItem[]): void {
+    const rows = tableBody.querySelectorAll('tr');
+
+    rows.forEach((row) => {
+        const checkbox = row.querySelector<HTMLInputElement>('.presence-checkbox');
+        if (!checkbox) return;
+
+        const empId = parseInt(checkbox.dataset.empId!);
+        const record = records.find((r) => r.employee_id === empId);
+
+        const halfbox = row.querySelector<HTMLInputElement>('.half-checkbox')!;
+        const boatSelect = row.querySelector<HTMLSelectElement>('.boat-select')!;
+        const otBoatSelect = row.querySelector<HTMLSelectElement>('.ot-boat-select')!;
+        const overtimeInput = row.querySelector<HTMLInputElement>('.overtime-input')!;
+
+        checkbox.checked = false;
+        halfbox.checked = false;
+        boatSelect.value = "";
+        otBoatSelect.value = "";
+        overtimeInput.value = "0";
+
+        if (record) {
+            checkbox.checked = record.present;
+            halfbox.checked = record.is_half_day;
+
+            if (record.boat_id) {
+                boatSelect.value = record.boat_id.toString();
+            }
+        }
+    });
+
+    unlockForm();
+}
+
+
+function formatDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    return `${day}/${month}/${d.getFullYear()}`;
+}
