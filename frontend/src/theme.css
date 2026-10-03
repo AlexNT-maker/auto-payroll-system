@@ -1,10 +1,6 @@
-/* ============================================================
-   THEME — Variables (Navy + Glassmorphism)
-   Loaded LAST after common.css + module.css
-   ============================================================ */
+
 
 :root {
-    /* -------- Brand (Navy) -------- */
     --brand:           #05407a;
     --brand-hover:     #03305c;
     --brand-light:     #e0f2fe;

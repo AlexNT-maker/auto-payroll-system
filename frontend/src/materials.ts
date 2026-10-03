@@ -10,6 +10,7 @@ import { initShellEvents } from "./handlers/shellEvents";
 import { initInvoiceEvents, 
     initInvoiceFilters } from "./handlers/invoiceEvents";
 import { renderInvoicesList } from "./ui/renderInvoiceList";
+import { initFullReportEvents, initFullReportPage } from "./handlers/fullReportEvents";
 
 
 type PageKey = "usage" | "priceList" | "invoices" | "fullReport";
@@ -48,6 +49,10 @@ function navigateTo(pageKey: PageKey): void {
     initInvoiceFilters();
     renderInvoicesList();
 }
+
+if (pageKey === "fullReport") {
+    initFullReportPage();
+}
 }
 
 function handleHashChange(): void {
@@ -75,6 +80,8 @@ async function initApp(): Promise<void> {
     handleHashChange();
 
     initInvoiceEvents();
+
+    initFullReportEvents();
 }
 
 initApp();

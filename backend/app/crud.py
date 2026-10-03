@@ -981,3 +981,97 @@ def get_last_attendance_before(db: Session, target_date: date):
             for r in records
         ]
     }
+
+
+# -- Full Boat Report --
+
+def get_full_boat_report_data(db: Session, boat_id: int, start: date, end: date):
+    boat = db.query(models.Boat).filter(models.Boat.id == boat_id).first()
+    if not boat:
+        return None
+
+    records = db.query(models.Attendance).filter(
+        (models.Attendance.boat_id == boat_id) |
+        (models.Attendance.overtime_boat_id == boat_id),
+        models.Attendance.date >= start,
+        models.Attendance.date <= end,
+    ).all()
+
+    emp_totals: dict = {}
+    for rec in records:
+        emp_key = rec.employee_id if rec.employee_id is not None else -1
+        if emp_key not in emp_totals:
+            emp_totals[emp_key] = {
+                "name": _get_employee_name(rec),
+                "days": 0.0,
+                "ot_hours": 0.0,
+            }
+        if rec.boat_id == boat_id:
+            mult = 0.5 if rec.is_half_day else 1.0 if rec.present else 0.0
+            emp_totals[emp_key]["days"] += mult
+        if rec.overtime_boat_id == boat_id:
+            emp_totals[emp_key]["ot_hours"] += rec.overtime_hours or 0.0
+
+    personnel = sorted(emp_totals.values(), key=lambda x: x["name"])
+    total_days = sum(e["days"] for e in personnel)
+    total_ot_hours = sum(e["ot_hours"] for e in personnel)
+
+    usages = db.query(models.MaterialUsage).filter(
+        models.MaterialUsage.boat_id == boat_id,
+        models.MaterialUsage.date >= start,
+        models.MaterialUsage.date <= end,
+    ).all()
+
+    mat_totals: dict = {}
+    for u in usages:
+        if not u.material:
+            continue
+        key = u.material_id
+        if key not in mat_totals:
+            mat_totals[key] = {
+                "name": u.material.name,
+                "quantity": 0.0,
+                "unit_price": u.unit_price or 0.0,
+                "total": 0.0,
+            }
+        mat_totals[key]["quantity"] += u.quantity or 0.0
+        mat_totals[key]["total"] += u.total_price or 0.0
+
+    materials = sorted(mat_totals.values(), key=lambda x: x["name"])
+    materials_total = sum(m["total"] for m in materials)
+
+    invoices = db.query(models.Invoice).filter(
+        models.Invoice.boat_id == boat_id,
+        models.Invoice.date >= start,
+        models.Invoice.date <= end,
+    ).all()
+
+    sup_totals: dict = {}
+    for inv in invoices:
+        if not inv.supplier:
+            continue
+        key = inv.supplier_id
+        if key not in sup_totals:
+            sup_totals[key] = {
+                "name": inv.supplier.name,
+                "amount": 0.0,
+                "count": 0,
+            }
+        sup_totals[key]["amount"] += inv.amount or 0.0
+        sup_totals[key]["count"] += 1
+
+    suppliers = sorted(sup_totals.values(), key=lambda x: x["name"])
+    suppliers_total = sum(s["amount"] for s in suppliers)
+
+    return {
+        "boat_name": boat.name,
+        "start_date": start,
+        "end_date": end,
+        "personnel": personnel,
+        "total_days": total_days,
+        "total_ot_hours": total_ot_hours,
+        "materials": materials,
+        "materials_total": materials_total,
+        "suppliers": suppliers,
+        "suppliers_total": suppliers_total,
+    }

@@ -1,6 +1,7 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.utils import ImageReader
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -86,11 +87,11 @@ def generate_payroll_pdf(payroll_data):
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#05407a')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'), 
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#b0b8c4')),
         
         ('BACKGROUND', (7, 0), (7, -1), colors.aliceblue), 
         ('BACKGROUND', (8, 0), (8, -1), colors.lightyellow), 
@@ -140,10 +141,10 @@ def generate_boat_analysis_pdf(data):
     table = Table(table_data)
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#05407a')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#b0b8c4')),
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])
@@ -205,10 +206,10 @@ def generate_short_boat_analysis_pdf(data, is_captain=False):
     table = Table(table_data)
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.gray),      
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#05407a')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#b0b8c4')),
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])
@@ -229,11 +230,13 @@ def _base_table_style(font_name):
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#05407a')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 1), (0, -1), 'LEFT'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#b0b8c4')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -2),
+            [colors.white, colors.HexColor('#f0f4fa')]),
     ])
     try:
         pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
@@ -316,6 +319,157 @@ def generate_invoice_analysis_pdf(data):
     table = Table(table_data, colWidths=[180, 140, 100, 75])
     table.setStyle(_base_table_style(font_name))
     elements.append(table)
+
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+# -- Full Boat Report --
+
+LOGO_PATH = r"C:\Users\alexn\OneDrive\Desktop\auto-payroll-system\frontend\src\icon\logo.png"
+
+
+LOGO_PATH = r"C:\Users\alexn\OneDrive\Desktop\auto-payroll-system\frontend\src\icon\logo.png"
+
+
+def _load_logo_flowable(width: float = 180):
+    """Load the logo image for PDF reports."""
+    try:
+        if not os.path.exists(LOGO_PATH):
+            print(f"[logo] Δεν βρέθηκε: {LOGO_PATH}")
+            return None
+
+        img_reader = ImageReader(LOGO_PATH)
+        iw, ih = img_reader.getSize()
+
+        if iw <= 0 or ih <= 0:
+            print(f"[logo] Μη έγκυρες διαστάσεις: {iw}x{ih}")
+            return None
+
+        ratio = ih / iw
+        height = width * ratio
+
+        logo = Image(LOGO_PATH, width=width, height=height)
+        logo.hAlign = 'CENTER'
+        return logo
+
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        return None
+
+
+def generate_full_boat_report_pdf(data):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        leftMargin=45, rightMargin=45,
+        topMargin=35, bottomMargin=35,
+    )
+    elements = []
+    font_name = register_greek_font()
+    styles = getSampleStyleSheet()
+
+    # ---------- LOGO ----------
+    logo = _load_logo_flowable(180)
+    if logo:
+        elements.append(logo)
+        elements.append(Spacer(1, 12))
+
+    # ---------- TITLE ----------
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading1'],
+        fontName=font_name,
+        alignment=1,
+        fontSize=15,
+        spaceAfter=4,
+    )
+    sub_style = ParagraphStyle(
+        'Sub',
+        fontName=font_name,
+        alignment=1,
+        fontSize=9,
+        textColor=colors.grey,
+    )
+    section_style = ParagraphStyle(
+        'Section',
+        parent=styles['Heading2'],
+        fontName=font_name,
+        alignment=1,
+        fontSize=12,
+        spaceBefore=8,
+        spaceAfter=8,
+    )
+
+    elements.append(Paragraph(
+        f"{data['boat_name']} ΣΥΝΟΠΤΙΚΗ ΑΝΑΛΥΣΗ ΕΡΓΑΣΙΩΝ",
+        title_style
+    ))
+    elements.append(Paragraph(
+        f"Διάστημα: {data['start_date']} έως {data['end_date']}",
+        sub_style
+    ))
+    elements.append(Spacer(1, 18))
+
+    elements.append(Paragraph("ΠΡΟΣΩΠΙΚΟ", section_style))
+
+    p_data = [["Εργαζόμενος", "Μεροκάματα", "Ώρες Υπ."]]
+    for p in data["personnel"]:
+        p_data.append([p["name"], str(p["days"]), str(p["ot_hours"])])
+    p_data.append(["ΣΥΝΟΛΟ", str(data["total_days"]), str(data["total_ot_hours"])])
+
+    t1 = Table(p_data, colWidths=[290, 105, 100])
+    t1.setStyle(_base_table_style(font_name))
+    elements.append(t1)
+    elements.append(Spacer(1, 22))
+
+    elements.append(Paragraph("ΥΛΙΚΑ ΣΥΝΟΛΙΚΟ ΚΟΣΤΟΣ", section_style))
+
+    m_data = [["Υλικά", "Ποσότητα", "Κόστος", "Σύνολο"]]
+    if data["materials"]:
+        for m in data["materials"]:
+            m_data.append([
+                m["name"],
+                f"{m['quantity']:g}",
+                f"{m['unit_price']:.2f}",
+                f"{m['total']:.2f}",
+            ])
+    else:
+        m_data.append(["—", "", "", "0.00"])
+    m_data.append(["ΣΥΝΟΛΟ", "", "", f"{data['materials_total']:.2f}"])
+
+    t2 = Table(m_data, colWidths=[275, 70, 70, 80])
+    t2.setStyle(_base_table_style(font_name))
+    elements.append(t2)
+    elements.append(Spacer(1, 22))
+
+    # ---------- ΠΡΟΜΗΘΕΥΤΕΣ ----------
+    if data["suppliers"]:
+        elements.append(Paragraph("ΕΞΟΔΑ ΠΡΟΜΗΘΕΥΤΗ", section_style))
+
+        s_data = [["Προμηθευτής", "Τιμολόγια", "Σύνολο"]]
+        for s in data["suppliers"]:
+            s_data.append([s["name"], str(s["count"]), f"{s['amount']:.2f}"])
+        s_data.append(["ΣΥΝΟΛΟ", "", f"{data['suppliers_total']:.2f}"])
+
+        t3 = Table(s_data, colWidths=[280, 100, 115])
+        t3.setStyle(_base_table_style(font_name))
+        elements.append(t3)
+        elements.append(Spacer(1, 22))
+
+    # ---------- GRAND TOTAL ----------
+    total_style = ParagraphStyle(
+        'GrandTotal',
+        parent=styles['Heading2'],
+        fontName=font_name,
+        alignment=2,
+        fontSize=13,
+        textColor=colors.HexColor('#05407a'),
+    )
+    grand = data["materials_total"] + data["suppliers_total"]
+    elements.append(Paragraph(f"ΓΕΝΙΚΟ ΣΥΝΟΛΟ: {grand:.2f} €", total_style))
 
     doc.build(elements)
     buffer.seek(0)

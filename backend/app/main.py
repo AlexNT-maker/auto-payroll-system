@@ -462,3 +462,22 @@ def read_last_attendance_before(target_date: date, db: Session = Depends(get_db)
     if not result:
         raise HTTPException(status_code=404, detail="Δεν βρέθηκε προηγούμενη καταχώρηση")
     return result
+
+@app.get("/boats/{boat_id}/full-report/pdf")
+def export_full_boat_report_pdf(
+    boat_id: int,
+    start: date,
+    end: date,
+    db: Session = Depends(get_db),
+):
+    data = crud.get_full_boat_report_data(db, boat_id, start, end)
+    if not data:
+        raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
+
+    pdf_buffer = pdf_utils.generate_full_boat_report_pdf(data)
+    filename = f"full_report_{data['boat_name']}_{start}_{end}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
