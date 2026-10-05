@@ -4,7 +4,7 @@
 
 A full-stack ERP system built for a Greek boat repair company, replacing a fully manual, paper-based workflow with a modern web application for payroll, attendance, materials, and invoicing.
 
-![System Architecture](architecture.png)
+![System Architecture](architect.svg)
 
 ---
 
