@@ -8,20 +8,87 @@ from reportlab.pdfbase.ttfonts import TTFont
 import os
 from io import BytesIO
 
-def register_greek_font():
-    try:
-        font_path = "C:\\Windows\\Fonts\\arial.ttf"
-        
-        if not os.path.exists(font_path):
-             font_path = "C:\\Users\\alexn\\OneDrive\\Desktop\\ARIAL.TTF"
+# ============================================================
+# ASSETS (bundled in repo, work on any OS)
+# ============================================================
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(APP_DIR, "assets")
+FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
 
-        if os.path.exists(font_path):
-            pdfmetrics.registerFont(TTFont('Arial', font_path))
-            return 'Arial'
-        else:
-            return 'Helvetica' 
-    except:
-        return 'Helvetica'
+# (regular_path, bold_path, base_name)
+FONT_CANDIDATES = [
+    # 1. Bundled DejaVu Sans (recommended)
+    (
+        os.path.join(FONTS_DIR, "DejaVuSans.ttf"),
+        os.path.join(FONTS_DIR, "DejaVuSans-Bold.ttf"),
+        "DejaVuSans",
+    ),
+    # 2. Linux system fallback
+    (
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "DejaVuSans",
+    ),
+    # 3. Windows dev fallback
+    (
+        "C:\\Windows\\Fonts\\arial.ttf",
+        "C:\\Windows\\Fonts\\arialbd.ttf",
+        "Arial",
+    ),
+]
+
+_font_regular = None
+_font_bold = None
+
+
+def register_greek_font() -> str:
+    """Register a Greek-supporting font for PDF generation."""
+    global _font_regular, _font_bold
+
+    if _font_regular:
+        return _font_regular
+
+    for regular_path, bold_path, base_name in FONT_CANDIDATES:
+        if not os.path.exists(regular_path):
+            continue
+
+        try:
+            pdfmetrics.registerFont(TTFont(base_name, regular_path))
+            _font_regular = base_name
+
+            if os.path.exists(bold_path):
+                bold_name = f"{base_name}-Bold"
+                pdfmetrics.registerFont(TTFont(bold_name, bold_path))
+                _font_bold = bold_name
+
+                pdfmetrics.registerFontFamily(
+                    base_name,
+                    normal=base_name,
+                    bold=bold_name,
+                    italic=base_name,
+                    boldItalic=bold_name,
+                )
+            else:
+                _font_bold = base_name
+
+            print(f"[pdf] Font loaded: {base_name}")
+            return base_name
+
+        except Exception as e:
+            print(f"[pdf] Failed to load {base_name}: {e}")
+            continue
+
+    print("[pdf] WARNING: No Greek font found. Falling back to Helvetica.")
+    _font_regular = "Helvetica"
+    _font_bold = "Helvetica"
+    return "Helvetica"
+
+
+def get_bold_font() -> str:
+    """Return the registered bold font name (or regular as fallback)."""
+    if not _font_regular:
+        register_greek_font()
+    return _font_bold or _font_regular or "Helvetica"
 
 def generate_payroll_pdf(payroll_data):
     buffer = BytesIO()
@@ -47,7 +114,7 @@ def generate_payroll_pdf(payroll_data):
     
     data = [[
         "Εργαζόμενος", "Ημέρες", "Μισθός","Ώρες Υπ.", "Υπερωρία", 
-        "Extra", "Αιτιολογία", 
+        "Πρόσθετα", "Αιτιολογία", 
         "Σύνολο", "Τράπεζα", "Μετρητά"
     ]]
     
@@ -93,18 +160,15 @@ def generate_payroll_pdf(payroll_data):
         ('ALIGN', (0, 0), (0, -1), 'LEFT'), 
         ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#b0b8c4')),
         
-        ('BACKGROUND', (7, 0), (7, -1), colors.aliceblue), 
-        ('BACKGROUND', (8, 0), (8, -1), colors.lightyellow), 
+        ('BACKGROUND', (7, 1), (7, -1), colors.aliceblue), 
+        ('BACKGROUND', (8, 1), (8, -1), colors.lightyellow), 
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])
     
-    try:
-        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
-        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold') 
-        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold') 
-    except:
-        pass
+    bold_name = get_bold_font()
+    style.add('FONTNAME', (0, 0), (-1, 0), bold_name)
+    style.add('FONTNAME', (0, -1), (-1, -1), bold_name)
 
     table.setStyle(style)
     elements.append(table)
@@ -148,11 +212,10 @@ def generate_boat_analysis_pdf(data):
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])
-    try:
-        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
-        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold') 
-        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold') 
-    except: pass
+    
+    bold_name = get_bold_font()
+    style.add('FONTNAME', (0, 0), (-1, 0), bold_name)
+    style.add('FONTNAME', (0, -1), (-1, -1), bold_name)
 
     table.setStyle(style)
     elements.append(table)
@@ -213,11 +276,10 @@ def generate_short_boat_analysis_pdf(data, is_captain=False):
         ('FONTNAME', (0, -1), (-1, -1), f'{font_name}-Bold' if font_name=='Arial' else font_name),
         ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
     ])
-    try:
-        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
-        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold') 
-        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold') 
-    except: pass
+    
+    bold_name = get_bold_font()
+    style.add('FONTNAME', (0, 0), (-1, 0), bold_name)
+    style.add('FONTNAME', (0, -1), (-1, -1), bold_name)
 
     table.setStyle(style)
     elements.append(table)
@@ -238,12 +300,10 @@ def _base_table_style(font_name):
         ('ROWBACKGROUNDS', (0, 1), (-1, -2),
             [colors.white, colors.HexColor('#f0f4fa')]),
     ])
-    try:
-        pdfmetrics.registerFont(TTFont('Arial-Bold', "C:\\Windows\\Fonts\\arialbd.ttf"))
-        style.add('FONTNAME', (0, 0), (-1, 0), 'Arial-Bold')
-        style.add('FONTNAME', (0, -1), (-1, -1), 'Arial-Bold')
-    except Exception:
-        pass
+
+    bold_name = get_bold_font()
+    style.add('FONTNAME', (0, 0), (-1, 0), bold_name)
+    style.add('FONTNAME', (0, -1), (-1, -1), bold_name)
     return style
 
 
@@ -326,8 +386,7 @@ def generate_invoice_analysis_pdf(data):
 
 # -- Full Boat Report --
 
-LOGO_PATH = r"C:\Users\alexn\OneDrive\Desktop\auto-payroll-system\frontend\src\icon\logo.png"
-
+LOGO_PATH = os.path.join(ASSETS_DIR, "logo.png")
 def _load_logo_flowable(width: float = 180):
     """Load the logo image for PDF reports."""
     try:

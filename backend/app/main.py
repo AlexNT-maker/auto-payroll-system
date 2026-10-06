@@ -8,6 +8,7 @@ from . import crud, models, schemas, pdf_utils
 from .database import SessionLocal, engine
 import os
 from .seed_demo import seed_all
+from urllib.parse import quote
 
 
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
@@ -473,9 +474,16 @@ def export_full_boat_report_pdf(
         raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
 
     pdf_buffer = pdf_utils.generate_full_boat_report_pdf(data)
-    filename = f"full_report_{data['boat_name']}_{start}_{end}.pdf"
+
+    safe_filename = f"full_report_{start}_{end}.pdf"
+    # UTF-8 encoded filename for modern browsers, greek fonts
+    utf8_filename = quote(f"full_report_{data['boat_name']}_{start}_{end}.pdf")
+
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={filename}"},
+        headers={
+            "Content-Disposition":
+                f"attachment; filename={safe_filename}; filename*=UTF-8''{utf8_filename}"
+        },
     )
