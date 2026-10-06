@@ -9,23 +9,30 @@ from .database import SessionLocal, engine
 import os
 from .seed_demo import seed_all
 
+
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
 app = FastAPI()
 
-# Here we will define who is allowed to talk with our frontend
+# ---------- CORS ----------
+# Local dev origins (always allowed)
 origins = [
-    "http://localhost:5173" , # Our frontend adrees
-    "http://127.0.0.1:5173" , # Alternative adress of our frontend
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+
+# Production origins from env (comma-separated)
+# Example: ALLOWED_ORIGINS=https://my-app.vercel.app,https://my-app-git-main.vercel.app
+prod_origins = os.getenv("ALLOWED_ORIGINS", "")
+if prod_origins:
+    origins.extend([o.strip() for o in prod_origins.split(",") if o.strip()])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins ,  # We allow only the origins of the uplist
-    allow_credentials = True , # Enables cookies / auth headers
-    allow_methods = ["*"] , # We allow all the request methods
-    allow_headers = ["*"] , # We allow all kind of headers
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 # -- Seed default values on first run --
 
