@@ -1,4 +1,5 @@
 import type { Employee } from "../models/employee";
+import { API_URL } from "../config/api";
 
 type EmployeePayload = {
     name: string;
@@ -7,7 +8,7 @@ type EmployeePayload = {
     bank_daily_amount: number;
 };
 
-const BASE_URL = "http://127.0.0.1:8000/employees";
+const BASE_URL = `${API_URL}/employees`;
 
 export async function getEmployees(): Promise<Employee[]> {
     const response = await fetch(`${BASE_URL}/`);

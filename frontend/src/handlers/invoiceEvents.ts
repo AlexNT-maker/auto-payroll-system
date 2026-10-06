@@ -1,10 +1,8 @@
 import { store } from "../state/store";
 import { showMessageModal } from "../utils/messageModal";
-import { showConfirmModal } from "../utils/confirmModal";
 import {
     createInvoice,
     updateInvoice,
-    deleteInvoice,
 } from "../api/invoiceApi";
 import { fetchData } from "../services/appLoader";
 import {
@@ -13,6 +11,7 @@ import {
     invoiceFilters,
     setInvoiceView,
 } from "../ui/renderInvoiceList";
+import { API_URL } from "../config/api";
 
 const btnExportInvoices = document.querySelector<HTMLButtonElement>("#btn-export-invoices-pdf")!;
 
@@ -34,7 +33,7 @@ function handleExportInvoicesPdf(): void {
         return;
     }
 
-    let url = `http://127.0.0.1:8000/invoices/pdf?start=${start}&end=${end}`;
+    let url = `${API_URL}/invoices/pdf?start=${start}&end=${end}`;
     if (filterSupplier.value) url += `&supplier_id=${filterSupplier.value}`;
     if (filterBoat.value)     url += `&boat_id=${filterBoat.value}`;
 

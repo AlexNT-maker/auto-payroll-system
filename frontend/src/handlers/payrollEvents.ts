@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import { showConfirmModal } from "../utils/confirmModal";
 import { showMessageModal } from "../utils/messageModal";
 
@@ -65,7 +66,7 @@ async function handlePayrollCalculation() {
     }
 
     try {
-        const response = await fetch(`http://127.0.0.1:8000/payroll/?start=${start}&end=${end}`);
+        const response = await fetch(`${API_URL}/payroll/?start=${start}&end=${end}`);
         
         if (response.ok) {
             const data = await response.json(); 
@@ -145,7 +146,7 @@ function printPayrollPdf() {
             showMessageModal("Προσοχή", "Παρακαλώ επιλέξτε ημερομηνίες.", "warning");
             return;
         }
-        const url = `http://127.0.0.1:8000/payroll/pdf?start=${start}&end=${end}`;    
+        const url = `${API_URL}/payroll/pdf?start=${start}&end=${end}`;    
         window.open(url, '_blank');
 }
 
@@ -166,7 +167,7 @@ async function handleExtraSubmit(e: Event) {
         };
 
         try {
-            const res = await fetch('http://127.0.0.1:8000/attendance/', {
+            const res = await fetch(`${API_URL}/attendance/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -198,7 +199,7 @@ async function handleResetExtra() {
 
         if (await showConfirmModal("Προειδοποίηση", "Θέλετε να διαγράψετε το Extra ποσό;", "error")) {
             try {
-                const res = await fetch('http://127.0.0.1:8000/attendance/', {
+                const res = await fetch(`${API_URL}/attendance/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

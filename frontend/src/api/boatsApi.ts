@@ -1,6 +1,7 @@
 import type { Boat } from "../models/boat";
+import { API_URL } from "../config/api";
 
-const BASE_URL = "http://127.0.0.1:8000/boats";
+const BASE_URL = `${API_URL}/boats`;
 
 type BoatPayload = {
     name: string;
