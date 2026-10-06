@@ -6,6 +6,8 @@ from datetime import date
 from fastapi.responses import StreamingResponse
 from . import crud, models, schemas, pdf_utils
 from .database import SessionLocal, engine
+import os
+from .seed_demo import seed_all
 
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
 app = FastAPI()
@@ -27,27 +29,16 @@ app.add_middleware(
 
 # -- Seed default values on first run --
 
+
 @app.on_event("startup")
-def seed_defaults():
-    db = SessionLocal()
-    try:
-        if db.query(models.MaterialUnit).count() == 0:
-            for unit in ["GAL", "KG", "PCS", "M", "5L", "1L", "3L", "SET"]:
-                db.add(models.MaterialUnit(name=unit))
-
-        if db.query(models.MaterialCategory).count() == 0:
-            for cat in ["Χρώματα", "Αναλώσιμα", "Διαλυτικά είδη", "Γυαλιστικά είδη"]:
-                db.add(models.MaterialCategory(name=cat))
-
-        if db.query(models.InvoiceCategory).count() == 0:
-            for cat in ["Καύσιμα", "Τρόφιμα & Προμήθειες",
-                        "Συντήρηση & Ανταλλακτικά", "Εξοπλισμός",
-                        "Υπηρεσίες", "Άλλο"]:
-                db.add(models.InvoiceCategory(name=cat))
-
-        db.commit()
-    finally:
-        db.close()
+def startup_seed():
+    """
+    On every startup:
+    - If RESET_DB_ON_START=true  -> wipe + seed (demo deployment)
+    - Otherwise                  -> seed only if empty (local dev)
+    """
+    should_reset = os.getenv("RESET_DB_ON_START", "false").lower() == "true"
+    seed_all(reset=should_reset)
 
 # -- Dependency --
 
