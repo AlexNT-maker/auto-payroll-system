@@ -1,4 +1,15 @@
-fastapi
-uvicorn
-sqlalchemy
-reportlab
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# Database
+sqlalchemy==2.0.36
+
+# Validation
+pydantic==2.10.4
+
+# PDF generation
+reportlab==4.2.5
+
+# Multipart form data (for FastAPI forms/uploads)
+python-multipart==0.0.20
