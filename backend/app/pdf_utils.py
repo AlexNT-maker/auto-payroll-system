@@ -87,11 +87,11 @@ def generate_payroll_pdf(payroll_data):
     style = TableStyle([
         ('FONT', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#05407a')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#F5F5F5')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.navy),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'), 
-        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#b0b8c4')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#F5F5F5')),
         
         ('BACKGROUND', (7, 0), (7, -1), colors.aliceblue), 
         ('BACKGROUND', (8, 0), (8, -1), colors.lightyellow), 
