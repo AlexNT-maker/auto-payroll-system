@@ -1,6 +1,7 @@
 import type { Material } from "../models/material";
+import { API_URL } from "../config/api";
 
-const BASE_URL = "http://127.0.0.1:8000/materials";
+const BASE_URL = `${API_URL}/materials`;
 
 type MaterialPayload = {
     name: string;

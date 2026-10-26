@@ -4,6 +4,7 @@ import type { LastAttendanceItem } from "../api/attendanceApi";
 import { renderTable } from "../ui/renderTable";
 import { showMessageModal } from "../utils/messageModal";
 import { showConfirmModal } from "../utils/confirmModal";
+import { API_URL } from "../config/api";
 
 const btnEditDaily = document.querySelector<HTMLButtonElement>('#btn-edit-daily')!;
 const datePicker = document.querySelector<HTMLInputElement>('#date-picker')!;
@@ -99,7 +100,7 @@ export async function handleAttendanceSubmit(e: Event) {
     }; 
 
     try {
-        await fetch('http://127.0.0.1:8000/attendance/', {
+        await fetch(`${API_URL}/attendance/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

@@ -1,3 +1,4 @@
+import { API_URL } from "../config/api";
 import { store } from "../state/store";
 import { showMessageModal } from "../utils/messageModal";
 
@@ -39,7 +40,7 @@ function printShortAnalysis() {
         return;
     }
 
-    const url = `http://127.0.0.1:8000/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}&is_captain=${isCaptain}`;
+    const url = `${API_URL}/boats/${boatId}/short-analysis/pdf?start=${start}&end=${end}&is_captain=${isCaptain}`;
     window.open(url, '_blank');
 }
 

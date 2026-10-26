@@ -1,6 +1,7 @@
 import type { Invoice } from "../models/invoice";
+import { API_URL } from "../config/api";
 
-const BASE_URL = "http://127.0.0.1:8000/invoices";
+const BASE_URL = `${API_URL}/invoices`;
 
 type InvoicePayload = {
     date: string;

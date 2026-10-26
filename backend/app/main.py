@@ -6,48 +6,48 @@ from datetime import date
 from fastapi.responses import StreamingResponse
 from . import crud, models, schemas, pdf_utils
 from .database import SessionLocal, engine
+import os
+from .seed_demo import seed_all
+from urllib.parse import quote
+
 
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
 app = FastAPI()
 
-# Here we will define who is allowed to talk with our frontend
+# ---------- CORS ----------
+# Local dev origins (always allowed)
 origins = [
-    "http://localhost:5173" , # Our frontend adrees
-    "http://127.0.0.1:5173" , # Alternative adress of our frontend
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
+
+# Production origins from env (comma-separated)
+# Example: ALLOWED_ORIGINS=https://my-app.vercel.app,https://my-app-git-main.vercel.app
+prod_origins = os.getenv("ALLOWED_ORIGINS", "")
+if prod_origins:
+    origins.extend([o.strip() for o in prod_origins.split(",") if o.strip()])
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = origins ,  # We allow only the origins of the uplist
-    allow_credentials = True , # Enables cookies / auth headers
-    allow_methods = ["*"] , # We allow all the request methods
-    allow_headers = ["*"] , # We allow all kind of headers
+    allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
 
 # -- Seed default values on first run --
 
+
 @app.on_event("startup")
-def seed_defaults():
-    db = SessionLocal()
-    try:
-        if db.query(models.MaterialUnit).count() == 0:
-            for unit in ["GAL", "KG", "PCS", "M", "5L", "1L", "3L", "SET"]:
-                db.add(models.MaterialUnit(name=unit))
-
-        if db.query(models.MaterialCategory).count() == 0:
-            for cat in ["Χρώματα", "Αναλώσιμα", "Διαλυτικά είδη", "Γυαλιστικά είδη"]:
-                db.add(models.MaterialCategory(name=cat))
-
-        if db.query(models.InvoiceCategory).count() == 0:
-            for cat in ["Καύσιμα", "Τρόφιμα & Προμήθειες",
-                        "Συντήρηση & Ανταλλακτικά", "Εξοπλισμός",
-                        "Υπηρεσίες", "Άλλο"]:
-                db.add(models.InvoiceCategory(name=cat))
-
-        db.commit()
-    finally:
-        db.close()
+def startup_seed():
+    """
+    On every startup:
+    - If RESET_DB_ON_START=true  -> wipe + seed (demo deployment)
+    - Otherwise                  -> seed only if empty (local dev)
+    """
+    should_reset = os.getenv("RESET_DB_ON_START", "false").lower() == "true"
+    seed_all(reset=should_reset)
 
 # -- Dependency --
 
@@ -475,9 +475,16 @@ def export_full_boat_report_pdf(
         raise HTTPException(status_code=404, detail="Το σκάφος δεν βρέθηκε")
 
     pdf_buffer = pdf_utils.generate_full_boat_report_pdf(data)
-    filename = f"full_report_{data['boat_name']}_{start}_{end}.pdf"
+
+    safe_filename = f"full_report_{start}_{end}.pdf"
+    # UTF-8 encoded filename for modern browsers, greek fonts
+    utf8_filename = quote(f"full_report_{data['boat_name']}_{start}_{end}.pdf")
+
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={filename}"},
+        headers={
+            "Content-Disposition":
+                f"attachment; filename={safe_filename}; filename*=UTF-8''{utf8_filename}"
+        },
     )
