@@ -8,6 +8,7 @@ const btnCalcPayroll = document.querySelector<HTMLButtonElement>('#btn-calc-payr
 const btnPrintPayroll = document.querySelector<HTMLButtonElement>('#btn-print-payroll')!;
 const payrollListBody = document.querySelector<HTMLTableSectionElement>('#payroll-list')!;
 const payrollActions = document.querySelector<HTMLDivElement>('#payroll-actions')!;
+const payrollSummary = document.querySelector<HTMLDivElement>('#payroll-summary')!;
 const btnClearExtra = document.querySelector<HTMLButtonElement>('#btn-clear-extra')!; 
 const modalExtra = document.querySelector<HTMLDivElement>('#modal-extra')!;
 const extraForm = document.querySelector<HTMLFormElement>('#extra-form')!;
@@ -76,37 +77,44 @@ async function handlePayrollCalculation() {
             if (data.payments.length === 0) {
                 payrollListBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Δεν βρέθηκαν πληρωμές για αυτό το διάστημα.</td></tr>';
                 payrollActions.classList.add('hidden');
+                payrollSummary.classList.add('hidden');
                 return;
             }
             payrollActions.classList.remove('hidden');
+            renderPayrollSummary(data.payments);
 
             data.payments.forEach((item: any) => {
                 const row = document.createElement('tr');
+                row.className = "group payroll-row";
+                const totalExtra = Number(item.total_extra ?? 0);
+                const extraContent = totalExtra > 0
+                    ? `
+                        <button class="btn-add-extra payroll-extra-button payroll-extra-button-filled" data-id="${item.employee_id}" type="button">
+                            <span class="payroll-extra-amount">${totalExtra.toFixed(2)} €</span>
+                            <svg class="payroll-extra-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" />
+                            </svg>
+                        </button>
+                    `
+                    : `
+                        <button class="btn-add-extra payroll-extra-button payroll-extra-button-empty" data-id="${item.employee_id}" type="button">
+                            + Προσθήκη
+                        </button>
+                    `;
                 
                 row.innerHTML = `
                     <td style="font-weight: 500;">${item.employee_name}</td>
                     <td style="text-align: center;">${item.days_worked}</td>
                     <td>${item.total_wage.toFixed(2)} €</td>
                     <td>${item.total_overtime.toFixed(2)} €</td>
-                    <td style="font-weight: 800;">${item.grand_total.toFixed(2)} €</td>
-                    
-                    
-                    <td style="background-color: #eff6ff; color: #1e40af; font-weight: bold;">
+                    <td class="payroll-total-amount">${item.grand_total.toFixed(2)} €</td>
+                    <td class="payroll-bank-cell">
                         ${item.bank_pay.toFixed(2)} €
                     </td>
-                    
-                    <td style="background-color: #fffbeb; color: #92400e; font-weight: bold;">
+                    <td class="payroll-cash-cell">
                         ${item.cash_pay.toFixed(2)} €
                     </td>
-                    
-                    <td>
-                        <button class="action-btn btn-add-extra" data-id="${item.employee_id}">
-                            Πρόσθετα
-                        </button>
-                    </td>
-                    <td style="font-weight: 700; color: #d97706;">
-    ${(item.total_extra ?? 0).toFixed(2)} €
-</td>
+                    <td class="payroll-extra-cell">${extraContent}</td>
                 `;
                 payrollListBody.appendChild(row);
             });
@@ -120,11 +128,31 @@ async function handlePayrollCalculation() {
     }
 }
 
+function renderPayrollSummary(payments: any[]): void {
+    const totals = payments.reduce(
+        (summary, item) => ({
+            grandTotal: summary.grandTotal + Number(item.grand_total ?? 0),
+            bankPay: summary.bankPay + Number(item.bank_pay ?? 0),
+            cashPay: summary.cashPay + Number(item.cash_pay ?? 0),
+            totalExtra: summary.totalExtra + Number(item.total_extra ?? 0),
+        }),
+        { grandTotal: 0, bankPay: 0, cashPay: 0, totalExtra: 0 }
+    );
+
+    const formatAmount = (amount: number) => `${amount.toFixed(2)} €`;
+    document.getElementById("payroll-summary-total")!.textContent = formatAmount(totals.grandTotal);
+    document.getElementById("payroll-summary-bank")!.textContent = formatAmount(totals.bankPay);
+    document.getElementById("payroll-summary-cash")!.textContent = formatAmount(totals.cashPay);
+    document.getElementById("payroll-summary-extra")!.textContent = formatAmount(totals.totalExtra);
+    payrollSummary.classList.remove("hidden");
+}
+
 
 function handleOpenExtraModal(e: Event) {
     const target = e.target as HTMLElement;
-    if (target.classList.contains('btn-add-extra')) {
-        const empId = target.dataset.id;
+    const extraButton = target.closest<HTMLButtonElement>(".btn-add-extra");
+    if (extraButton) {
+        const empId = extraButton.dataset.id;
         (document.getElementById('extra-emp-id') as HTMLInputElement).value = empId!;
         (document.getElementById('extra-amount') as HTMLInputElement).value = '';
         (document.getElementById('extra-reason') as HTMLInputElement).value = '';
