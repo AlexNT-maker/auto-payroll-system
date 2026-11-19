@@ -33,25 +33,18 @@ export function showMessageModal(
 
     if (!messageModal || !messageText || !messageTitle || !messageWindow) return;
 
-        messageTitle.style.color = "#264653"
-
     switch(type){
         case "info":
             messageIcon.innerHTML = infoIcon;
-            btnOk.style.backgroundColor = "#264653";
             break;
         case "warning":
             messageIcon.innerHTML = warningIcon;
-            btnOk.style.backgroundColor = "#d97706";
             break;
         case "success":
             messageIcon.innerHTML = successIcon;
-            btnOk.style.backgroundColor = "#16a34a";
             break;
         case "error":
             messageIcon.innerHTML = errorIcon;
-            btnOk.style.backgroundColor = "#dc2626";
-            messageTitle.style.color = "#dc2626";
             break;
     }
     messageTitle.textContent = title;
