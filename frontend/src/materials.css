@@ -203,15 +203,24 @@
     background: #e0f2fe;
     color: var(--theme-primary);
     border: 1px solid #7dd3fc;
-    padding: 0.4rem 0.85rem;
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 0.25rem;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .usage-edit-btn:hover {
     background: #bae6fd;
+    transform: translateY(-1px);
+}
+
+@media (hover: none) {
+    .usage-edit-btn {
+        opacity: 1;
+    }
 }
 
 .usage-empty {
@@ -225,8 +234,7 @@
     font-weight: 500;
 }
 
-.usage-form-row td:last-child,
-.usage-locked-row td:last-child {
+.usage-form-row td:last-child {
     white-space: nowrap;
     width: 1%;
     min-width: max-content;

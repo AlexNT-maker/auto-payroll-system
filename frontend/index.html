@@ -97,7 +97,7 @@
     <!-- Export full report -->
     <div class="glass-card dashboard-export">
         <div>
-            <strong>📄 Πλήρης Αναφορά</strong>
+            <strong>Πλήρης Αναφορά</strong>
             <p>Κατέβασε την πλήρη αναφορά εξόδων ανά σκάφος.</p>
         </div>
         <button class="btn-submit" id="btn-export-full">Εξαγωγή PDF</button>
@@ -150,8 +150,16 @@
 
           <!--Page No.2-->
           <div id="page-employees" class="animate-enter hidden">
-            <div style="margin-bottom: 2rem; text-align: right;">
-              <button id="btn-add-employee" style="margin-bottom: 5px;" class="btn-submit hover-lift click-shrink">
+            <div class="employees-table-toolbar">
+              <div class="employees-table-heading">
+                <h2>Εργαζόμενοι</h2>
+                <span id="employees-count" class="employees-count-badge">Σύνολο: 0</span>
+              </div>
+              <label class="employees-search">
+                <span class="sr-only">Αναζήτηση εργαζομένου</span>
+                <input id="employees-search" type="search" placeholder="Αναζήτηση εργαζομένου..." autocomplete="off">
+              </label>
+              <button id="btn-add-employee" class="btn-submit hover-lift click-shrink">
                 Προσθήκη εργαζόμενου
               </button>
             </div>
@@ -159,10 +167,9 @@
               <thead>
                 <tr>
                   <th>Όνομα</th>
-                  <th>Ημερομίσθιο</th>
-                  <th>Υπερωρία</th>
-                  <th>Τράπεζα/μέρα</th>
-                  <th>Ενέργειες</th>
+                  <th class="amount-header">Ημερομίσθιο</th>
+                  <th class="amount-header">Υπερωρία</th>
+                  <th class="amount-header">Τράπεζα/μέρα</th>
                 </tr>
               </thead>
               <tbody id="employees-list"></tbody>
@@ -182,7 +189,7 @@
               <thead>
                 <tr>
                   <th>Όνομα Σκάφους</th>
-                  <th>Ενέργειες</th>
+                  <th class="amount-header">Συνολικά ποσά εξόδων</th>
                 </tr>
               </thead>
               <tbody id="boats-list"></tbody>

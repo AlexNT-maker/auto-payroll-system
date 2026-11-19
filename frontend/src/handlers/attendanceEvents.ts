@@ -123,6 +123,18 @@ export function lockForm() {
 export function unlockForm() {
   const inputs = tableBody.querySelectorAll('input, select');
   inputs.forEach((input: any) => input.disabled = false);
+
+  tableBody.querySelectorAll('tr').forEach((row) => {
+    const presentInput = row.querySelector<HTMLInputElement>('.presence-checkbox');
+    const halfInput = row.querySelector<HTMLInputElement>('.half-checkbox');
+    const boatSelect = row.querySelector<HTMLSelectElement>('.boat-select');
+    const otBoatSelect = row.querySelector<HTMLSelectElement>('.ot-boat-select');
+    const hasAttendanceSelection = Boolean(presentInput?.checked || halfInput?.checked);
+
+    if (boatSelect) boatSelect.disabled = !hasAttendanceSelection;
+    if (otBoatSelect) otBoatSelect.disabled = !hasAttendanceSelection;
+  });
+
   btnSubmitDaily.classList.remove('hidden');
   btnEditDaily.classList.add('hidden');
 }
