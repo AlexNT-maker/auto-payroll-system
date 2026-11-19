@@ -89,23 +89,15 @@ The shorter calculation cycle enabled **bi-weekly payouts** instead of monthly â
 
 ## App screenshots
 
-### Inventory/ Pricelist **Data are mocked just to visualize the UI, brand logo is real
-
-![Home-page](images/homePage.png)
-![InventoryUI](images/inventoryUI.png)
-![Inventorylist UI](images/Inv&PriceUI.png)
-
-### Payroll
-![PayrollUI](images/PaydayUI.png)
-
-### Manipulate standard data
-![Standard info manipulation](images/StandardInfo.png)
-
-## Data organized
-![Suppliers data](images/Data_manipulation.png)
-
-## PDF Report 
-![Pdf report visualization](images/Full_Report.png)
+![Screenshot 2230](../images/Screenshot%20%282230%29.png)
+![Screenshot 2231](../images/Screenshot%20%282231%29.png)
+![Screenshot 2232](../images/Screenshot%20%282232%29.png)
+![Screenshot 2233](../images/Screenshot%20%282233%29.png)
+![Screenshot 2234](../images/Screenshot%20%282234%29.png)
+![Screenshot 2235](../images/Screenshot%20%282235%29.png)
+![Screenshot 2236](../images/Screenshot%20%282236%29.png)
+![Screenshot 2237](../images/Screenshot%20%282237%29.png)
+![Screenshot 2238](../images/Screenshot%20%282238%29.png)
 
 ---
 
