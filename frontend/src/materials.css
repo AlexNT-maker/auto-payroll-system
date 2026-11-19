@@ -4,6 +4,10 @@
     padding: 1.75rem;
 }
 
+#materials-page .materials-table {
+    max-width: none;
+}
+
 #materials-page h1 {
     margin-bottom: 1.25rem;
 }

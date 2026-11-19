@@ -729,25 +729,37 @@ tr:hover .usage-edit-btn,
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.45);
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
     z-index: 9999;
 }
 
 .message-modal-window {
     width: 420px;
     max-width: 90%;
-    background: #fcfcfc;
-    border: 1px solid #d9d9d9;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
     padding: 1.5rem;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
 }
 
 .message-modal-icon {
     width: 52px;
     height: 52px;
     margin: 0 auto 0.75rem;
-    display: block;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+}
+
+.message-modal-icon svg {
+    width: 30px;
+    height: 30px;
 }
 
 #message-modal-title {
@@ -756,13 +768,12 @@ tr:hover .usage-edit-btn,
     font-size: 1.3rem;
     font-weight: 700;
     text-align: center;
-    color: #2b2b2b;
     border-radius: 12px 12px 0 0;
 }
 
 #message-modal-text {
     text-align: center;
-    color: #4b5563;
+    color: #334155;
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
@@ -777,35 +788,112 @@ tr:hover .usage-edit-btn,
     padding: 10px 26px;
     border: none;
     border-radius: 8px;
-    background: #d62828;
     color: #ffffff;
     cursor: pointer;
     font-weight: 600;
-    transition: 0.2s;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-#message-modal-ok:hover { background: #b81f1f; }
+#message-modal-ok:hover {
+    transform: translateY(-1px);
+}
 
 #message-modal-cancel {
     padding: 10px 26px;
-    border: 1px solid #c7c7c7;
+    border: 1px solid rgba(71, 85, 105, 0.35);
     border-radius: 8px;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.55);
+    color: #334155;
     cursor: pointer;
-    transition: 0.2s;
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-#message-modal-cancel:hover { background: #f3f3f3; }
+#message-modal-cancel:hover {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: #475569;
+}
 
-.modal-success { border: 3px solid #22c55e; }
-.modal-error   { border: 3px solid #ef4444; }
-.modal-warning { border: 3px solid #f59e0b; }
-.modal-info    { border: 3px solid var(--theme-primary); }
+.modal-success {
+    border-color: rgba(22, 101, 52, 0.65);
+    background: rgba(240, 253, 244, 0.78);
+}
 
-.modal-error   .message-modal-icon { color: #dc2626; }
-.modal-info    .message-modal-icon { color: var(--theme-primary); }
-.modal-warning .message-modal-icon { color: #d97706; }
-.modal-success .message-modal-icon { color: #16a34a; }
+.modal-error {
+    border-color: rgba(153, 27, 27, 0.65);
+    background: rgba(254, 242, 242, 0.8);
+}
+
+.modal-warning {
+    border-color: rgba(154, 52, 18, 0.65);
+    background: rgba(255, 247, 237, 0.82);
+}
+
+.modal-info {
+    border-color: rgba(30, 64, 175, 0.6);
+    background: rgba(239, 246, 255, 0.78);
+}
+
+.modal-success #message-modal-title,
+.modal-success #message-modal-ok {
+    color: #166534;
+}
+
+.modal-success #message-modal-ok {
+    background: #166534;
+    color: #ffffff;
+}
+
+.modal-success .message-modal-icon {
+    background: rgba(187, 247, 208, 0.75);
+    color: #166534;
+}
+
+.modal-error #message-modal-title,
+.modal-error #message-modal-ok {
+    color: #991b1b;
+}
+
+.modal-error #message-modal-ok {
+    background: #991b1b;
+    color: #ffffff;
+}
+
+.modal-error .message-modal-icon {
+    background: rgba(254, 202, 202, 0.78);
+    color: #991b1b;
+}
+
+.modal-warning #message-modal-title,
+.modal-warning #message-modal-ok {
+    color: #9a3412;
+}
+
+.modal-warning #message-modal-ok {
+    background: #9a3412;
+    color: #ffffff;
+}
+
+.modal-warning .message-modal-icon {
+    background: rgba(254, 215, 170, 0.82);
+    color: #9a3412;
+}
+
+.modal-info #message-modal-title,
+.modal-info #message-modal-ok {
+    color: #1e3a8a;
+}
+
+.modal-info #message-modal-ok {
+    background: #1e3a8a;
+    color: #ffffff;
+}
+
+.modal-info .message-modal-icon {
+    background: rgba(191, 219, 254, 0.78);
+    color: #1e3a8a;
+}
 
 
 
