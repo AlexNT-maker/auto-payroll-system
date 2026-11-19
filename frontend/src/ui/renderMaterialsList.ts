@@ -10,21 +10,21 @@ export function renderMaterialsList(): void {
         const code = "ID" + material.id.toString().padStart(3, "0");
 
         row.innerHTML = `
-            <td>${code}</td>
-            <td>${material.name}</td>
-            <td>${material.category}</td>
-            <td>${material.unit}</td>
-            <td>${material.price.toFixed(2)} €</td>
             <td>
-                <div class="materials-actions">
-                    <button class="material-edit-btn" data-id="${material.id}">
-                        Επεξεργασία
+                ${code}
+                <div class="table-row-actions">
+                    <button class="material-edit-btn" data-id="${material.id}" title="Επεξεργασία" aria-label="Επεξεργασία">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                     </button>
-                    <button class="material-delete-btn" data-id="${material.id}">
-                        Διαγραφή
+                    <button class="material-delete-btn" data-id="${material.id}" title="Διαγραφή" aria-label="Διαγραφή">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/></svg>
                     </button>
                 </div>
             </td>
+            <td>${material.name}</td>
+            <td>${material.category}</td>
+            <td>${material.unit}</td>
+            <td class="amount-cell">${material.price.toFixed(2)} €</td>
         `;
 
         materialsListBody.appendChild(row);

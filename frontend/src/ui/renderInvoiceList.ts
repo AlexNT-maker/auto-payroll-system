@@ -53,16 +53,17 @@ function getFilteredInvoices(): Invoice[] {
 
 function renderThead(): void {
     const headers = currentView === "detail"
-        ? ["Ημερομηνία", "Ποσό", "Προμηθευτής", "Χρεώνεται σε", "Ενέργειες"]
+        ? ["Ημερομηνία", "Ποσό", "Προμηθευτής", "Χρεώνεται σε"]
         : ["Προμηθευτής", "Χρεώνεται σε", "Σύνολο Τιμολογίων", "Πλήθος"];
+    const amountIndexes = currentView === "detail" ? [1] : [2];
 
-    invoiceThead.innerHTML = `<tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>`;
+    invoiceThead.innerHTML = `<tr>${headers.map((h, index) => `<th class="${amountIndexes.includes(index) ? "amount-header" : ""}">${h}</th>`).join("")}</tr>`;
 }
 
 
 function renderDetailView(invoices: Invoice[]): void {
     if (invoices.length === 0) {
-        invoiceListBody.innerHTML = `<tr><td colspan="5" class="usage-empty">Δεν βρέθηκαν τιμολόγια για τα επιλεγμένα φίλτρα.</td></tr>`;
+        invoiceListBody.innerHTML = `<tr><td colspan="4" class="usage-empty">Δεν βρέθηκαν τιμολόγια για τα επιλεγμένα φίλτρα.</td></tr>`;
         return;
     }
 
@@ -80,13 +81,17 @@ function createLockedInvoiceRow(inv: Invoice): HTMLTableRowElement {
     const boat = store.boats.find((b) => b.id === inv.boat_id);
 
     row.innerHTML = `
-        <td>${formatDate(inv.date)}</td>
-        <td style="font-weight: 700;">${inv.amount.toFixed(2)} €</td>
+        <td>
+            ${formatDate(inv.date)}
+            <div class="table-row-actions">
+                <button class="usage-edit-btn" data-id="${inv.id}" title="Επεξεργασία" aria-label="Επεξεργασία">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+            </div>
+        </td>
+        <td class="amount-cell">${inv.amount.toFixed(2)} €</td>
         <td>${supplier?.name ?? "-"}</td>
         <td>${boat?.name ?? "-"}</td>
-        <td>
-            <button class="usage-edit-btn" data-id="${inv.id}">Επεξεργασία</button>
-        </td>
     `;
 
     return row;
@@ -151,7 +156,7 @@ function renderAggregateView(invoices: Invoice[]): void {
         row.innerHTML = `
             <td style="font-weight: 600;">${supplier?.name ?? "-"}</td>
             <td>${boat?.name ?? "-"}</td>
-            <td style="font-weight: 700;">${agg.total.toFixed(2)} €</td>
+            <td class="amount-cell">${agg.total.toFixed(2)} €</td>
             <td>${agg.count}</td>
         `;
         invoiceListBody.appendChild(row);
@@ -206,7 +211,7 @@ function createAddInvoiceRow(): HTMLTableRowElement {
     const row = document.createElement("tr");
     row.className = "add-usage-row";
     row.innerHTML = `
-        <td colspan="5">
+        <td colspan="4">
             <button class="add-usage-btn" type="button">+ Προσθέστε τιμολόγιο</button>
         </td>
     `;

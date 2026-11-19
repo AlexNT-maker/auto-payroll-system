@@ -72,16 +72,17 @@ function getFilteredUsages(): MaterialUsage[] {
 
 function renderThead(): void {
     const headers = currentView === "detail"
-        ? ["Ημερομηνία", "Υλικό", "Μονάδα", "Κατηγορία", "Ποσότητα", "Παραχωρήθηκε", "Σύνολο", "Ενέργειες"]
+        ? ["Ημερομηνία", "Υλικό", "Μονάδα", "Κατηγορία", "Ποσότητα", "Παραχωρήθηκε", "Σύνολο"]
         : ["Υλικό", "Μονάδα", "Κατηγορία", "Ποσότητα", "Παραχωρήθηκε"];
+    const amountIndexes = currentView === "detail" ? [4, 6] : [3];
 
-    usageThead.innerHTML = `<tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>`;
+    usageThead.innerHTML = `<tr>${headers.map((h, index) => `<th class="${amountIndexes.includes(index) ? "amount-header" : ""}">${h}</th>`).join("")}</tr>`;
 }
 
 
 function renderDetailView(usages: MaterialUsage[]): void {
     if (usages.length === 0) {
-        usageListBody.innerHTML = `<tr><td colspan="8" class="usage-empty">Δεν βρέθηκαν καταχωρήσεις για τα επιλεγμένα φίλτρα.</td></tr>`;
+        usageListBody.innerHTML = `<tr><td colspan="7" class="usage-empty">Δεν βρέθηκαν καταχωρήσεις για τα επιλεγμένα φίλτρα.</td></tr>`;
         return;
     }
 
@@ -99,16 +100,20 @@ function createLockedUsageRow(usage: MaterialUsage): HTMLTableRowElement {
     const boat = store.boats.find((b) => b.id === usage.boat_id);
 
     row.innerHTML = `
-        <td>${formatDate(usage.date)}</td>
+        <td>
+            ${formatDate(usage.date)}
+            <div class="table-row-actions">
+                <button class="usage-edit-btn" data-id="${usage.id}" title="Επεξεργασία" aria-label="Επεξεργασία">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+            </div>
+        </td>
         <td>${material?.name ?? "-"}</td>
         <td>${material?.unit ?? "-"}</td>
         <td>${material?.category ?? "-"}</td>
-        <td>${usage.quantity}</td>
+        <td class="amount-cell">${usage.quantity}</td>
         <td>${boat?.name ?? "-"}</td>
-        <td style="font-weight: 700;">${usage.total_price.toFixed(2)} €</td>
-        <td>
-            <button class="usage-edit-btn" data-id="${usage.id}">Επεξεργασία</button>
-        </td>
+        <td class="amount-cell">${usage.total_price.toFixed(2)} €</td>
     `;
 
     return row;
@@ -173,7 +178,7 @@ function renderAggregateView(usages: MaterialUsage[]): void {
             <td style="font-weight: 600;">${material?.name ?? "-"}</td>
             <td>${material?.unit ?? "-"}</td>
             <td>${material?.category ?? "-"}</td>
-            <td style="font-weight: 700;">${agg.quantity}</td>
+            <td class="amount-cell">${agg.quantity}</td>
             <td>${boat?.name ?? "-"}</td>
         `;
         usageListBody.appendChild(row);
@@ -265,7 +270,7 @@ function createAddUsageRow(): HTMLTableRowElement {
     const row = document.createElement("tr");
     row.className = "add-usage-row";
     row.innerHTML = `
-        <td colspan="8">
+        <td colspan="7">
             <button class="add-usage-btn" type="button">+ Προσθέστε προϊόν</button>
         </td>
     `;

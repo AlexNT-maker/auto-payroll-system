@@ -41,16 +41,98 @@ input[type="number"] {
     border-radius: 6px;
 }
 
-.attendance-table thead th:nth-child(5),
-.attendance-table thead th:nth-child(6) {
-    background-color: #fdf7ec;
+#page-home .attendance-table,
+#page-employees .attendance-table {
+    background: var(--glass-3);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
 }
 
-.attendance-table tbody tr:hover td:nth-child(5),
-.attendance-table tbody tr:hover td:nth-child(6) {
-    background-color: rgba(245, 158, 11, 0.08);
+#page-home .attendance-table thead th,
+#page-employees .attendance-table thead th {
+    border-bottom-color: rgba(var(--brand-rgb), 0.2);
 }
 
+#page-home .attendance-table thead th {
+    background: rgba(224, 242, 254, 0.78);
+    color: #23395d;
+}
+
+#page-employees .attendance-table thead th {
+    background: #ffffff;
+    color: #23395d;
+}
+
+#page-home .attendance-table .presence-checkbox,
+#page-home .attendance-table .half-checkbox {
+    appearance: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    border: 1px solid rgba(var(--brand-rgb), 0.45);
+    border-radius: 4px;
+    background: #ffffff;
+    cursor: pointer;
+    vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(31, 38, 135, 0.12);
+}
+
+#page-home .attendance-table .presence-checkbox:checked,
+#page-home .attendance-table .half-checkbox:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 0.8rem;
+}
+
+#page-home .attendance-table .boat-select,
+#page-home .attendance-table .ot-boat-select {
+    border-color: var(--theme-primary);
+    background: rgba(224, 242, 254, 0.78);
+    color: #23395d;
+    box-shadow: 0 4px 12px rgba(31, 38, 135, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#page-home .attendance-table .boat-select:hover,
+#page-home .attendance-table .ot-boat-select:hover,
+#page-home .attendance-table .boat-select:focus,
+#page-home .attendance-table .ot-boat-select:focus {
+    border-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 4px 14px rgba(31, 38, 135, 0.18);
+}
+
+#page-home .attendance-table select option {
+    background: #ffffff;
+    color: #000000;
+}
+
+#page-home .attendance-table select:disabled {
+    border-color: #cbd5e1;
+    background: rgba(226, 232, 240, 0.78);
+    color: #94a3b8;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+#page-home .attendance-table .overtime-input::-webkit-inner-spin-button,
+#page-home .attendance-table .overtime-input::-webkit-outer-spin-button,
+#emp-overtime::-webkit-inner-spin-button,
+#emp-overtime::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+#page-home .attendance-table .overtime-input,
+#emp-overtime {
+    -moz-appearance: textfield;
+}
 
 .dashboard-header {
     display: flex;

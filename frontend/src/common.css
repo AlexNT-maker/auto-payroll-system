@@ -262,6 +262,102 @@ h1 {
     font-size: 0.95rem;
 }
 
+.materials-table,
+#page-employees .attendance-table,
+#page-boats .attendance-table {
+    max-width: 1000px;
+}
+
+.employees-table-toolbar,
+#page-employees .attendance-table {
+    max-width: none;
+}
+
+#page-boats .attendance-table {
+    table-layout: fixed;
+}
+
+#page-boats .attendance-table th:first-child,
+#page-boats .attendance-table td:first-child {
+    width: 60%;
+}
+
+#page-boats .attendance-table th:last-child,
+#page-boats .attendance-table td:last-child {
+    width: 40%;
+}
+
+.employees-table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.employees-table-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-right: auto;
+}
+
+.employees-table-heading h2 {
+    margin: 0;
+    color: var(--theme-primary);
+    font-size: 1.25rem;
+}
+
+.employees-count-badge {
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    background: #e8f1f8;
+    color: #334e73;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.employees-search input {
+    width: 220px;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    color: #23395d;
+    background: #ffffff;
+}
+
+.employees-search input:focus {
+    outline: none;
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 0 2px rgba(var(--brand-rgb), 0.12);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+#page-employees .amount-header,
+#page-employees .amount-cell {
+    text-align: right;
+}
+
+.materials-table th,
+.materials-table td,
+#page-employees .attendance-table th,
+#page-employees .attendance-table td,
+#page-boats .attendance-table th,
+#page-boats .attendance-table td {
+    padding: 0.65rem 0.75rem;
+}
+
 .materials-table th,
 .materials-table td,
 .attendance-table th,
@@ -286,6 +382,22 @@ h1 {
 .materials-table tbody tr:hover,
 .attendance-table tbody tr:hover {
     background: #f8fafc;
+}
+
+.amount-header,
+.amount-cell {
+    background: #f0f7fc;
+    color: #23395d;
+}
+
+.amount-cell {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.amount-header {
+    color: #334e73 !important;
+    text-align: right;
 }
 
 .btn-submit,
@@ -325,19 +437,41 @@ h1 {
     border-color: #fca5a5;
 }
 
-.materials-actions {
+.table-row-actions {
     display: flex;
-    gap: 0.4rem;
+    gap: 0.25rem;
+    height: 1.35rem;
+    margin-top: 0.2rem;
+    align-items: center;
 }
 
 .material-edit-btn,
-.material-delete-btn {
-    padding: 0.4rem 0.85rem;
+.material-delete-btn,
+.usage-edit-btn {
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 0.25rem;
     border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.85rem;
     cursor: pointer;
-    transition: background 0.2s ease;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+tr:hover .material-edit-btn,
+tr:hover .material-delete-btn,
+tr:hover .usage-edit-btn,
+.material-edit-btn:focus-visible,
+.material-delete-btn:focus-visible,
+.usage-edit-btn:focus-visible {
+    opacity: 1;
+}
+
+.material-edit-btn svg,
+.material-delete-btn svg,
+.usage-edit-btn svg {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .material-edit-btn {
@@ -348,6 +482,7 @@ h1 {
 
 .material-edit-btn:hover {
     background: #bae6fd;
+    transform: translateY(-1px);
 }
 
 .material-delete-btn {
@@ -358,6 +493,15 @@ h1 {
 
 .material-delete-btn:hover {
     background: #f5d7d7;
+    transform: translateY(-1px);
+}
+
+@media (hover: none) {
+    .material-edit-btn,
+    .material-delete-btn,
+    .usage-edit-btn {
+        opacity: 1;
+    }
 }
 
 

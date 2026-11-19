@@ -38,8 +38,20 @@ export function renderEmployeeRow(
         halfInput.checked = true;
     }
 
-    presentInput.addEventListener('change', () => { if(presentInput.checked) halfInput.checked = false; });
-    halfInput.addEventListener('change', () => { if(halfInput.checked) presentInput.checked = false; });
+    const updateBoatSelectState = (): void => {
+        const hasAttendanceSelection = presentInput.checked || halfInput.checked;
+        boatSelect.disabled = !hasAttendanceSelection;
+        otBoatSelect.disabled = !hasAttendanceSelection;
+    };
+
+    presentInput.addEventListener('change', () => {
+        if (presentInput.checked) halfInput.checked = false;
+        updateBoatSelectState();
+    });
+    halfInput.addEventListener('change', () => {
+        if (halfInput.checked) presentInput.checked = false;
+        updateBoatSelectState();
+    });
 
     // Cell No.3 Boat (Dropdown style)
     const boatCell = document.createElement('td');
@@ -90,6 +102,8 @@ row.appendChild(otBoatCell);
     
     overtimeCell.appendChild(overtimeInput);
     row.appendChild(overtimeCell);
+
+    updateBoatSelectState();
 
     return row;
 }
