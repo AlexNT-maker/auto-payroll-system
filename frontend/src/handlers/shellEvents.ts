@@ -2,7 +2,7 @@ const pageLoader = document.querySelector<HTMLDivElement>("#page-loader")!;
 const sidebar = document.querySelector<HTMLElement>("#sidebar")!;
 const sidebarOverlay = document.querySelector<HTMLDivElement>("#sidebar-overlay")!;
 
-const LOADER_DURATION = 700;
+const LOADER_MIN_DURATION = 200;
 
 // ============================================================
 // PUBLIC
@@ -77,7 +77,7 @@ function navigateWithLoader(href: string): void {
     pageLoader?.classList.remove("hidden");
     setTimeout(() => {
         window.location.href = href;
-    }, LOADER_DURATION);
+    }, LOADER_MIN_DURATION);
 }
 
 // ============================================================
