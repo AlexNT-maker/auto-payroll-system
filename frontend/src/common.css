@@ -265,7 +265,6 @@ h1 {
 .materials-table,
 #page-employees .attendance-table,
 #page-boats .attendance-table {
-    justify-content: center;
     max-width: 1000px;
 }
 
@@ -274,16 +273,8 @@ h1 {
     max-width: none;
 }
 
-#page-boats {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding-bottom: 1.75rem;
-}
-
 #page-boats .attendance-table {
     table-layout: fixed;
-    margin-top: 1rem;
 }
 
 #page-boats .attendance-table th:first-child,
@@ -434,134 +425,6 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     background-color: #bae6fd;
     color: #05407a;
-}
-
-.btn-export-min {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #374151;
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.btn-export-min:hover {
-    background: #f8fafc;
-    color: var(--theme-primary);
-    border-color: var(--theme-primary);
-}
-
-.btn-export-min svg {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-}
-
-.payroll-export-action {
-    display: flex;
-    align-items: flex-end;
-}
-
-.payroll-export-action.hidden,
-.payroll-summary.hidden {
-    display: none;
-}
-
-.payroll-summary {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.payroll-summary-card {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-    padding: 0.85rem 1rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(226, 232, 240, 0.7);
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-    transition: box-shadow 0.2s ease;
-}
-
-.payroll-summary-card:hover {
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
-}
-
-.payroll-summary-icon {
-    display: grid;
-    flex: 0 0 2.25rem;
-    width: 2.25rem;
-    height: 2.25rem;
-    place-items: center;
-    border-radius: 0.65rem;
-}
-
-.payroll-summary-icon svg {
-    width: 1.25rem;
-    height: 1.25rem;
-}
-
-.payroll-summary-label {
-    overflow: hidden;
-    color: #64748b;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.2;
-    text-overflow: ellipsis;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.payroll-summary-value {
-    color: #1e293b;
-    font-size: 1.25rem;
-    font-variant-numeric: tabular-nums;
-    font-weight: 700;
-    line-height: 1.4;
-}
-
-.payroll-summary-total .payroll-summary-icon {
-    background: #e0e7ff;
-    color: #4f46e5;
-}
-
-.payroll-summary-bank .payroll-summary-icon {
-    background: #dbeafe;
-    color: #2563eb;
-}
-
-.payroll-summary-cash .payroll-summary-icon {
-    background: #d1fae5;
-    color: #059669;
-}
-
-.payroll-summary-extra .payroll-summary-icon {
-    background: #ffedd5;
-    color: #ea580c;
-}
-
-@media (max-width: 1100px) {
-    .payroll-summary {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 600px) {
-    .payroll-summary {
-        grid-template-columns: minmax(0, 1fr);
-    }
 }
 
 .btn-cancel {
@@ -729,37 +592,25 @@ tr:hover .usage-edit-btn,
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
-    background: rgba(15, 23, 42, 0.58);
-    backdrop-filter: blur(7px);
-    -webkit-backdrop-filter: blur(7px);
+    background: rgba(0, 0, 0, 0.45);
     z-index: 9999;
 }
 
 .message-modal-window {
     width: 420px;
     max-width: 90%;
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(18px) saturate(150%);
-    -webkit-backdrop-filter: blur(18px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 18px;
+    background: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
 .message-modal-icon {
     width: 52px;
     height: 52px;
     margin: 0 auto 0.75rem;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-}
-
-.message-modal-icon svg {
-    width: 30px;
-    height: 30px;
+    display: block;
 }
 
 #message-modal-title {
@@ -768,12 +619,13 @@ tr:hover .usage-edit-btn,
     font-size: 1.3rem;
     font-weight: 700;
     text-align: center;
+    color: #2b2b2b;
     border-radius: 12px 12px 0 0;
 }
 
 #message-modal-text {
     text-align: center;
-    color: #334155;
+    color: #4b5563;
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
@@ -788,112 +640,35 @@ tr:hover .usage-edit-btn,
     padding: 10px 26px;
     border: none;
     border-radius: 8px;
+    background: #d62828;
     color: #ffffff;
     cursor: pointer;
     font-weight: 600;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: 0.2s;
 }
 
-#message-modal-ok:hover {
-    transform: translateY(-1px);
-}
+#message-modal-ok:hover { background: #b81f1f; }
 
 #message-modal-cancel {
     padding: 10px 26px;
-    border: 1px solid rgba(71, 85, 105, 0.35);
+    border: 1px solid #c7c7c7;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.55);
-    color: #334155;
+    background: #ffffff;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: 0.2s;
 }
 
-#message-modal-cancel:hover {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: #475569;
-}
+#message-modal-cancel:hover { background: #f3f3f3; }
 
-.modal-success {
-    border-color: rgba(22, 101, 52, 0.65);
-    background: rgba(240, 253, 244, 0.78);
-}
+.modal-success { border: 3px solid #22c55e; }
+.modal-error   { border: 3px solid #ef4444; }
+.modal-warning { border: 3px solid #f59e0b; }
+.modal-info    { border: 3px solid var(--theme-primary); }
 
-.modal-error {
-    border-color: rgba(153, 27, 27, 0.65);
-    background: rgba(254, 242, 242, 0.8);
-}
-
-.modal-warning {
-    border-color: rgba(154, 52, 18, 0.65);
-    background: rgba(255, 247, 237, 0.82);
-}
-
-.modal-info {
-    border-color: rgba(30, 64, 175, 0.6);
-    background: rgba(239, 246, 255, 0.78);
-}
-
-.modal-success #message-modal-title,
-.modal-success #message-modal-ok {
-    color: #166534;
-}
-
-.modal-success #message-modal-ok {
-    background: #166534;
-    color: #ffffff;
-}
-
-.modal-success .message-modal-icon {
-    background: rgba(187, 247, 208, 0.75);
-    color: #166534;
-}
-
-.modal-error #message-modal-title,
-.modal-error #message-modal-ok {
-    color: #991b1b;
-}
-
-.modal-error #message-modal-ok {
-    background: #991b1b;
-    color: #ffffff;
-}
-
-.modal-error .message-modal-icon {
-    background: rgba(254, 202, 202, 0.78);
-    color: #991b1b;
-}
-
-.modal-warning #message-modal-title,
-.modal-warning #message-modal-ok {
-    color: #9a3412;
-}
-
-.modal-warning #message-modal-ok {
-    background: #9a3412;
-    color: #ffffff;
-}
-
-.modal-warning .message-modal-icon {
-    background: rgba(254, 215, 170, 0.82);
-    color: #9a3412;
-}
-
-.modal-info #message-modal-title,
-.modal-info #message-modal-ok {
-    color: #1e3a8a;
-}
-
-.modal-info #message-modal-ok {
-    background: #1e3a8a;
-    color: #ffffff;
-}
-
-.modal-info .message-modal-icon {
-    background: rgba(191, 219, 254, 0.78);
-    color: #1e3a8a;
-}
+.modal-error   .message-modal-icon { color: #dc2626; }
+.modal-info    .message-modal-icon { color: var(--theme-primary); }
+.modal-warning .message-modal-icon { color: #d97706; }
+.modal-success .message-modal-icon { color: #16a34a; }
 
 
 
