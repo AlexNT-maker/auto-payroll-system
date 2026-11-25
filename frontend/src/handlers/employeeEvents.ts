@@ -1,6 +1,8 @@
 import { store } from "../state/store";
 import { 
-    deleteEmployee,
+    archiveEmployee,
+    restoreEmployee,
+    softDeleteEmployee,
 updateEmployee,
 createEmployee
  } from "../api/employeesApi";
@@ -58,38 +60,92 @@ export function openEditModal(id: number) {
     modal.classList.remove('hidden');
 }
 
-export async function handleDeleteEmployee(id:number) {
-try {
-    await deleteEmployee(id);
-
-    await fetchData();
-
-    showMessageModal("Επιτυχία", "Ο εργαζόμενος διαγράφηκε επιτυχώς", "success", () => window.location.reload());
-
-
-} catch (error) {
-    console.error(error);
-
-    showMessageModal("Σφάλμα","Προέκυψε σφάλμα κατά τη διαγραφή του εργαζομένου", "error");
+export async function handleArchiveEmployee(id: number) {
+    try {
+        await archiveEmployee(id);
+        await fetchData();
+        showMessageModal(
+            "Επιτυχία",
+            "Ο εργαζόμενος αρχειοθετήθηκε. Το ιστορικό και τα μεροκάματά του διατηρούνται.",
+            "success",
+            () => window.location.reload()
+        );
+    } catch (error) {
+        console.error(error);
+        showMessageModal("Σφάλμα", "Προέκυψε σφάλμα κατά την αρχειοθέτηση του εργαζομένου", "error");
+    }
 }
+
+export async function handleRestoreEmployee(id: number) {
+    try {
+        await restoreEmployee(id);
+        await fetchData();
+        showMessageModal(
+            "Επιτυχία",
+            "Ο εργαζόμενος επανήλθε με το προηγούμενο ιστορικό και τα μεροκάματά του.",
+            "success",
+            () => window.location.reload()
+        );
+    } catch (error) {
+        console.error(error);
+        showMessageModal("Σφάλμα", "Δεν ήταν δυνατή η επαναφορά του εργαζομένου", "error");
+    }
+}
+
+export async function handleSoftDeleteEmployee(id: number) {
+    try {
+        await softDeleteEmployee(id);
+        await fetchData();
+        showMessageModal(
+            "Επιτυχία",
+            "Ο εργαζόμενος αφαιρέθηκε από το παρόν και τις μελλοντικές ενέργειες. Τα ιστορικά μεροκάματα διατηρούνται.",
+            "success",
+            () => window.location.reload()
+        );
+    } catch (error) {
+        console.error(error);
+        showMessageModal("Σφάλμα", "Δεν ήταν δυνατή η διαγραφή του εργαζομένου από το παρόν", "error");
+    }
 }
 
 export function attachActionListeners() {
     const list = document.getElementById("employees-list");
     if (!list) return;
 
-    list.querySelectorAll<HTMLButtonElement>(".material-edit-btn").forEach(btn => {
+    list.querySelectorAll<HTMLButtonElement>(".employee-edit-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
             openEditModal(id);
         });
     });
 
-    list.querySelectorAll<HTMLButtonElement>(".material-delete-btn").forEach(btn => {
+    list.querySelectorAll<HTMLButtonElement>(".employee-archive-btn").forEach(btn => {
         btn.addEventListener("click", async (e) => {
             const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
-            if (await showConfirmModal("Προειδοποίηση", "Είστε σίγουρος για τη διαγραφή;", "error")) {
-                handleDeleteEmployee(id);
+            if (await showConfirmModal("Αρχειοθέτηση", "Να αρχειοθετηθεί ο εργαζόμενος; Το ιστορικό του θα διατηρηθεί.", "warning")) {
+                handleArchiveEmployee(id);
+            }
+        });
+    });
+
+    list.querySelectorAll<HTMLButtonElement>(".employee-restore-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
+            if (await showConfirmModal("Επαναφορά", "Να επανέλθει ο εργαζόμενος με το παλιό του ιστορικό;", "info")) {
+                handleRestoreEmployee(id);
+            }
+        });
+    });
+
+    list.querySelectorAll<HTMLButtonElement>(".employee-delete-btn").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+            const id = parseInt((e.currentTarget as HTMLElement).dataset.id!);
+            if (await showConfirmModal(
+                "Διαγραφή από το παρόν",
+                "Ο εργαζόμενος δεν θα εμφανίζεται πλέον στη διαχείριση ή σε νέες ενέργειες. Τα ιστορικά στοιχεία θα διατηρηθούν και δεν θα είναι δυνατή η επαναφορά του.",
+                "error"
+            )) {
+                handleSoftDeleteEmployee(id);
             }
         });
     });

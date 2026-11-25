@@ -75,7 +75,6 @@ function renderDetail(records: AttendanceReportItem[]): void {
 
 
 interface AggregateRow {
-    employee_id: number;
     employee_name: string;
     days: number;
     wage: number;
@@ -86,13 +85,15 @@ interface AggregateRow {
 }
 
 function renderAggregate(records: AttendanceReportItem[]): void {
-    const map = new Map<number, AggregateRow>();
+    const map = new Map<string, AggregateRow>();
 
     records.forEach((r) => {
-        let agg = map.get(r.employee_id);
+        const key = r.employee_id === null
+            ? `deleted:${r.employee_name}`
+            : `employee:${r.employee_id}`;
+        let agg = map.get(key);
         if (!agg) {
             agg = {
-                employee_id: r.employee_id,
                 employee_name: r.employee_name,
                 days: 0,
                 wage: 0,
@@ -101,7 +102,7 @@ function renderAggregate(records: AttendanceReportItem[]): void {
                 extra: 0,
                 total: 0,
             };
-            map.set(r.employee_id, agg);
+            map.set(key, agg);
         }
 
         if (r.daily_wage > 0) {

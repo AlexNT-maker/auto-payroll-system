@@ -55,7 +55,11 @@ function initFilters(): void {
     store.employees.forEach((e) => {
         const opt = document.createElement("option");
         opt.value = e.id.toString();
-        opt.textContent = e.name;
+        opt.textContent = e.is_deleted
+            ? `${e.name} (Διαγραμμένος)`
+            : e.is_active
+                ? e.name
+                : `${e.name} (Αρχειοθετημένος)`;
         filterEmp.appendChild(opt);
     });
 

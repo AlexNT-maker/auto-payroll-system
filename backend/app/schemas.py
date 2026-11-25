@@ -30,6 +30,8 @@ class EmployeeCreate(EmployeeBase):
 
 class Employee(EmployeeBase):
     id: int
+    is_active: bool = True
+    is_deleted: bool = False
 
     class Config:
         from_attributes = True

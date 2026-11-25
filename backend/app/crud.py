@@ -51,7 +51,7 @@ def create_employee(db: Session, employee: schemas.EmployeeCreate):
 # Update employee
 def update_employee(db: Session, employee_id: int, employee_data: schemas.EmployeeCreate):
     db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
-    if not db_employee:
+    if not db_employee or db_employee.is_deleted:
         return None
     
     db_employee.name = employee_data.name
@@ -63,24 +63,48 @@ def update_employee(db: Session, employee_id: int, employee_data: schemas.Employ
     db.refresh(db_employee)
     return db_employee
 
-# Delete employee
-def delete_employee(db: Session, employee_id: int):
+
+def _snapshot_employee_attendance(db: Session, employee: models.Employee) -> None:
+    attendance_records = db.query(models.Attendance).filter(
+        models.Attendance.employee_id == employee.id
+    ).all()
+    for record in attendance_records:
+        if record.daily_wage_snapshot is None:
+            record.daily_wage_snapshot = employee.daily_wage
+        if record.overtime_rate_snapshot is None:
+            record.overtime_rate_snapshot = employee.overtime_rate
+        if record.bank_daily_amount_snapshot is None:
+            record.bank_daily_amount_snapshot = employee.bank_daily_amount
+        if not record.employee_name_snapshot:
+            record.employee_name_snapshot = employee.name
+
+
+# Archive or restore an employee without detaching historical attendance.
+def set_employee_active(db: Session, employee_id: int, is_active: bool):
     db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
-    if not db_employee:
-        return "NOT_FOUND"
+    if not db_employee or db_employee.is_deleted:
+        return None
 
-    has_records = db.query(models.Attendance).filter(
-        models.Attendance.employee_id == employee_id
-    ).count()
+    if not is_active:
+        _snapshot_employee_attendance(db, db_employee)
 
-    if has_records > 0:
-        return "BLOCKED"   
-    
-    name = db_employee.name
-    db.delete(db_employee)
+    db_employee.is_active = is_active
     db.commit()
-    return {"status" : "ok", 
-            "name" : name }
+    db.refresh(db_employee)
+    return db_employee
+
+
+def soft_delete_employee(db: Session, employee_id: int):
+    db_employee = db.query(models.Employee).filter(models.Employee.id == employee_id).first()
+    if not db_employee or db_employee.is_deleted:
+        return None
+
+    _snapshot_employee_attendance(db, db_employee)
+    db_employee.is_active = False
+    db_employee.is_deleted = True
+    db.commit()
+    db.refresh(db_employee)
+    return db_employee
 
 # -- Boats --
 
@@ -250,6 +274,16 @@ def get_expenses_report(db: Session, start:date, end:date, boat_id: int=None, em
 
 # -- Attendance (Update or Create) --
 def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
+    employee = None
+    if attendance.employee_id is not None:
+        employee = db.query(models.Employee).filter(
+            models.Employee.id == attendance.employee_id
+        ).first()
+        if employee is None:
+            return "EMPLOYEE_NOT_FOUND"
+        if employee.is_deleted:
+            return "EMPLOYEE_DELETED"
+
     existing_record = db.query(models.Attendance).filter(
         models.Attendance.date == attendance.date,
         models.Attendance.employee_id == attendance.employee_id
@@ -267,9 +301,8 @@ def create_attendance(db: Session, attendance: schemas.AttendanceCreate):
         db.refresh(existing_record)
         return existing_record
 
-    employee = db.query(models.Employee).filter(
-        models.Employee.id == attendance.employee_id
-    ).first()
+    if employee is not None and not employee.is_active:
+        return "EMPLOYEE_ARCHIVED"
 
     db_attendance = models.Attendance(
         date = attendance.date, employee_id = attendance.employee_id,
