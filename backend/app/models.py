@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, Date
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Float, Date, text
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -12,6 +12,8 @@ class Employee(Base):
     daily_wage = Column(Float)
     overtime_rate = Column(Float)
     bank_daily_amount = Column(Float)
+    is_active = Column(Boolean, nullable=False, default=True, server_default=text("1"))
+    is_deleted = Column(Boolean, nullable=False, default=False, server_default=text("0"))
 
     attendance_records = relationship("Attendance", back_populates="employee")
 

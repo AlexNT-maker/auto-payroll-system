@@ -4,6 +4,8 @@ export interface Employee {
   daily_wage: number;
   overtime_rate: number;
   bank_daily_amount: number;
+  is_active: boolean;
+  is_deleted: boolean;
   tempPresent?: boolean;
   tempHalfDay?: boolean;
   tempBoat?: string;

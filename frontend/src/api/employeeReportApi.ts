@@ -5,7 +5,7 @@ const BASE_URL = API_URL;
 export interface AttendanceReportItem {
     id: number;
     date: string;
-    employee_id: number;
+    employee_id: number | null;
     employee_name: string;
     boat_id: number | null;
     boat_name: string | null;

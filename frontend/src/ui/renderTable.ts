@@ -8,13 +8,15 @@ const tableBody = document.querySelector<HTMLTableSectionElement>('#attendance-l
 export function renderTable(existingData: AttendanceRecord[]=[]){
   tableBody.innerHTML = '';
 
-  store.employees.forEach((employee) => {
+  store.employees
+    .filter((employee) => employee.is_active && !employee.is_deleted)
+    .forEach((employee) => {
     const record = existingData.find(r => r.employee_id === employee.id);
 
     const row = renderEmployeeRow(employee, record);
 
     tableBody.appendChild(row);
-  });
+    });
 }
 
 

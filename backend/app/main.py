@@ -5,13 +5,14 @@ from typing import List, Optional
 from datetime import date
 from fastapi.responses import StreamingResponse
 from . import crud, models, schemas, pdf_utils
-from .database import SessionLocal, engine
+from .database import SessionLocal, engine, ensure_employee_status_columns
 import os
 from .seed_demo import seed_all
 from urllib.parse import quote
 
 
 models.Base.metadata.create_all(bind=engine) # Creates the base if not exists
+ensure_employee_status_columns(engine)
 app = FastAPI()
 
 # ---------- CORS ----------
@@ -84,19 +85,27 @@ def update_employee(employee_id: int, employee: schemas.EmployeeCreate, db: Sess
     return updated_employee
 
 @app.delete("/employees/{employee_id}")
-def delete_employee(employee_id: int, db: Session = Depends(get_db)):
-    result = crud.delete_employee(db, employee_id)
-
-    if result == "NOT_FOUND":
+def archive_employee(employee_id: int, db: Session = Depends(get_db)):
+    employee = crud.set_employee_active(db, employee_id, False)
+    if employee is None:
         raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
 
-    if result == "BLOCKED":
-        raise HTTPException(
-            status_code=400,
-            detail="Δεν μπορεί να διαγραφεί: έχει καταχωρήσεις εργασίας. Τα δεδομένα είναι ιστορικά."
-        )
+    return {"message": "Ο εργαζόμενος αρχειοθετήθηκε", "name": employee.name}
 
-    return {"message": "Επιτυχής διαγραφή", "name": result["name"]}
+@app.post("/employees/{employee_id}/restore", response_model=schemas.Employee)
+def restore_employee(employee_id: int, db: Session = Depends(get_db)):
+    employee = crud.set_employee_active(db, employee_id, True)
+    if employee is None:
+        raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
+    return employee
+
+@app.delete("/employees/{employee_id}/permanent")
+def soft_delete_employee(employee_id: int, db: Session = Depends(get_db)):
+    employee = crud.soft_delete_employee(db, employee_id)
+    if employee is None:
+        raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
+
+    return {"message": "Ο εργαζόμενος διαγράφηκε από το παρόν", "name": employee.name}
 
 # 2. -- Boats --
 @app.post("/boats/", response_model= schemas.Boat)
@@ -146,7 +155,14 @@ def export_boat_analysis_pdf(boat_id: int, start: date, end: date, db: Session =
 # 3. -- Attendance --
 @app.post("/attendance/", response_model=schemas.Attendance)
 def create_attendance_record(attendance: schemas.AttendanceCreate, db: Session = Depends(get_db)):
-    return crud.create_attendance(db=db, attendance=attendance)
+    result = crud.create_attendance(db=db, attendance=attendance)
+    if result == "EMPLOYEE_NOT_FOUND":
+        raise HTTPException(status_code=404, detail="Ο εργαζόμενος δεν βρέθηκε")
+    if result == "EMPLOYEE_DELETED":
+        raise HTTPException(status_code=410, detail="Ο εργαζόμενος έχει διαγραφεί")
+    if result == "EMPLOYEE_ARCHIVED":
+        raise HTTPException(status_code=400, detail="Ο εργαζόμενος είναι αρχειοθετημένος")
+    return result
 
 @app.get("/attendance/{target_date}", response_model=List[schemas.Attendance])
 def read_attendance_by_date(target_date: date, db: Session = Depends(get_db)):

@@ -59,15 +59,37 @@ export async function updateEmployee(
     return response.json();
 }
 
-export async function deleteEmployee(id: number): Promise<void> {
+export async function archiveEmployee(id: number): Promise<void> {
 
     const response = await fetch(`${BASE_URL}/${id}`, {
         method: "DELETE"
     });
 
     if (!response.ok) {
+        throw new Error("Failed to archive employee");
+    }
+}
+
+export async function softDeleteEmployee(id: number): Promise<void> {
+    const response = await fetch(`${BASE_URL}/${id}/permanent`, {
+        method: "DELETE"
+    });
+
+    if (!response.ok) {
         throw new Error("Failed to delete employee");
     }
+}
+
+export async function restoreEmployee(id: number): Promise<Employee> {
+    const response = await fetch(`${BASE_URL}/${id}/restore`, {
+        method: "POST"
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to restore employee");
+    }
+
+    return response.json();
 }
 
 
